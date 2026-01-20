@@ -32,7 +32,7 @@ export default function StoreDetailPage() {
   }
 
   // Get unique categories for this store's products
-  const storeCategories = [...new Set(products.map((p) => p.category))]
+  const storeCategories = Array.from(new Set(products.map((p) => p.category)))
 
   return (
     <div className="min-h-screen">
