@@ -213,18 +213,16 @@ export default function OrdersPage() {
                             Mark as {ORDER_STATUS_LABELS[nextStatus]}
                           </Button>
                         )}
-                        {order.status !== 'cancelled' && (
-                          <Button
-                            variant="outline"
-                            onClick={(e) => {
-                              e.stopPropagation()
-                              handleStatusChange(order.id, 'cancelled')
-                            }}
-                            className="text-red-600 border-red-200 hover:bg-red-50"
-                          >
-                            Cancel Order
-                          </Button>
-                        )}
+                        <Button
+                          variant="outline"
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            handleStatusChange(order.id, 'cancelled')
+                          }}
+                          className="text-red-600 border-red-200 hover:bg-red-50"
+                        >
+                          Cancel Order
+                        </Button>
                       </div>
                     )}
                   </div>
