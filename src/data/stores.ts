@@ -1,0 +1,73 @@
+import { StoreLocation } from '@/types'
+
+export const stores: StoreLocation[] = [
+  {
+    id: 'store-ab-kirkstall',
+    vendorId: 'abubakr-stores',
+    name: 'Abu Bakr Supermarket - Kirkstall Road',
+    address: '330 Kirkstall Rd, Burley',
+    city: 'Leeds',
+    postcode: 'LS4 2DN',
+    coordinates: {
+      lat: 53.8067,
+      lng: -1.5788,
+    },
+    openingHours: {
+      monday: { open: '09:00', close: '21:00' },
+      tuesday: { open: '09:00', close: '21:00' },
+      wednesday: { open: '09:00', close: '21:00' },
+      thursday: { open: '09:00', close: '21:00' },
+      friday: { open: '09:00', close: '21:00' },
+      saturday: { open: '09:00', close: '21:00' },
+      sunday: { open: '10:00', close: '18:00' },
+    },
+    isActive: true,
+    image: 'https://images.unsplash.com/photo-1604719312566-8912e9227c6a?w=800',
+  },
+  {
+    id: 'store-ab-queens',
+    vendorId: 'abubakr-stores',
+    name: 'Abu Bakr Supermarket - Queens Road',
+    address: "37 Queen's Rd, Burley",
+    city: 'Leeds',
+    postcode: 'LS6 1NY',
+    coordinates: {
+      lat: 53.81,
+      lng: -1.5699,
+    },
+    openingHours: {
+      monday: { open: '09:00', close: '20:00' },
+      tuesday: { open: '09:00', close: '20:00' },
+      wednesday: { open: '09:00', close: '20:00' },
+      thursday: { open: '09:00', close: '20:00' },
+      friday: { open: '09:00', close: '20:00' },
+      saturday: { open: '09:00', close: '20:00' },
+      sunday: { open: '10:00', close: '17:00' },
+    },
+    isActive: true,
+    image: 'https://images.unsplash.com/photo-1578916171728-46686eac8d58?w=800',
+  },
+  {
+    id: 'store-sunnyday',
+    vendorId: 'sunnyday-foods',
+    name: 'Sunnyday International Foods',
+    address: '111 Shirley High St, Shirley',
+    city: 'Southampton',
+    postcode: 'SO16 4EY',
+    coordinates: {
+      lat: 50.9217,
+      lng: -1.4343,
+    },
+    openingHours: {
+      monday: { open: '08:00', close: '20:00' },
+      tuesday: { open: '08:00', close: '20:00' },
+      wednesday: { open: '08:00', close: '20:00' },
+      thursday: { open: '08:00', close: '20:00' },
+      friday: { open: '08:00', close: '20:00' },
+      saturday: { open: '08:00', close: '19:00' },
+      sunday: { open: '09:00', close: '17:00' },
+    },
+    isActive: true,
+    image: 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=800',
+  },
+]
