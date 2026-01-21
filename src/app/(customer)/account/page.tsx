@@ -136,7 +136,7 @@ export default function AccountPage() {
                 <Repeat className="h-5 w-5" />
                 <span className="hidden sm:inline">Regulars</span>
                 {regularProducts.length > 0 && (
-                  <Badge variant={activeTab === 'regulars' ? 'secondary' : 'outline'} size="sm">
+                  <Badge variant={activeTab === 'regulars' ? 'info' : 'outline'} size="sm">
                     {regularProducts.length}
                   </Badge>
                 )}
@@ -152,7 +152,7 @@ export default function AccountPage() {
                 <Heart className="h-5 w-5" />
                 <span className="hidden sm:inline">Favourites</span>
                 {favouriteProducts.length > 0 && (
-                  <Badge variant={activeTab === 'favourites' ? 'secondary' : 'outline'} size="sm">
+                  <Badge variant={activeTab === 'favourites' ? 'info' : 'outline'} size="sm">
                     {favouriteProducts.length}
                   </Badge>
                 )}
@@ -168,7 +168,7 @@ export default function AccountPage() {
                 <ShoppingBag className="h-5 w-5" />
                 <span className="hidden sm:inline">Previously Purchased</span>
                 {previouslyPurchasedProducts.length > 0 && (
-                  <Badge variant={activeTab === 'previously-purchased' ? 'secondary' : 'outline'} size="sm">
+                  <Badge variant={activeTab === 'previously-purchased' ? 'info' : 'outline'} size="sm">
                     {previouslyPurchasedProducts.length}
                   </Badge>
                 )}
