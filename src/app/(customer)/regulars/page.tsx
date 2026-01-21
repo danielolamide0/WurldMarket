@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { ShoppingBasket, Heart, History, Plus, Check } from 'lucide-react'
@@ -15,7 +15,7 @@ import { useToast } from '@/components/ui/toast'
 
 type TabType = 'regulars' | 'favourites' | 'previously-purchased'
 
-export default function RegularsPage() {
+function RegularsContent() {
   const searchParams = useSearchParams()
   const initialTab = (searchParams.get('tab') as TabType) || 'regulars'
   const [activeTab, setActiveTab] = useState<TabType>(initialTab)
@@ -218,5 +218,17 @@ export default function RegularsPage() {
         )}
       </div>
     </div>
+  )
+}
+
+export default function RegularsPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="w-8 h-8 border-4 border-terracotta border-t-transparent rounded-full animate-spin" />
+      </div>
+    }>
+      <RegularsContent />
+    </Suspense>
   )
 }
