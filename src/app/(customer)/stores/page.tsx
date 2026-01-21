@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { MapPin, Navigation, Clock, ExternalLink, Phone, ChevronRight } from 'lucide-react'
+import { MapPin, Clock, ExternalLink, ChevronRight, Loader2 } from 'lucide-react'
 import { stores } from '@/data/stores'
 import { vendors } from '@/data/users'
 import { StoreLocation } from '@/types'
@@ -15,13 +15,11 @@ import { calculateDistance } from '@/lib/utils'
 export default function StoresPage() {
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null)
   const [selectedStore, setSelectedStore] = useState<StoreLocation | null>(null)
-  const [isLocating, setIsLocating] = useState(false)
+  const [isLocating, setIsLocating] = useState(true)
   const [locationError, setLocationError] = useState<string | null>(null)
 
-  const handleGetLocation = () => {
-    setIsLocating(true)
-    setLocationError(null)
-
+  // Automatically request location when page loads
+  useEffect(() => {
     if (!navigator.geolocation) {
       setLocationError('Geolocation is not supported by your browser')
       setIsLocating(false)
@@ -37,13 +35,17 @@ export default function StoresPage() {
         setIsLocating(false)
       },
       (error) => {
-        setLocationError('Unable to get your location. Please enable location services.')
+        // User declined or error occurred
         setIsLocating(false)
-        console.error('Geolocation error:', error)
+        if (error.code === error.PERMISSION_DENIED) {
+          setLocationError('Location access declined. Showing all stores.')
+        } else {
+          setLocationError('Unable to get your location. Showing all stores.')
+        }
       },
       { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
     )
-  }
+  }, [])
 
   // Sort stores by distance if user location is available
   const sortedStores = userLocation
@@ -86,26 +88,21 @@ export default function StoresPage() {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 py-6">
-        {/* Location Button */}
-        <div className="mb-6">
-          <Button
-            onClick={handleGetLocation}
-            isLoading={isLocating}
-            variant={userLocation ? 'secondary' : 'primary'}
-            className="w-full sm:w-auto"
-          >
-            <Navigation className="h-4 w-4 mr-2" />
-            {userLocation ? 'Location Found' : 'Use My Location'}
-          </Button>
-          {locationError && (
-            <p className="text-sm text-red-600 mt-2">{locationError}</p>
-          )}
-          {userLocation && (
-            <p className="text-sm text-forest mt-2">
-              Showing stores sorted by distance from your location
-            </p>
-          )}
-        </div>
+        {/* Location Status */}
+        {isLocating && (
+          <div className="mb-4 flex items-center gap-2 text-gray-600">
+            <Loader2 className="h-4 w-4 animate-spin" />
+            <span>Getting your location...</span>
+          </div>
+        )}
+        {locationError && (
+          <p className="text-sm text-gray-500 mb-4">{locationError}</p>
+        )}
+        {userLocation && !isLocating && (
+          <p className="text-sm text-forest mb-4">
+            Showing stores sorted by distance from your location
+          </p>
+        )}
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Map */}
