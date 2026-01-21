@@ -21,6 +21,7 @@ export function Header() {
   const [searchQuery, setSearchQuery] = useState('')
   const [isSearchOpen, setIsSearchOpen] = useState(false)
   const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false)
+  const [pendingNavigation, setPendingNavigation] = useState<string | null>(null)
   const [searchResults, setSearchResults] = useState<{
     products: Product[]
     stores: StoreLocation[]
@@ -66,6 +67,15 @@ export function Header() {
     setSearchResults({ products: matchedProducts, stores: matchedStores })
   }, [searchQuery, products])
 
+  // Handle navigation after overlay closes
+  useEffect(() => {
+    if (pendingNavigation && !isMobileSearchOpen) {
+      // Overlay has closed, now navigate
+      router.push(pendingNavigation)
+      setPendingNavigation(null)
+    }
+  }, [pendingNavigation, isMobileSearchOpen, router])
+
   // Close search dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -82,35 +92,42 @@ export function Header() {
   }, [])
 
   const handleSearchSelect = (type: 'product' | 'store', id: string) => {
-    // Close mobile overlay first
-    setIsMobileSearchOpen(false)
-    // Clear search state
-    setSearchQuery('')
-    setIsSearchOpen(false)
-    setSearchResults({ products: [], stores: [] })
+    // Determine navigation path
+    const path = type === 'product' ? `/products/${id}` : `/stores/${id}`
     
-    // Small delay to ensure overlay unmounts before navigation
-    setTimeout(() => {
-      if (type === 'product') {
-        router.push(`/products/${id}`)
-      } else {
-        router.push(`/stores/${id}`)
-      }
-    }, 100)
+    // If mobile overlay is open, close it first and queue navigation
+    if (isMobileSearchOpen) {
+      setPendingNavigation(path)
+      setIsMobileSearchOpen(false)
+      // Clear search state
+      setSearchQuery('')
+      setIsSearchOpen(false)
+      setSearchResults({ products: [], stores: [] })
+    } else {
+      // Desktop: navigate immediately
+      setSearchQuery('')
+      setIsSearchOpen(false)
+      setSearchResults({ products: [], stores: [] })
+      router.push(path)
+    }
   }
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     if (searchQuery.trim()) {
       const query = searchQuery.trim()
-      // Close mobile overlay first
-      setIsMobileSearchOpen(false)
-      setIsSearchOpen(false)
+      const path = `/search?q=${encodeURIComponent(query)}`
       
-      // Small delay to ensure overlay unmounts before navigation
-      setTimeout(() => {
-        router.push(`/search?q=${encodeURIComponent(query)}`)
-      }, 100)
+      // If mobile overlay is open, close it first and queue navigation
+      if (isMobileSearchOpen) {
+        setPendingNavigation(path)
+        setIsMobileSearchOpen(false)
+        setIsSearchOpen(false)
+      } else {
+        // Desktop: navigate immediately
+        setIsSearchOpen(false)
+        router.push(path)
+      }
     }
   }
 
