@@ -283,7 +283,7 @@ export default function CheckoutPage() {
       </div>
 
       {/* Fixed Bottom Button */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 p-4 md:hidden">
+      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 p-4 md:hidden z-[60]">
         <Button
           onClick={handleSubmitOrder}
           isLoading={isProcessing}

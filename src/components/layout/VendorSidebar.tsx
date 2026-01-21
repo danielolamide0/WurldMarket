@@ -20,7 +20,7 @@ import { useState } from 'react'
 const navItems = [
   { href: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
   { href: '/inventory', icon: Package, label: 'Inventory' },
-  { href: '/orders', icon: ShoppingCart, label: 'Orders' },
+  { href: '/vendor/orders', icon: ShoppingCart, label: 'Orders' },
   { href: '/my-stores', icon: Store, label: 'My Stores' },
 ]
 
@@ -58,7 +58,7 @@ export function VendorSidebar() {
       <nav className="flex-1 p-4">
         <ul className="space-y-2">
           {navItems.map(({ href, icon: Icon, label }) => {
-            const isActive = pathname === href || (href !== '/dashboard' && pathname.startsWith(href))
+            const isActive = pathname === href || (href !== '/dashboard' && pathname.startsWith(href)) || (href === '/vendor/orders' && pathname.startsWith('/vendor/orders'))
 
             return (
               <li key={href}>

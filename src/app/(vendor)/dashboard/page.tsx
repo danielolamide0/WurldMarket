@@ -54,21 +54,21 @@ export default function VendorDashboardPage() {
       value: orders.length,
       icon: ShoppingCart,
       color: 'bg-green-50 text-green-600',
-      href: '/orders',
+      href: '/vendor/orders',
     },
     {
       label: 'Revenue',
       value: formatPrice(totalRevenue),
       icon: DollarSign,
       color: 'bg-terracotta/10 text-terracotta',
-      href: '/orders',
+      href: '/vendor/orders',
     },
     {
       label: 'Pending Orders',
       value: pendingOrdersCount,
       icon: TrendingUp,
       color: 'bg-purple-50 text-purple-600',
-      href: '/orders',
+      href: '/vendor/orders',
     },
   ]
 
@@ -106,7 +106,7 @@ export default function VendorDashboardPage() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between">
             <h2 className="font-semibold text-gray-900">Recent Orders</h2>
-            <Link href="/orders" className="text-sm text-terracotta hover:underline flex items-center gap-1">
+            <Link href="/vendor/orders" className="text-sm text-terracotta hover:underline flex items-center gap-1">
               View All <ArrowRight className="h-4 w-4" />
             </Link>
           </CardHeader>
@@ -199,7 +199,7 @@ export default function VendorDashboardPage() {
                 Add New Product
               </Button>
             </Link>
-            <Link href="/orders">
+            <Link href="/vendor/orders">
               <Button variant="outline">
                 <ShoppingCart className="h-4 w-4 mr-2" />
                 View All Orders

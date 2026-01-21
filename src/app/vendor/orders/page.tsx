@@ -15,7 +15,7 @@ import { OrderStatus } from '@/types'
 
 const statusOptions: OrderStatus[] = ['pending', 'confirmed', 'preparing', 'ready', 'completed', 'cancelled']
 
-export default function OrdersPage() {
+export default function VendorOrdersPage() {
   const { user } = useAuthStore()
   const { addToast } = useToast()
   const orders = useOrderStore((state) =>
