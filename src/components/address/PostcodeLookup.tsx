@@ -145,7 +145,7 @@ export function PostcodeLookup({ onAddressSelect, onManualEntry }: PostcodeLooku
 
   const handleManualEntry = () => {
     setShowDropdown(false)
-    onManualEntry()
+    onManualEntry?.()
   }
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
