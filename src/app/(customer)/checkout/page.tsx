@@ -137,7 +137,7 @@ export default function CheckoutPage() {
     await new Promise((resolve) => setTimeout(resolve, 1500))
 
     // Create order
-    const order = createOrder(
+    const order = await createOrder(
       items,
       user?.id || 'guest',
       customerName,
@@ -146,6 +146,12 @@ export default function CheckoutPage() {
       orderType === 'delivery' ? address : undefined,
       notes || undefined
     )
+
+    if (!order) {
+      addToast('Failed to create order. Please try again.', 'error')
+      setIsProcessing(false)
+      return
+    }
 
     // Decrement stock for all items
     items.forEach((item) => {
