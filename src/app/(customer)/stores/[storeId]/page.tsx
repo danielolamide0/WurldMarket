@@ -1,5 +1,6 @@
 'use client'
 
+import { useEffect } from 'react'
 import { useParams } from 'next/navigation'
 import Link from 'next/link'
 import { ArrowLeft, MapPin, Clock, Phone, ExternalLink } from 'lucide-react'
@@ -17,6 +18,12 @@ export default function StoreDetailPage() {
   const store = stores.find((s) => s.id === storeId)
   const vendor = store ? vendors.find((v) => v.id === store.vendorId) : null
   const products = useProductStore((state) => state.getProductsByStore(storeId))
+  const initializeProducts = useProductStore((state) => state.initializeProducts)
+
+  // Ensure products are initialized
+  useEffect(() => {
+    initializeProducts()
+  }, [initializeProducts])
 
   if (!store) {
     return (

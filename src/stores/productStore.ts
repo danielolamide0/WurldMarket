@@ -27,8 +27,10 @@ export const useProductStore = create<ProductState>()(
 
       initializeProducts: () => {
         const currentProducts = get().products
-        if (currentProducts.length === 0) {
-          set({ products: initialProducts })
+        // Always initialize if store is empty and we have initial products
+        // This ensures products are loaded even if localStorage was cleared or corrupted
+        if (currentProducts.length === 0 && initialProducts.length > 0) {
+          set({ products: [...initialProducts] })
         }
       },
 
@@ -98,6 +100,13 @@ export const useProductStore = create<ProductState>()(
     }),
     {
       name: 'wurldbasket-products',
+      version: 1,
+      onRehydrateStorage: () => (state) => {
+        // After rehydration, ensure products are initialized if empty
+        if (state && state.products.length === 0 && initialProducts.length > 0) {
+          state.products = [...initialProducts]
+        }
+      },
     }
   )
 )
