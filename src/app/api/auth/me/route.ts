@@ -38,15 +38,20 @@ export async function PUT(request: NextRequest) {
   try {
     await dbConnect()
 
-    const userId = request.headers.get('x-user-id')
+    const body = await request.json()
+    const { userId, name, email, phone } = body
+
     if (!userId) {
-      return NextResponse.json({ error: 'Not authenticated' }, { status: 401 })
+      return NextResponse.json({ error: 'User ID is required' }, { status: 400 })
     }
 
-    const body = await request.json()
-    const { name, email, phone } = body
+    // Build update object with only provided fields
+    const updateData: { name?: string; email?: string; phone?: string } = {}
+    if (name !== undefined) updateData.name = name
+    if (email !== undefined) updateData.email = email
+    if (phone !== undefined) updateData.phone = phone
 
-    const user = await User.findByIdAndUpdate(userId, { name, email, phone }, { new: true })
+    const user = await User.findByIdAndUpdate(userId, updateData, { new: true })
     if (!user) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 })
     }

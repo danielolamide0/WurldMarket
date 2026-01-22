@@ -1,5 +1,6 @@
 'use client'
 
+import { useEffect } from 'react'
 import Link from 'next/link'
 import { MapPin, ArrowRight, Star, Clock, Truck, ShoppingBasket, ClipboardList, Package, ChevronRight, Heart } from 'lucide-react'
 import { useProductStore } from '@/stores/productStore'
@@ -20,13 +21,30 @@ export default function HomePage() {
   const featuredProducts = products.filter((p) => p.isActive).slice(0, 8)
   const { user, isAuthenticated } = useAuthStore()
   const { getOrdersByCustomer } = useOrderStore()
-  const { favourites, getPreviouslyPurchased } = useCustomerStore()
+  const { favourites, getRegulars, userId, setUserId, fetchCustomerData } = useCustomerStore()
   const stores = useVendorStore((state) => state.stores)
   const vendors = useVendorStore((state) => state.vendors)
 
+  // Sync customerStore when user changes
+  useEffect(() => {
+    if (isAuthenticated && user?.id && user?.role === 'customer') {
+      // If userId changed, clear old data and fetch new user's data
+      if (userId !== user.id) {
+        setUserId(user.id)
+        fetchCustomerData(user.id)
+      } else if (userId === user.id) {
+        // Same user, just ensure data is fresh
+        fetchCustomerData(user.id)
+      }
+    } else if (!isAuthenticated) {
+      // User logged out, clear customer data
+      setUserId(null)
+    }
+  }, [isAuthenticated, user?.id, userId, setUserId, fetchCustomerData])
+
   const customerOrders = user ? getOrdersByCustomer(user.id) : []
   const mostRecentOrder = customerOrders[0]
-  const regularsCount = getPreviouslyPurchased().length
+  const regularsCount = getRegulars().length
   const favouritesCount = favourites.length
 
   // Show personalized homepage for signed-in customers

@@ -26,6 +26,7 @@ interface CustomerState {
   isRegular: (vendorId: string) => boolean
   recordPurchase: (productId: string, quantity?: number) => Promise<void>
   getPreviouslyPurchased: () => string[]
+  getRegulars: () => string[]
   clearCustomerData: () => void
 }
 
@@ -39,9 +40,27 @@ export const useCustomerStore = create<CustomerState>()(
       isLoading: false,
 
       setUserId: (userId: string | null) => {
+        const currentUserId = get().userId
+        
+        // If userId is changing (and not just logging out), clear old data
+        if (currentUserId && userId && currentUserId !== userId) {
+          // User is switching - clear old data first and clear localStorage
+          set({ favourites: [], regulars: [], purchaseHistory: [] })
+          // Clear localStorage for the old user
+          if (typeof window !== 'undefined') {
+            localStorage.removeItem('wurldbasket-customer')
+          }
+        }
+        
         set({ userId })
+        
+        // If logging out, clear all data
         if (!userId) {
           set({ favourites: [], regulars: [], purchaseHistory: [] })
+          // Clear localStorage on logout
+          if (typeof window !== 'undefined') {
+            localStorage.removeItem('wurldbasket-customer')
+          }
         }
       },
 
@@ -74,11 +93,19 @@ export const useCustomerStore = create<CustomerState>()(
         set((state) => ({ favourites: [...state.favourites, productId] }))
 
         try {
-          await fetch('/api/customer-data', {
+          const response = await fetch('/api/customer-data', {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ userId, action: 'addFavorite', productId }),
           })
+
+          if (response.ok) {
+            // Refresh data from server to ensure sync
+            await get().fetchCustomerData(userId)
+          } else {
+            // Revert on error
+            set((state) => ({ favourites: state.favourites.filter((id) => id !== productId) }))
+          }
         } catch {
           // Revert on error
           set((state) => ({ favourites: state.favourites.filter((id) => id !== productId) }))
@@ -170,11 +197,23 @@ export const useCustomerStore = create<CustomerState>()(
         set((state) => ({ purchaseHistory: [...state.purchaseHistory, newRecord] }))
 
         try {
-          await fetch('/api/customer-data', {
+          const response = await fetch('/api/customer-data', {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ userId, action: 'recordPurchase', productId, quantity }),
           })
+
+          if (response.ok) {
+            // Refresh data from server to ensure sync
+            await get().fetchCustomerData(userId)
+          } else {
+            // Revert on error
+            set((state) => ({
+              purchaseHistory: state.purchaseHistory.filter(
+                (r) => !(r.productId === productId && r.purchasedAt === newRecord.purchasedAt)
+              ),
+            }))
+          }
         } catch {
           // Revert on error
           set((state) => ({
@@ -202,6 +241,23 @@ export const useCustomerStore = create<CustomerState>()(
           .map(([productId]) => productId)
       },
 
+      getRegulars: () => {
+        // Return product IDs that have been ordered more than twice
+        const history = get().purchaseHistory
+        const productCounts = new Map<string, number>()
+
+        // Count how many times each product has been purchased
+        history.forEach((record) => {
+          const currentCount = productCounts.get(record.productId) || 0
+          productCounts.set(record.productId, currentCount + record.quantity)
+        })
+
+        // Return product IDs that have been purchased more than twice
+        return Array.from(productCounts.entries())
+          .filter(([_, count]) => count > 2)
+          .map(([productId]) => productId)
+      },
+
       clearCustomerData: () => {
         set({ userId: null, favourites: [], regulars: [], purchaseHistory: [] })
       },
@@ -214,6 +270,41 @@ export const useCustomerStore = create<CustomerState>()(
         regulars: state.regulars,
         purchaseHistory: state.purchaseHistory,
       }),
+      onRehydrateStorage: () => {
+        return (state) => {
+          // When rehydrating, validate userId matches current logged-in user
+          if (state && typeof window !== 'undefined') {
+            try {
+              const authData = localStorage.getItem('wurldbasket-auth')
+              if (authData) {
+                const auth = JSON.parse(authData)
+                const currentUserId = auth.state?.user?.id
+                // If userId doesn't match, clear the data
+                if (currentUserId && state.userId && state.userId !== currentUserId) {
+                  state.userId = null
+                  state.favourites = []
+                  state.regulars = []
+                  state.purchaseHistory = []
+                }
+              } else if (state.userId) {
+                // No auth data but customer data exists - clear it
+                state.userId = null
+                state.favourites = []
+                state.regulars = []
+                state.purchaseHistory = []
+              }
+            } catch {
+              // If parsing fails, clear customer data to be safe
+              if (state) {
+                state.userId = null
+                state.favourites = []
+                state.regulars = []
+                state.purchaseHistory = []
+              }
+            }
+          }
+        }
+      },
     }
   )
 )

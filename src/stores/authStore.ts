@@ -22,6 +22,7 @@ interface AuthState {
   checkUsernameExists: (username: string) => Promise<boolean>
   resetPassword: (username: string) => Promise<{ success: boolean; error?: string }>
   updateUser: (updates: Partial<User>) => Promise<boolean>
+  deleteAccount: (userId: string) => Promise<boolean>
   logout: () => void
   clearError: () => void
 }
@@ -191,6 +192,33 @@ export const useAuthStore = create<AuthState>()(
           return true
         } catch (error) {
           set({ isLoading: false, error: 'Failed to connect to server' })
+          return false
+        }
+      },
+
+      deleteAccount: async (userId: string) => {
+        set({ isLoading: true, error: null })
+
+        try {
+          // Remove from localStorage
+          const storedUsers = localStorage.getItem('wurldbasket-users')
+          if (storedUsers) {
+            let registeredUsers: User[] = JSON.parse(storedUsers)
+            registeredUsers = registeredUsers.filter((u) => u.id !== userId)
+            localStorage.setItem('wurldbasket-users', JSON.stringify(registeredUsers))
+          }
+
+          // Clear auth state
+          set({
+            user: null,
+            isAuthenticated: false,
+            isLoading: false,
+            error: null,
+          })
+
+          return true
+        } catch (error) {
+          set({ isLoading: false, error: 'Failed to delete account' })
           return false
         }
       },

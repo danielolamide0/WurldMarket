@@ -26,7 +26,7 @@ export default function CheckoutPage() {
   const { user, isAuthenticated } = useAuthStore()
   const { createOrder } = useOrderStore()
   const { decrementStock } = useProductStore()
-  const { recordPurchase } = useCustomerStore()
+  const { fetchCustomerData } = useCustomerStore()
   const { getAddressesByUser, getPrimaryAddress } = useAddressStore()
   const { stores, fetchStores } = useVendorStore()
   const { addToast } = useToast()
@@ -165,10 +165,10 @@ export default function CheckoutPage() {
     })
 
     // Record purchases for customer history (if authenticated)
+    // Note: The order API also records purchases, so we'll refresh customer data after order
     if (user && user.role === 'customer') {
-      items.forEach((item) => {
-        recordPurchase(item.productId, item.quantity)
-      })
+      // Refresh customer data to get the purchases recorded by the order API
+      await fetchCustomerData(user.id)
     }
 
     // Clear cart

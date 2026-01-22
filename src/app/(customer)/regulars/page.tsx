@@ -20,11 +20,28 @@ function RegularsContent() {
   const initialTab = (searchParams.get('tab') as TabType) || 'regulars'
   const [activeTab, setActiveTab] = useState<TabType>(initialTab)
 
-  const { isAuthenticated } = useAuthStore()
+  const { isAuthenticated, user } = useAuthStore()
   const products = useProductStore((state) => state.products)
-  const { favourites, regulars, getPreviouslyPurchased } = useCustomerStore()
+  const { favourites, getPreviouslyPurchased, getRegulars, fetchCustomerData, userId, setUserId } = useCustomerStore()
   const { addItem } = useCartStore()
   const { addToast } = useToast()
+
+  // Sync customerStore when user changes
+  useEffect(() => {
+    if (isAuthenticated && user?.id && user?.role === 'customer') {
+      // If userId changed, clear old data and fetch new user's data
+      if (userId !== user.id) {
+        setUserId(user.id)
+        fetchCustomerData(user.id)
+      } else if (userId === user.id) {
+        // Same user, just ensure data is fresh
+        fetchCustomerData(user.id)
+      }
+    } else if (!isAuthenticated) {
+      // User logged out, clear customer data
+      setUserId(null)
+    }
+  }, [isAuthenticated, user?.id, userId, setUserId, fetchCustomerData])
 
   // Update tab when URL changes
   useEffect(() => {
@@ -35,9 +52,10 @@ function RegularsContent() {
   }, [searchParams])
 
   const previouslyPurchasedIds = getPreviouslyPurchased()
+  const regularsProductIds = getRegulars()
 
-  // Regulars are products from vendors the user frequently shops at
-  const regularsProducts = products.filter((p) => regulars.includes(p.vendorId))
+  // Regulars are products ordered more than twice
+  const regularsProducts = products.filter((p) => regularsProductIds.includes(p.id))
   const favouritesProducts = products.filter((p) => favourites.includes(p.id))
   const previouslyPurchasedProducts = products.filter((p) => previouslyPurchasedIds.includes(p.id))
 
