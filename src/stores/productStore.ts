@@ -1,17 +1,15 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import { Product } from '@/types'
-import { products as initialProducts } from '@/data/products'
-import { generateId } from '@/lib/utils'
 
 interface ProductState {
   products: Product[]
   isLoading: boolean
-  initializeProducts: () => void
-  addProduct: (product: Omit<Product, 'id' | 'createdAt' | 'updatedAt'>) => Product
-  updateProduct: (id: string, updates: Partial<Product>) => void
-  deleteProduct: (id: string) => void
-  decrementStock: (id: string, quantity: number) => void
+  fetchProducts: (params?: { storeId?: string; vendorId?: string; category?: string }) => Promise<void>
+  addProduct: (product: Omit<Product, 'id' | 'createdAt' | 'updatedAt'>) => Promise<Product | null>
+  updateProduct: (id: string, updates: Partial<Product>) => Promise<void>
+  deleteProduct: (id: string) => Promise<void>
+  decrementStock: (id: string, quantity: number) => Promise<void>
   getProductById: (id: string) => Product | undefined
   getProductsByStore: (storeId: string) => Product[]
   getProductsByVendor: (vendorId: string) => Product[]
@@ -25,32 +23,54 @@ export const useProductStore = create<ProductState>()(
       products: [],
       isLoading: false,
 
-      initializeProducts: () => {
-        const currentProducts = get().products
-        // Always initialize if store is empty and we have initial products
-        // This ensures products are loaded even if localStorage was cleared or corrupted
-        if (currentProducts.length === 0 && initialProducts.length > 0) {
-          set({ products: [...initialProducts] })
+      fetchProducts: async (params) => {
+        set({ isLoading: true })
+        try {
+          const searchParams = new URLSearchParams()
+          if (params?.storeId) searchParams.set('storeId', params.storeId)
+          if (params?.vendorId) searchParams.set('vendorId', params.vendorId)
+          if (params?.category) searchParams.set('category', params.category)
+
+          const url = `/api/products${searchParams.toString() ? `?${searchParams}` : ''}`
+          const response = await fetch(url)
+          const data = await response.json()
+
+          if (response.ok) {
+            set({ products: data.products || [], isLoading: false })
+          } else {
+            set({ isLoading: false })
+          }
+        } catch {
+          set({ isLoading: false })
         }
       },
 
-      addProduct: (productData) => {
-        const now = new Date().toISOString()
-        const newProduct: Product = {
-          ...productData,
-          id: `prod-${generateId()}`,
-          createdAt: now,
-          updatedAt: now,
+      addProduct: async (productData) => {
+        try {
+          const response = await fetch('/api/products', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(productData),
+          })
+
+          const data = await response.json()
+
+          if (response.ok) {
+            const newProduct = data.product
+            set((state) => ({
+              products: [...state.products, newProduct],
+            }))
+            return newProduct
+          }
+          return null
+        } catch {
+          return null
         }
-
-        set((state) => ({
-          products: [...state.products, newProduct],
-        }))
-
-        return newProduct
       },
 
-      updateProduct: (id, updates) => {
+      updateProduct: async (id, updates) => {
+        // Optimistically update
+        const originalProducts = get().products
         set((state) => ({
           products: state.products.map((p) =>
             p.id === id
@@ -58,22 +78,52 @@ export const useProductStore = create<ProductState>()(
               : p
           ),
         }))
+
+        try {
+          const response = await fetch('/api/products', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id, ...updates }),
+          })
+
+          if (!response.ok) {
+            // Revert on error
+            set({ products: originalProducts })
+          }
+        } catch {
+          // Revert on error
+          set({ products: originalProducts })
+        }
       },
 
-      deleteProduct: (id) => {
+      deleteProduct: async (id) => {
+        const originalProducts = get().products
+        // Optimistically update
         set((state) => ({
           products: state.products.filter((p) => p.id !== id),
         }))
+
+        try {
+          const response = await fetch(`/api/products?id=${id}`, {
+            method: 'DELETE',
+          })
+
+          if (!response.ok) {
+            // Revert on error
+            set({ products: originalProducts })
+          }
+        } catch {
+          // Revert on error
+          set({ products: originalProducts })
+        }
       },
 
-      decrementStock: (id, quantity) => {
-        set((state) => ({
-          products: state.products.map((p) =>
-            p.id === id
-              ? { ...p, stock: Math.max(0, p.stock - quantity), updatedAt: new Date().toISOString() }
-              : p
-          ),
-        }))
+      decrementStock: async (id, quantity) => {
+        const product = get().products.find((p) => p.id === id)
+        if (!product) return
+
+        const newStock = Math.max(0, product.stock - quantity)
+        await get().updateProduct(id, { stock: newStock })
       },
 
       getProductById: (id) => {
@@ -100,13 +150,7 @@ export const useProductStore = create<ProductState>()(
     }),
     {
       name: 'wurldbasket-products',
-      version: 1,
-      onRehydrateStorage: () => (state) => {
-        // After rehydration, ensure products are initialized if empty
-        if (state && state.products.length === 0 && initialProducts.length > 0) {
-          state.products = [...initialProducts]
-        }
-      },
+      version: 2,
     }
   )
 )

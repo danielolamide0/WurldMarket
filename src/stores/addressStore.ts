@@ -1,10 +1,11 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import { SavedAddress } from '@/types'
-import { generateId } from '@/lib/utils'
 
 interface AddressState {
   addresses: SavedAddress[]
+  isLoading: boolean
+  fetchAddresses: (userId: string) => Promise<void>
   addAddress: (
     userId: string,
     label: string,
@@ -12,13 +13,13 @@ interface AddressState {
     city: string,
     postcode: string,
     isPrimary?: boolean
-  ) => SavedAddress
+  ) => Promise<SavedAddress | null>
   updateAddress: (
     addressId: string,
     updates: Partial<Omit<SavedAddress, 'id' | 'userId' | 'createdAt'>>
-  ) => void
-  deleteAddress: (addressId: string) => void
-  setPrimaryAddress: (userId: string, addressId: string) => void
+  ) => Promise<void>
+  deleteAddress: (addressId: string) => Promise<void>
+  setPrimaryAddress: (userId: string, addressId: string) => Promise<void>
   getAddressesByUser: (userId: string) => SavedAddress[]
   getPrimaryAddress: (userId: string) => SavedAddress | undefined
 }
@@ -27,75 +28,126 @@ export const useAddressStore = create<AddressState>()(
   persist(
     (set, get) => ({
       addresses: [],
+      isLoading: false,
 
-      addAddress: (userId, label, fullAddress, city, postcode, isPrimary = false) => {
-        const newAddress: SavedAddress = {
-          id: `addr-${generateId()}`,
-          userId,
-          label,
-          fullAddress,
-          city,
-          postcode,
-          isPrimary: false,
-          createdAt: new Date().toISOString(),
+      fetchAddresses: async (userId: string) => {
+        set({ isLoading: true })
+        try {
+          const response = await fetch(`/api/addresses?userId=${userId}`)
+          const data = await response.json()
+          if (response.ok) {
+            set({ addresses: data.addresses || [], isLoading: false })
+          } else {
+            set({ isLoading: false })
+          }
+        } catch {
+          set({ isLoading: false })
         }
+      },
 
-        set((state) => {
-          let updatedAddresses = [...state.addresses, newAddress]
+      addAddress: async (userId, label, fullAddress, city, postcode, isPrimary = false) => {
+        try {
+          const response = await fetch('/api/addresses', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ userId, label, fullAddress, city, postcode, isPrimary }),
+          })
 
-          // If this is the first address for the user or isPrimary is true, make it primary
-          const userAddresses = updatedAddresses.filter((a) => a.userId === userId)
-          if (userAddresses.length === 1 || isPrimary) {
-            updatedAddresses = updatedAddresses.map((a) => ({
-              ...a,
-              isPrimary: a.userId === userId ? a.id === newAddress.id : a.isPrimary,
+          const data = await response.json()
+
+          if (response.ok) {
+            const newAddress = data.address
+            set((state) => {
+              // If new address is primary, update others
+              let updatedAddresses = state.addresses
+              if (newAddress.isPrimary) {
+                updatedAddresses = updatedAddresses.map((a) => ({
+                  ...a,
+                  isPrimary: a.userId === userId ? false : a.isPrimary,
+                }))
+              }
+              return { addresses: [...updatedAddresses, newAddress] }
+            })
+            return newAddress
+          }
+          return null
+        } catch {
+          return null
+        }
+      },
+
+      updateAddress: async (addressId, updates) => {
+        try {
+          const response = await fetch('/api/addresses', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id: addressId, ...updates }),
+          })
+
+          if (response.ok) {
+            const data = await response.json()
+            set((state) => ({
+              addresses: state.addresses.map((address) =>
+                address.id === addressId ? data.address : address
+              ),
             }))
-            newAddress.isPrimary = true
           }
-
-          return { addresses: updatedAddresses }
-        })
-
-        return newAddress
+        } catch {
+          // Handle error silently
+        }
       },
 
-      updateAddress: (addressId, updates) => {
-        set((state) => ({
-          addresses: state.addresses.map((address) =>
-            address.id === addressId ? { ...address, ...updates } : address
-          ),
-        }))
-      },
+      deleteAddress: async (addressId) => {
+        try {
+          const response = await fetch(`/api/addresses?id=${addressId}`, {
+            method: 'DELETE',
+          })
 
-      deleteAddress: (addressId) => {
-        set((state) => {
-          const addressToDelete = state.addresses.find((a) => a.id === addressId)
-          let updatedAddresses = state.addresses.filter((a) => a.id !== addressId)
+          if (response.ok) {
+            set((state) => {
+              const addressToDelete = state.addresses.find((a) => a.id === addressId)
+              let updatedAddresses = state.addresses.filter((a) => a.id !== addressId)
 
-          // If deleted address was primary, make the first remaining address primary
-          if (addressToDelete?.isPrimary) {
-            const userAddresses = updatedAddresses.filter(
-              (a) => a.userId === addressToDelete.userId
-            )
-            if (userAddresses.length > 0) {
-              updatedAddresses = updatedAddresses.map((a) =>
-                a.id === userAddresses[0].id ? { ...a, isPrimary: true } : a
-              )
-            }
+              // If deleted address was primary, make the first remaining address primary
+              if (addressToDelete?.isPrimary) {
+                const userAddresses = updatedAddresses.filter(
+                  (a) => a.userId === addressToDelete.userId
+                )
+                if (userAddresses.length > 0) {
+                  updatedAddresses = updatedAddresses.map((a) =>
+                    a.id === userAddresses[0].id ? { ...a, isPrimary: true } : a
+                  )
+                }
+              }
+
+              return { addresses: updatedAddresses }
+            })
           }
-
-          return { addresses: updatedAddresses }
-        })
+        } catch {
+          // Handle error silently
+        }
       },
 
-      setPrimaryAddress: (userId, addressId) => {
-        set((state) => ({
-          addresses: state.addresses.map((address) => ({
-            ...address,
-            isPrimary:
-              address.userId === userId ? address.id === addressId : address.isPrimary,
-          })),
-        }))
+      setPrimaryAddress: async (userId, addressId) => {
+        try {
+          const response = await fetch('/api/addresses', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id: addressId, isPrimary: true }),
+          })
+
+          if (response.ok) {
+            set((state) => ({
+              addresses: state.addresses.map((address) => ({
+                ...address,
+                isPrimary:
+                  address.userId === userId ? address.id === addressId : address.isPrimary,
+              })),
+            }))
+          }
+        } catch {
+          // Handle error silently
+        }
       },
 
       getAddressesByUser: (userId) => {

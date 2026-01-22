@@ -1,17 +1,15 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import { User } from '@/types'
-import { users } from '@/data/users'
-import { generateId } from '@/lib/utils'
 
 interface SignupOptions {
   username: string
   password: string
   name: string
   email?: string
-  phone?: string // Optional phone number for customers
+  phone?: string
   role?: 'customer' | 'vendor'
-  companyName?: string // Required for vendor signup
+  companyName?: string
 }
 
 interface AuthState {
@@ -21,7 +19,7 @@ interface AuthState {
   error: string | null
   login: (username: string, password: string) => Promise<boolean>
   signup: (options: SignupOptions) => Promise<{ success: boolean; error?: string; vendorId?: string }>
-  checkUsernameExists: (username: string) => boolean
+  checkUsernameExists: (username: string) => Promise<boolean>
   resetPassword: (username: string) => Promise<{ success: boolean; error?: string }>
   updateUser: (updates: Partial<User>) => Promise<boolean>
   logout: () => void
@@ -30,7 +28,7 @@ interface AuthState {
 
 export const useAuthStore = create<AuthState>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       user: null,
       isAuthenticated: false,
       isLoading: false,
@@ -39,54 +37,38 @@ export const useAuthStore = create<AuthState>()(
       login: async (username: string, password: string) => {
         set({ isLoading: true, error: null })
 
-        // Simulate API delay
-        await new Promise((resolve) => setTimeout(resolve, 500))
+        try {
+          const response = await fetch('/api/auth/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, password }),
+          })
 
-        // Check in-memory users first (for demo users)
-        let user = users.find(
-          (u) => u.username === username && u.password === password
-        )
+          const data = await response.json()
 
-        // If not found, check localStorage for registered users
-        if (!user) {
-          const storedUsers = localStorage.getItem('wurldbasket-users')
-          if (storedUsers) {
-            const registeredUsers: User[] = JSON.parse(storedUsers)
-            user = registeredUsers.find(
-              (u) => u.username === username && u.password === password
-            )
+          if (!response.ok) {
+            set({
+              user: null,
+              isAuthenticated: false,
+              isLoading: false,
+              error: data.error || 'Invalid username or password',
+            })
+            return false
           }
-        }
 
-        if (user) {
-          // Don't store password in state
-          const { password: _, ...safeUser } = user
           set({
-            user: user,
+            user: data.user,
             isAuthenticated: true,
             isLoading: false,
             error: null,
           })
           return true
-        } else {
-          // Check if username exists but password is wrong
-          const usernameExists = users.some((u) => u.username === username) ||
-            (() => {
-              const storedUsers = localStorage.getItem('wurldbasket-users')
-              if (storedUsers) {
-                const registeredUsers: User[] = JSON.parse(storedUsers)
-                return registeredUsers.some((u) => u.username === username)
-              }
-              return false
-            })()
-
+        } catch (error) {
           set({
             user: null,
             isAuthenticated: false,
             isLoading: false,
-            error: usernameExists
-              ? 'Incorrect password. Please try again or reset your password.'
-              : 'Invalid username or password',
+            error: 'Failed to connect to server',
           })
           return false
         }
@@ -96,167 +78,121 @@ export const useAuthStore = create<AuthState>()(
         const { username, password, name, email, phone, role = 'customer', companyName } = options
         set({ isLoading: true, error: null })
 
-        // Simulate API delay
-        await new Promise((resolve) => setTimeout(resolve, 500))
-
-        // Check if username already exists
-        const usernameExists = users.some((u) => u.username === username) ||
-          (() => {
-            const storedUsers = localStorage.getItem('wurldbasket-users')
-            if (storedUsers) {
-              const registeredUsers: User[] = JSON.parse(storedUsers)
-              return registeredUsers.some((u) => u.username === username)
-            }
-            return false
-          })()
-
-        if (usernameExists) {
-          set({
-            isLoading: false,
-            error: 'Username already exists. Please choose a different username.',
+        try {
+          const response = await fetch('/api/auth/signup', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              username,
+              password,
+              name,
+              email,
+              phone,
+              role,
+              companyName,
+            }),
           })
-          return { success: false, error: 'Username already exists' }
-        }
 
-        // For vendor signup, create vendor profile
-        let vendorId: string | undefined
-        if (role === 'vendor') {
-          if (!companyName) {
+          const data = await response.json()
+
+          if (!response.ok) {
             set({
               isLoading: false,
-              error: 'Company name is required for vendor signup.',
+              error: data.error || 'Signup failed',
             })
-            return { success: false, error: 'Company name required' }
+            return { success: false, error: data.error }
           }
 
-          // Create vendor ID based on company name
-          const slug = companyName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')
-          vendorId = `vendor-${slug}-${generateId()}`
+          set({
+            user: data.user,
+            isAuthenticated: true,
+            isLoading: false,
+            error: null,
+          })
 
-          // Store vendor in localStorage
-          const storedVendors = localStorage.getItem('wurldbasket-vendors')
-          const registeredVendors = storedVendors ? JSON.parse(storedVendors) : []
-          const newVendor = {
-            id: vendorId,
-            name: companyName,
-            slug,
-            description: '',
-            storeIds: [],
-            contactEmail: email || '',
-            contactPhone: '',
-            isLive: false,
-            createdAt: new Date().toISOString(),
-          }
-          registeredVendors.push(newVendor)
-          localStorage.setItem('wurldbasket-vendors', JSON.stringify(registeredVendors))
+          return { success: true, vendorId: data.vendorId }
+        } catch (error) {
+          set({
+            isLoading: false,
+            error: 'Failed to connect to server',
+          })
+          return { success: false, error: 'Failed to connect to server' }
         }
-
-        // Create new user
-        const newUser: User = {
-          id: role === 'vendor' ? `vendor-user-${generateId()}` : `cust-${generateId()}`,
-          username,
-          password, // In production, this should be hashed
-          role,
-          name,
-          email,
-          phone, // Optional phone number
-          vendorId, // Will be undefined for customers
-          createdAt: new Date().toISOString(),
-        }
-
-        // Store in localStorage (for demo - will be replaced with database)
-        const storedUsers = localStorage.getItem('wurldbasket-users')
-        const registeredUsers: User[] = storedUsers ? JSON.parse(storedUsers) : []
-        registeredUsers.push(newUser)
-        localStorage.setItem('wurldbasket-users', JSON.stringify(registeredUsers))
-
-        set({
-          user: newUser,
-          isAuthenticated: true,
-          isLoading: false,
-          error: null,
-        })
-
-        return { success: true, vendorId }
       },
 
-      checkUsernameExists: (username: string) => {
-        const existsInMemory = users.some((u) => u.username === username)
-        if (existsInMemory) return true
-
-        const storedUsers = localStorage.getItem('wurldbasket-users')
-        if (storedUsers) {
-          const registeredUsers: User[] = JSON.parse(storedUsers)
-          return registeredUsers.some((u) => u.username === username)
+      checkUsernameExists: async (username: string) => {
+        try {
+          const response = await fetch(`/api/auth/check-username?username=${encodeURIComponent(username)}`)
+          const data = await response.json()
+          return data.exists
+        } catch {
+          return false
         }
-        return false
       },
 
       resetPassword: async (username: string) => {
         set({ isLoading: true, error: null })
 
-        // Simulate API delay
-        await new Promise((resolve) => setTimeout(resolve, 500))
+        // For now, just check if username exists
+        // In production, this would send an email with reset link
+        try {
+          const exists = await get().checkUsernameExists(username)
 
-        const usernameExists = users.some((u) => u.username === username) ||
-          (() => {
-            const storedUsers = localStorage.getItem('wurldbasket-users')
-            if (storedUsers) {
-              const registeredUsers: User[] = JSON.parse(storedUsers)
-              return registeredUsers.some((u) => u.username === username)
-            }
-            return false
-          })()
+          if (!exists) {
+            set({
+              isLoading: false,
+              error: 'Username not found',
+            })
+            return { success: false, error: 'Username not found' }
+          }
 
-        if (!usernameExists) {
           set({
             isLoading: false,
-            error: 'Username not found',
+            error: null,
           })
-          return { success: false, error: 'Username not found' }
+          return { success: true }
+        } catch {
+          set({
+            isLoading: false,
+            error: 'Failed to reset password',
+          })
+          return { success: false, error: 'Failed to reset password' }
         }
-
-        // In a real app, this would send an email with reset link
-        // For demo, we'll just show a success message
-        set({
-          isLoading: false,
-          error: null,
-        })
-
-        return { success: true }
       },
 
       updateUser: async (updates: Partial<User>) => {
         set({ isLoading: true, error: null })
 
-        // Simulate API delay
-        await new Promise((resolve) => setTimeout(resolve, 300))
-
-        const currentUser = useAuthStore.getState().user
+        const currentUser = get().user
         if (!currentUser) {
           set({ isLoading: false, error: 'No user logged in' })
           return false
         }
 
-        // Update user in localStorage
-        const storedUsers = localStorage.getItem('wurldbasket-users')
-        if (storedUsers) {
-          const registeredUsers: User[] = JSON.parse(storedUsers)
-          const updatedUsers = registeredUsers.map((u) =>
-            u.id === currentUser.id ? { ...u, ...updates } : u
-          )
-          localStorage.setItem('wurldbasket-users', JSON.stringify(updatedUsers))
+        try {
+          const response = await fetch('/api/auth/me', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ userId: currentUser.id, ...updates }),
+          })
+
+          const data = await response.json()
+
+          if (!response.ok) {
+            set({ isLoading: false, error: data.error || 'Failed to update profile' })
+            return false
+          }
+
+          set({
+            user: data.user,
+            isLoading: false,
+            error: null,
+          })
+          return true
+        } catch (error) {
+          set({ isLoading: false, error: 'Failed to connect to server' })
+          return false
         }
-
-        // Update current user in state
-        const updatedUser = { ...currentUser, ...updates }
-        set({
-          user: updatedUser,
-          isLoading: false,
-          error: null,
-        })
-
-        return true
       },
 
       logout: () => {

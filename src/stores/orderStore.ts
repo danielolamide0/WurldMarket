@@ -1,11 +1,11 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import { Order, OrderStatus, CartItem, OrderItem } from '@/types'
-import { generateId } from '@/lib/utils'
-import { stores } from '@/data/stores'
 
 interface OrderState {
   orders: Order[]
+  isLoading: boolean
+  fetchOrders: (params?: { customerId?: string; vendorId?: string; storeId?: string }) => Promise<void>
   createOrder: (
     items: CartItem[],
     customerId: string,
@@ -14,8 +14,8 @@ interface OrderState {
     orderType: 'delivery' | 'pickup',
     deliveryAddress?: string,
     notes?: string
-  ) => Order
-  updateOrderStatus: (orderId: string, status: OrderStatus) => void
+  ) => Promise<Order | null>
+  updateOrderStatus: (orderId: string, status: OrderStatus) => Promise<void>
   getOrderById: (orderId: string) => Order | undefined
   getOrdersByVendor: (vendorId: string) => Order[]
   getOrdersByCustomer: (customerId: string) => Order[]
@@ -29,11 +29,33 @@ export const useOrderStore = create<OrderState>()(
   persist(
     (set, get) => ({
       orders: [],
+      isLoading: false,
 
-      createOrder: (items, customerId, customerName, customerPhone, orderType, deliveryAddress, notes) => {
-        // Group items by store (for simplicity, we assume all items are from the same store)
+      fetchOrders: async (params) => {
+        set({ isLoading: true })
+        try {
+          const searchParams = new URLSearchParams()
+          if (params?.customerId) searchParams.set('customerId', params.customerId)
+          if (params?.vendorId) searchParams.set('vendorId', params.vendorId)
+          if (params?.storeId) searchParams.set('storeId', params.storeId)
+
+          const url = `/api/orders${searchParams.toString() ? `?${searchParams}` : ''}`
+          const response = await fetch(url)
+          const data = await response.json()
+
+          if (response.ok) {
+            set({ orders: data.orders || [], isLoading: false })
+          } else {
+            set({ isLoading: false })
+          }
+        } catch {
+          set({ isLoading: false })
+        }
+      },
+
+      createOrder: async (items, customerId, customerName, customerPhone, orderType, deliveryAddress, notes) => {
         const firstItem = items[0]
-        const store = stores.find((s) => s.id === firstItem.storeId)
+        if (!firstItem) return null
 
         const orderItems: OrderItem[] = items.map((item) => ({
           productId: item.productId,
@@ -47,34 +69,44 @@ export const useOrderStore = create<OrderState>()(
         const subtotal = orderItems.reduce((sum, item) => sum + item.totalPrice, 0)
         const deliveryFee = orderType === 'delivery' ? 3.99 : 0
 
-        const order: Order = {
-          id: `ORD-${generateId().toUpperCase()}`,
-          customerId,
-          customerName,
-          customerPhone,
-          vendorId: firstItem.vendorId,
-          storeId: firstItem.storeId,
-          storeName: store?.name || 'Unknown Store',
-          items: orderItems,
-          subtotal,
-          deliveryFee,
-          total: subtotal + deliveryFee,
-          status: 'pending',
-          orderType,
-          deliveryAddress,
-          notes,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
+        try {
+          const response = await fetch('/api/orders', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              customerId,
+              customerName,
+              customerPhone,
+              vendorId: firstItem.vendorId,
+              storeId: firstItem.storeId,
+              items: orderItems,
+              subtotal,
+              deliveryFee,
+              total: subtotal + deliveryFee,
+              orderType,
+              deliveryAddress,
+              notes,
+            }),
+          })
+
+          const data = await response.json()
+
+          if (response.ok) {
+            const newOrder = data.order
+            set((state) => ({
+              orders: [newOrder, ...state.orders],
+            }))
+            return newOrder
+          }
+          return null
+        } catch {
+          return null
         }
-
-        set((state) => ({
-          orders: [order, ...state.orders],
-        }))
-
-        return order
       },
 
-      updateOrderStatus: (orderId, status) => {
+      updateOrderStatus: async (orderId, status) => {
+        const originalOrders = get().orders
+        // Optimistically update
         set((state) => ({
           orders: state.orders.map((o) =>
             o.id === orderId
@@ -82,6 +114,22 @@ export const useOrderStore = create<OrderState>()(
               : o
           ),
         }))
+
+        try {
+          const response = await fetch('/api/orders', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id: orderId, status }),
+          })
+
+          if (!response.ok) {
+            // Revert on error
+            set({ orders: originalOrders })
+          }
+        } catch {
+          // Revert on error
+          set({ orders: originalOrders })
+        }
       },
 
       getOrderById: (orderId) => {

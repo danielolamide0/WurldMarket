@@ -3,8 +3,7 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { MapPin, Clock, ExternalLink, ChevronRight, Loader2 } from 'lucide-react'
-import { stores } from '@/data/stores'
-import { vendors } from '@/data/users'
+import { useVendorStore } from '@/stores/vendorStore'
 import { StoreLocation } from '@/types'
 import { StoreMap } from '@/components/stores/StoreMap'
 import { Button } from '@/components/ui/button'
@@ -13,10 +12,21 @@ import { Badge } from '@/components/ui/badge'
 import { calculateDistance } from '@/lib/utils'
 
 export default function StoresPage() {
+  const stores = useVendorStore((state) => state.stores)
+  const vendors = useVendorStore((state) => state.vendors)
+  const fetchStores = useVendorStore((state) => state.fetchStores)
+  const fetchVendors = useVendorStore((state) => state.fetchVendors)
+
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null)
   const [selectedStore, setSelectedStore] = useState<StoreLocation | null>(null)
   const [isLocating, setIsLocating] = useState(true)
   const [locationError, setLocationError] = useState<string | null>(null)
+
+  // Fetch data if not already loaded
+  useEffect(() => {
+    if (stores.length === 0) fetchStores()
+    if (vendors.length === 0) fetchVendors()
+  }, [stores.length, vendors.length, fetchStores, fetchVendors])
 
   // Automatically request location when page loads
   useEffect(() => {

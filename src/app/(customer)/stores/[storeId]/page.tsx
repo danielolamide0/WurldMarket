@@ -4,8 +4,7 @@ import { useEffect } from 'react'
 import { useParams } from 'next/navigation'
 import Link from 'next/link'
 import { ArrowLeft, MapPin, Clock, Phone, ExternalLink } from 'lucide-react'
-import { stores } from '@/data/stores'
-import { vendors } from '@/data/users'
+import { useVendorStore } from '@/stores/vendorStore'
 import { useProductStore } from '@/stores/productStore'
 import { ProductCard } from '@/components/products/ProductCard'
 import { Button } from '@/components/ui/button'
@@ -15,15 +14,24 @@ import { CATEGORIES } from '@/lib/constants'
 export default function StoreDetailPage() {
   const params = useParams()
   const storeId = params.storeId as string
+
+  const stores = useVendorStore((state) => state.stores)
+  const vendors = useVendorStore((state) => state.vendors)
+  const fetchStores = useVendorStore((state) => state.fetchStores)
+  const fetchVendors = useVendorStore((state) => state.fetchVendors)
+
+  const products = useProductStore((state) => state.getProductsByStore(storeId))
+  const fetchProducts = useProductStore((state) => state.fetchProducts)
+
   const store = stores.find((s) => s.id === storeId)
   const vendor = store ? vendors.find((v) => v.id === store.vendorId) : null
-  const products = useProductStore((state) => state.getProductsByStore(storeId))
-  const initializeProducts = useProductStore((state) => state.initializeProducts)
 
-  // Ensure products are initialized
+  // Ensure data is fetched
   useEffect(() => {
-    initializeProducts()
-  }, [initializeProducts])
+    if (stores.length === 0) fetchStores()
+    if (vendors.length === 0) fetchVendors()
+    fetchProducts({ storeId })
+  }, [fetchStores, fetchVendors, fetchProducts, storeId, stores.length, vendors.length])
 
   if (!store) {
     return (

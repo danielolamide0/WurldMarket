@@ -1,0 +1,134 @@
+import { NextRequest, NextResponse } from 'next/server'
+import dbConnect from '@/lib/mongodb'
+import Order from '@/models/Order'
+import Product from '@/models/Product'
+import CustomerData from '@/models/CustomerData'
+
+export async function GET(request: NextRequest) {
+  try {
+    await dbConnect()
+
+    const { searchParams } = new URL(request.url)
+    const orderId = searchParams.get('id')
+    const customerId = searchParams.get('customerId')
+    const vendorId = searchParams.get('vendorId')
+    const status = searchParams.get('status')
+
+    if (orderId) {
+      const order = await Order.findById(orderId)
+      if (!order) {
+        return NextResponse.json({ error: 'Order not found' }, { status: 404 })
+      }
+      return NextResponse.json({ order: formatOrder(order) })
+    }
+
+    const query: Record<string, unknown> = {}
+    if (customerId) query.customerId = customerId
+    if (vendorId) query.vendorId = vendorId
+    if (status) query.status = status
+
+    const orders = await Order.find(query).sort({ createdAt: -1 })
+
+    return NextResponse.json({ orders: orders.map(formatOrder) })
+  } catch (error) {
+    console.error('Get orders error:', error)
+    return NextResponse.json({ error: 'Failed to get orders' }, { status: 500 })
+  }
+}
+
+export async function POST(request: NextRequest) {
+  try {
+    await dbConnect()
+
+    const body = await request.json()
+    const {
+      customerId, customerName, customerPhone, vendorId, storeId, storeName,
+      items, subtotal, deliveryFee, total, orderType, deliveryAddress, notes,
+    } = body
+
+    if (!customerId || !customerName || !customerPhone || !vendorId || !storeId || !items?.length) {
+      return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
+    }
+
+    const order = await Order.create({
+      customerId, customerName, customerPhone, vendorId, storeId, storeName,
+      items, subtotal, deliveryFee: deliveryFee || 0, total,
+      status: 'pending', orderType, deliveryAddress, notes,
+    })
+
+    // Decrement stock
+    for (const item of items) {
+      await Product.findByIdAndUpdate(item.productId, { $inc: { stock: -item.quantity } })
+    }
+
+    // Record purchase history
+    const customerData = await CustomerData.findOne({ userId: customerId })
+    if (customerData) {
+      const purchases = items.map((item: { productId: string; quantity: number }) => ({
+        productId: item.productId,
+        purchasedAt: new Date(),
+        quantity: item.quantity,
+      }))
+      await CustomerData.findByIdAndUpdate(customerData._id, {
+        $push: { purchaseHistory: { $each: purchases } },
+      })
+    }
+
+    return NextResponse.json({ order: formatOrder(order) }, { status: 201 })
+  } catch (error) {
+    console.error('Create order error:', error)
+    return NextResponse.json({ error: 'Failed to create order' }, { status: 500 })
+  }
+}
+
+export async function PUT(request: NextRequest) {
+  try {
+    await dbConnect()
+
+    const body = await request.json()
+    const { id, status } = body
+
+    if (!id || !status) {
+      return NextResponse.json({ error: 'Order ID and status are required' }, { status: 400 })
+    }
+
+    const order = await Order.findByIdAndUpdate(id, { status }, { new: true })
+    if (!order) {
+      return NextResponse.json({ error: 'Order not found' }, { status: 404 })
+    }
+
+    return NextResponse.json({ order: formatOrder(order) })
+  } catch (error) {
+    console.error('Update order error:', error)
+    return NextResponse.json({ error: 'Failed to update order' }, { status: 500 })
+  }
+}
+
+function formatOrder(order: InstanceType<typeof Order>) {
+  return {
+    id: order._id.toString(),
+    customerId: order.customerId.toString(),
+    customerName: order.customerName,
+    customerPhone: order.customerPhone,
+    vendorId: order.vendorId.toString(),
+    storeId: order.storeId.toString(),
+    storeName: order.storeName,
+    items: order.items.map((item) => ({
+      productId: item.productId.toString(),
+      productName: item.productName,
+      quantity: item.quantity,
+      unitPrice: item.unitPrice,
+      totalPrice: item.totalPrice,
+      unit: item.unit,
+    })),
+    subtotal: order.subtotal,
+    deliveryFee: order.deliveryFee,
+    total: order.total,
+    status: order.status,
+    orderType: order.orderType,
+    deliveryAddress: order.deliveryAddress,
+    notes: order.notes,
+    createdAt: order.createdAt.toISOString(),
+    updatedAt: order.updatedAt.toISOString(),
+  }
+}

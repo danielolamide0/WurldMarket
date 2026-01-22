@@ -6,8 +6,7 @@ import { useProductStore } from '@/stores/productStore'
 import { useOrderStore } from '@/stores/orderStore'
 import { useAuthStore } from '@/stores/authStore'
 import { useCustomerStore } from '@/stores/customerStore'
-import { stores } from '@/data/stores'
-import { vendors } from '@/data/users'
+import { useVendorStore } from '@/stores/vendorStore'
 import { ProductCard } from '@/components/products/ProductCard'
 import { CategoryNav } from '@/components/products/CategoryNav'
 import { Button } from '@/components/ui/button'
@@ -21,11 +20,13 @@ export default function HomePage() {
   const featuredProducts = products.filter((p) => p.isActive).slice(0, 8)
   const { user, isAuthenticated } = useAuthStore()
   const { getOrdersByCustomer } = useOrderStore()
-  const { favourites, getRegulars } = useCustomerStore()
+  const { favourites, getPreviouslyPurchased } = useCustomerStore()
+  const stores = useVendorStore((state) => state.stores)
+  const vendors = useVendorStore((state) => state.vendors)
 
   const customerOrders = user ? getOrdersByCustomer(user.id) : []
   const mostRecentOrder = customerOrders[0]
-  const regularsCount = getRegulars().length
+  const regularsCount = getPreviouslyPurchased().length
   const favouritesCount = favourites.length
 
   // Show personalized homepage for signed-in customers

@@ -7,7 +7,7 @@ import { ShoppingBasket, ShoppingCart, User, Search, LogOut, X, MapPin, Package 
 import { useAuthStore } from '@/stores/authStore'
 import { useCartStore } from '@/stores/cartStore'
 import { useProductStore } from '@/stores/productStore'
-import { stores } from '@/data/stores'
+import { useVendorStore } from '@/stores/vendorStore'
 import { Button } from '@/components/ui/button'
 import { Product, StoreLocation } from '@/types'
 
@@ -16,6 +16,7 @@ export function Header() {
   const { user, isAuthenticated, logout } = useAuthStore()
   const { items, openCart } = useCartStore()
   const products = useProductStore((state) => state.products)
+  const stores = useVendorStore((state) => state.stores)
   const totalItems = items.reduce((sum, item) => sum + item.quantity, 0)
 
   const [searchQuery, setSearchQuery] = useState('')
