@@ -105,7 +105,7 @@ export function StoreMap({ stores, userLocation, onStoreSelect, selectedStoreId 
       center={[center.lat, center.lng]}
       zoom={zoom}
       className="w-full h-full rounded-2xl z-0"
-      style={{ minHeight: '400px' }}
+      style={{ minHeight: '200px' }}
     >
       <TileLayer
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'

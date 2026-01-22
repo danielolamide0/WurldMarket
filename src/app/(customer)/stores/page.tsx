@@ -106,7 +106,7 @@ export default function StoresPage() {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Map */}
-          <div className="h-[400px] lg:h-[600px] rounded-2xl overflow-hidden shadow-lg">
+          <div className="h-[200px] lg:h-[600px] rounded-2xl overflow-hidden shadow-lg">
             <StoreMap
               stores={stores}
               userLocation={userLocation}
