@@ -154,8 +154,9 @@ export default function CheckoutPage() {
 
     // Record purchases for customer history (if authenticated)
     if (user && user.role === 'customer') {
-      const productIds = items.map((item) => item.productId)
-      recordPurchase(productIds)
+      items.forEach((item) => {
+        recordPurchase(item.productId, item.quantity)
+      })
     }
 
     // Clear cart
