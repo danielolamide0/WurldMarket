@@ -22,7 +22,7 @@ function RegularsContent() {
 
   const { isAuthenticated } = useAuthStore()
   const products = useProductStore((state) => state.products)
-  const { favourites, getRegulars, getPreviouslyPurchased } = useCustomerStore()
+  const { favourites, regulars, getPreviouslyPurchased } = useCustomerStore()
   const { addItem } = useCartStore()
   const { addToast } = useToast()
 
@@ -34,10 +34,10 @@ function RegularsContent() {
     }
   }, [searchParams])
 
-  const regularsIds = getRegulars()
   const previouslyPurchasedIds = getPreviouslyPurchased()
 
-  const regularsProducts = products.filter((p) => regularsIds.includes(p.id))
+  // Regulars are products from vendors the user frequently shops at
+  const regularsProducts = products.filter((p) => regulars.includes(p.vendorId))
   const favouritesProducts = products.filter((p) => favourites.includes(p.id))
   const previouslyPurchasedProducts = products.filter((p) => previouslyPurchasedIds.includes(p.id))
 
