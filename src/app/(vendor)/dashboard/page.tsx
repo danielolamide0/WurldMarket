@@ -124,7 +124,7 @@ export default function VendorDashboardPage() {
     // Simulate processing
     await new Promise((resolve) => setTimeout(resolve, 1000))
 
-    const success = goLive(user.vendorId)
+    const success = await goLive(user.vendorId)
     if (success) {
       // Update local vendor state
       setVendor((prev) => prev ? { ...prev, isLive: true } : prev)

@@ -129,14 +129,14 @@ export default function VendorStoresPage() {
     addToast('Business details updated', 'success')
   }
 
-  const handleAddStore = () => {
+  const handleAddStore = async () => {
     if (!user?.vendorId) return
     if (!newStoreName || !newStoreAddress || !newStoreCity || !newStorePostcode) {
       addToast('Please fill in all store details', 'error')
       return
     }
 
-    const newStore = createStore(user.vendorId, {
+    const newStore = await createStore(user.vendorId, {
       name: newStoreName,
       address: newStoreAddress,
       city: newStoreCity,
@@ -153,6 +153,11 @@ export default function VendorStoresPage() {
       },
       image: 'https://images.unsplash.com/photo-1604719312566-8912e9227c6a?w=800',
     })
+
+    if (!newStore) {
+      addToast('Failed to add store', 'error')
+      return
+    }
 
     setVendorStores((prev) => [...prev, newStore])
     setIsAddingStore(false)
