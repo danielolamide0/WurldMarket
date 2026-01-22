@@ -26,6 +26,7 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
 import { useToast } from '@/components/ui/toast'
+import { PostcodeLookup } from '@/components/address/PostcodeLookup'
 import { Vendor, StoreLocation } from '@/types'
 
 export default function VendorStoresPage() {
@@ -48,6 +49,14 @@ export default function VendorStoresPage() {
   const [newStoreAddress, setNewStoreAddress] = useState('')
   const [newStoreCity, setNewStoreCity] = useState('')
   const [newStorePostcode, setNewStorePostcode] = useState('')
+  const [storeAddressSelected, setStoreAddressSelected] = useState(false)
+
+  const handleStoreAddressSelect = (addr: { line1: string; city: string; postcode: string }) => {
+    setNewStoreAddress(addr.line1)
+    setNewStoreCity(addr.city)
+    setNewStorePostcode(addr.postcode)
+    setStoreAddressSelected(true)
+  }
 
   const products = useProductStore((state) =>
     user?.vendorId ? state.getProductsByVendor(user.vendorId) : []
@@ -151,6 +160,7 @@ export default function VendorStoresPage() {
     setNewStoreAddress('')
     setNewStoreCity('')
     setNewStorePostcode('')
+    setStoreAddressSelected(false)
     addToast('Store location added', 'success')
   }
 
@@ -286,33 +296,51 @@ export default function VendorStoresPage() {
                 onChange={(e) => setNewStoreName(e.target.value)}
                 placeholder="e.g., Main Street Branch"
               />
-              <Input
-                label="Address"
-                value={newStoreAddress}
-                onChange={(e) => setNewStoreAddress(e.target.value)}
-                placeholder="123 Main Street"
-                icon={<MapPin className="h-5 w-5" />}
-              />
-              <div className="grid grid-cols-2 gap-4">
-                <Input
-                  label="City"
-                  value={newStoreCity}
-                  onChange={(e) => setNewStoreCity(e.target.value)}
-                  placeholder="London"
-                />
-                <Input
-                  label="Postcode"
-                  value={newStorePostcode}
-                  onChange={(e) => setNewStorePostcode(e.target.value)}
-                  placeholder="SW1A 1AA"
-                />
-              </div>
+
+              {/* Postcode Lookup */}
+              <PostcodeLookup onAddressSelect={handleStoreAddressSelect} />
+
+              {/* Show selected address fields */}
+              {storeAddressSelected && (
+                <div className="space-y-4 p-4 bg-gray-50 rounded-xl">
+                  <Input
+                    label="Street Address"
+                    value={newStoreAddress}
+                    onChange={(e) => setNewStoreAddress(e.target.value)}
+                    placeholder="123 Main Street"
+                    icon={<MapPin className="h-5 w-5" />}
+                  />
+                  <div className="grid grid-cols-2 gap-4">
+                    <Input
+                      label="City"
+                      value={newStoreCity}
+                      onChange={(e) => setNewStoreCity(e.target.value)}
+                      placeholder="London"
+                    />
+                    <Input
+                      label="Postcode"
+                      value={newStorePostcode}
+                      onChange={(e) => setNewStorePostcode(e.target.value)}
+                      placeholder="SW1A 1AA"
+                      className="uppercase"
+                    />
+                  </div>
+                </div>
+              )}
+
               <div className="flex gap-3">
-                <Button onClick={handleAddStore}>
+                <Button onClick={handleAddStore} disabled={!storeAddressSelected}>
                   <Plus className="h-4 w-4 mr-2" />
                   Add Store
                 </Button>
-                <Button variant="outline" onClick={() => setIsAddingStore(false)}>
+                <Button variant="outline" onClick={() => {
+                  setIsAddingStore(false)
+                  setStoreAddressSelected(false)
+                  setNewStoreName('')
+                  setNewStoreAddress('')
+                  setNewStoreCity('')
+                  setNewStorePostcode('')
+                }}>
                   Cancel
                 </Button>
               </div>

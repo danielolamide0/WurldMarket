@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { ArrowLeft, MapPin, Store, CheckCircle, Truck, Plus, Home, Briefcase, MapPinned } from 'lucide-react'
+import { ArrowLeft, MapPin, Store, CheckCircle, Truck, Plus, Home, Briefcase, MapPinned, Check } from 'lucide-react'
 import { useCartStore } from '@/stores/cartStore'
 import { useAuthStore } from '@/stores/authStore'
 import { useOrderStore } from '@/stores/orderStore'
@@ -17,6 +17,7 @@ import { Input } from '@/components/ui/input'
 import { useToast } from '@/components/ui/toast'
 import { formatPrice } from '@/lib/utils'
 import { DELIVERY_FEE, FREE_DELIVERY_THRESHOLD } from '@/lib/constants'
+import { PostcodeLookup } from '@/components/address/PostcodeLookup'
 import { SavedAddress } from '@/types'
 
 export default function CheckoutPage() {
@@ -39,6 +40,7 @@ export default function CheckoutPage() {
   const [orderId, setOrderId] = useState('')
   const [selectedAddressId, setSelectedAddressId] = useState<string | null>(null)
   const [useNewAddress, setUseNewAddress] = useState(false)
+  const [newAddressSelected, setNewAddressSelected] = useState(false)
 
   // Get saved addresses
   const savedAddresses = user ? getAddressesByUser(user.id) : []
@@ -62,6 +64,12 @@ export default function CheckoutPage() {
     setSelectedAddressId(null)
     setUseNewAddress(true)
     setAddress('')
+    setNewAddressSelected(false)
+  }
+
+  const handleNewAddressSelect = (addr: { line1: string; city: string; postcode: string; fullAddress: string }) => {
+    setAddress(addr.fullAddress)
+    setNewAddressSelected(true)
   }
 
   const getLabelIcon = (label: string) => {
@@ -332,16 +340,36 @@ export default function CheckoutPage() {
               </div>
             )}
 
-            {/* Manual address input - shown when no saved addresses or using new address */}
+            {/* Postcode lookup - shown when no saved addresses or using new address */}
             {(savedAddresses.length === 0 || useNewAddress) && (
-              <Input
-                label={savedAddresses.length > 0 ? 'New Address' : 'Address'}
-                placeholder="Enter your full address"
-                value={address}
-                onChange={(e) => setAddress(e.target.value)}
-                required
-                icon={<MapPin className="h-5 w-5" />}
-              />
+              <div className="space-y-4">
+                <PostcodeLookup onAddressSelect={handleNewAddressSelect} />
+
+                {/* Show selected address or manual entry */}
+                {newAddressSelected && (
+                  <div className="p-4 bg-green-50 border border-green-200 rounded-xl">
+                    <div className="flex items-start justify-between">
+                      <div className="flex items-start gap-3">
+                        <Check className="h-5 w-5 text-green-600 mt-0.5" />
+                        <div>
+                          <p className="font-medium text-gray-900">Delivery Address</p>
+                          <p className="text-sm text-gray-600">{address}</p>
+                        </div>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setNewAddressSelected(false)
+                          setAddress('')
+                        }}
+                        className="text-sm text-terracotta hover:underline"
+                      >
+                        Change
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
             )}
           </Card>
         ) : (

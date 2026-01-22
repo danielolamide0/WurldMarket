@@ -19,6 +19,7 @@ import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { useToast } from '@/components/ui/toast'
+import { PostcodeLookup } from '@/components/address/PostcodeLookup'
 import { SavedAddress } from '@/types'
 
 const addressLabels = [
@@ -44,6 +45,7 @@ export default function SavedAddressesPage() {
   const [fullAddress, setFullAddress] = useState('')
   const [city, setCity] = useState('')
   const [postcode, setPostcode] = useState('')
+  const [addressSelected, setAddressSelected] = useState(false)
 
   const addresses = user ? getAddressesByUser(user.id) : []
 
@@ -54,6 +56,14 @@ export default function SavedAddressesPage() {
     setPostcode('')
     setIsAdding(false)
     setEditingId(null)
+    setAddressSelected(false)
+  }
+
+  const handleAddressSelect = (address: { line1: string; city: string; postcode: string }) => {
+    setFullAddress(address.line1)
+    setCity(address.city)
+    setPostcode(address.postcode)
+    setAddressSelected(true)
   }
 
   const handleSave = () => {
@@ -81,6 +91,7 @@ export default function SavedAddressesPage() {
     setFullAddress(address.fullAddress)
     setCity(address.city)
     setPostcode(address.postcode)
+    setAddressSelected(true)
     setIsAdding(true)
   }
 
@@ -151,6 +162,7 @@ export default function SavedAddressesPage() {
                 {addressLabels.map(({ value, icon: Icon }) => (
                   <button
                     key={value}
+                    type="button"
                     onClick={() => setLabel(value)}
                     className={`flex items-center gap-2 px-4 py-2 rounded-xl border-2 transition-all ${
                       label === value
@@ -165,29 +177,41 @@ export default function SavedAddressesPage() {
               </div>
             </div>
 
-            <div className="space-y-4">
-              <Input
-                label="Full Address"
-                placeholder="123 Main Street, Apartment 4B"
-                value={fullAddress}
-                onChange={(e) => setFullAddress(e.target.value)}
-                icon={<MapPin className="h-5 w-5" />}
+            {/* Postcode Lookup - only for new addresses */}
+            {!editingId && (
+              <PostcodeLookup
+                onAddressSelect={handleAddressSelect}
+                initialPostcode={postcode}
               />
-              <div className="grid grid-cols-2 gap-4">
+            )}
+
+            {/* Manual fields - shown after postcode lookup or when editing */}
+            {(addressSelected || editingId) && (
+              <div className="space-y-4 mt-4">
                 <Input
-                  label="City"
-                  placeholder="London"
-                  value={city}
-                  onChange={(e) => setCity(e.target.value)}
+                  label="Street Address"
+                  placeholder="123 Main Street, Apartment 4B"
+                  value={fullAddress}
+                  onChange={(e) => setFullAddress(e.target.value)}
+                  icon={<MapPin className="h-5 w-5" />}
                 />
-                <Input
-                  label="Postcode"
-                  placeholder="SW1A 1AA"
-                  value={postcode}
-                  onChange={(e) => setPostcode(e.target.value)}
-                />
+                <div className="grid grid-cols-2 gap-4">
+                  <Input
+                    label="City"
+                    placeholder="London"
+                    value={city}
+                    onChange={(e) => setCity(e.target.value)}
+                  />
+                  <Input
+                    label="Postcode"
+                    placeholder="SW1A 1AA"
+                    value={postcode}
+                    onChange={(e) => setPostcode(e.target.value)}
+                    className="uppercase"
+                  />
+                </div>
               </div>
-            </div>
+            )}
 
             <div className="flex gap-3 mt-6">
               <Button onClick={handleSave} className="flex-1">
