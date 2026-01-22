@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import dbConnect from '@/lib/mongodb'
 import Order from '@/models/Order'
 import Product from '@/models/Product'
+import Store from '@/models/Store'
 import CustomerData from '@/models/CustomerData'
 
 export async function GET(request: NextRequest) {
@@ -50,8 +51,15 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
     }
 
+    // Look up store name if not provided
+    let resolvedStoreName = storeName
+    if (!resolvedStoreName) {
+      const store = await Store.findById(storeId)
+      resolvedStoreName = store?.name || 'Unknown Store'
+    }
+
     const order = await Order.create({
-      customerId, customerName, customerPhone, vendorId, storeId, storeName,
+      customerId, customerName, customerPhone, vendorId, storeId, storeName: resolvedStoreName,
       items, subtotal, deliveryFee: deliveryFee || 0, total,
       status: 'pending', orderType, deliveryAddress, notes,
     })
