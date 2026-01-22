@@ -42,6 +42,8 @@ export const vendors: Vendor[] = [
     storeIds: ['store-ab-kirkstall', 'store-ab-queens'],
     contactEmail: 'info@abubakr.com',
     contactPhone: '+44 113 123 4567',
+    isLive: true,
+    createdAt: '2024-01-01T00:00:00Z',
   },
   {
     id: 'sunnyday-foods',
@@ -52,5 +54,7 @@ export const vendors: Vendor[] = [
     storeIds: ['store-sunnyday'],
     contactEmail: 'info@sunnyday.com',
     contactPhone: '+44 23 8012 3456',
+    isLive: true,
+    createdAt: '2024-01-01T00:00:00Z',
   },
 ]

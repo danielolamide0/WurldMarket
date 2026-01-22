@@ -1,5 +1,6 @@
 'use client'
 
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import {
   Package,
@@ -8,20 +9,55 @@ import {
   AlertTriangle,
   TrendingUp,
   ArrowRight,
+  CheckCircle,
+  Circle,
+  Rocket,
+  Store,
+  MapPin,
+  FileText,
+  Phone,
 } from 'lucide-react'
 import { useAuthStore } from '@/stores/authStore'
 import { useProductStore } from '@/stores/productStore'
 import { useOrderStore } from '@/stores/orderStore'
-import { vendors } from '@/data/users'
+import { useVendorStore } from '@/stores/vendorStore'
+import { vendors as staticVendors } from '@/data/users'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { formatPrice, formatDateTime } from '@/lib/utils'
 import { ORDER_STATUS_LABELS, ORDER_STATUS_COLORS } from '@/lib/constants'
+import { Vendor } from '@/types'
 
 export default function VendorDashboardPage() {
   const { user } = useAuthStore()
-  const vendor = vendors.find((v) => v.id === user?.vendorId)
+  const { getVendorById, goLive, canGoLive, getStoresByVendor } = useVendorStore()
+  const [vendor, setVendor] = useState<Vendor | undefined>(undefined)
+  const [isGoingLive, setIsGoingLive] = useState(false)
+
+  // Get vendor from store or static data
+  useEffect(() => {
+    if (user?.vendorId) {
+      // First check vendorStore (for dynamically created vendors)
+      let v = getVendorById(user.vendorId)
+
+      // If not found, check static vendors
+      if (!v) {
+        v = staticVendors.find((sv) => sv.id === user.vendorId)
+      }
+
+      // If still not found, check localStorage directly
+      if (!v) {
+        const storedVendors = localStorage.getItem('wurldbasket-vendors')
+        if (storedVendors) {
+          const parsedVendors = JSON.parse(storedVendors)
+          v = parsedVendors.find((sv: Vendor) => sv.id === user.vendorId)
+        }
+      }
+
+      setVendor(v)
+    }
+  }, [user?.vendorId, getVendorById])
 
   const products = useProductStore((state) =>
     user?.vendorId ? state.getProductsByVendor(user.vendorId) : []
@@ -40,6 +76,62 @@ export default function VendorDashboardPage() {
   )
 
   const recentOrders = orders.slice(0, 5)
+  const vendorStores = user?.vendorId ? getStoresByVendor(user.vendorId) : []
+
+  // Check if vendor can go live
+  const liveStatus = user?.vendorId ? canGoLive(user.vendorId) : { canGoLive: false, missing: [] }
+
+  // Onboarding checklist items
+  const onboardingSteps = [
+    {
+      id: 'description',
+      label: 'Add business description',
+      completed: !!vendor?.description,
+      href: '/my-stores',
+      icon: FileText,
+    },
+    {
+      id: 'phone',
+      label: 'Add contact phone number',
+      completed: !!vendor?.contactPhone,
+      href: '/my-stores',
+      icon: Phone,
+    },
+    {
+      id: 'store',
+      label: 'Add at least one store location',
+      completed: vendorStores.length > 0,
+      href: '/my-stores',
+      icon: MapPin,
+    },
+    {
+      id: 'product',
+      label: 'Add at least one product',
+      completed: products.length > 0,
+      href: '/inventory/add',
+      icon: Package,
+    },
+  ]
+
+  const completedSteps = onboardingSteps.filter((s) => s.completed).length
+  const isOnboardingComplete = completedSteps === onboardingSteps.length
+  const isLive = vendor?.isLive ?? false
+
+  const handleGoLive = async () => {
+    if (!user?.vendorId) return
+    setIsGoingLive(true)
+
+    // Simulate processing
+    await new Promise((resolve) => setTimeout(resolve, 1000))
+
+    const success = goLive(user.vendorId)
+    if (success) {
+      // Update local vendor state
+      setVendor((prev) => prev ? { ...prev, isLive: true } : prev)
+    }
+
+    setIsGoingLive(false)
+  }
 
   const stats = [
     {
@@ -76,13 +168,105 @@ export default function VendorDashboardPage() {
     <div className="p-4 lg:p-8">
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-900 mb-2">
-          Welcome back, {user?.name.split(' ')[0]}!
-        </h1>
-        <p className="text-gray-600">
-          Here&apos;s what&apos;s happening with {vendor?.name} today.
-        </p>
+        <div className="flex items-start justify-between">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900 mb-2">
+              Welcome back, {user?.name.split(' ')[0]}!
+            </h1>
+            <p className="text-gray-600">
+              {isLive
+                ? `Here's what's happening with ${vendor?.name} today.`
+                : `Let's get ${vendor?.name || 'your store'} ready to go live!`}
+            </p>
+          </div>
+          {isLive && (
+            <Badge className="bg-green-100 text-green-700">
+              <span className="w-2 h-2 bg-green-500 rounded-full mr-2 animate-pulse" />
+              Live
+            </Badge>
+          )}
+        </div>
       </div>
+
+      {/* Onboarding Section - Only show if not live */}
+      {!isLive && (
+        <Card className="mb-8 border-2 border-dashed border-terracotta/30 bg-terracotta/5">
+          <CardContent className="p-6">
+            <div className="flex items-start gap-4 mb-6">
+              <div className="w-12 h-12 bg-terracotta/10 rounded-xl flex items-center justify-center flex-shrink-0">
+                <Rocket className="h-6 w-6 text-terracotta" />
+              </div>
+              <div className="flex-1">
+                <h2 className="text-lg font-semibold text-gray-900 mb-1">
+                  Get Your Store Ready
+                </h2>
+                <p className="text-gray-600 text-sm">
+                  Complete the steps below to make your store visible to customers.
+                </p>
+              </div>
+              <div className="text-right">
+                <p className="text-2xl font-bold text-terracotta">{completedSteps}/{onboardingSteps.length}</p>
+                <p className="text-xs text-gray-500">completed</p>
+              </div>
+            </div>
+
+            {/* Progress bar */}
+            <div className="w-full bg-gray-200 rounded-full h-2 mb-6">
+              <div
+                className="bg-terracotta h-2 rounded-full transition-all duration-500"
+                style={{ width: `${(completedSteps / onboardingSteps.length) * 100}%` }}
+              />
+            </div>
+
+            {/* Checklist */}
+            <div className="space-y-3 mb-6">
+              {onboardingSteps.map((step) => (
+                <Link
+                  key={step.id}
+                  href={step.href}
+                  className={`flex items-center gap-3 p-3 rounded-xl transition-colors ${
+                    step.completed
+                      ? 'bg-green-50'
+                      : 'bg-white hover:bg-gray-50 border border-gray-200'
+                  }`}
+                >
+                  {step.completed ? (
+                    <CheckCircle className="h-5 w-5 text-green-500 flex-shrink-0" />
+                  ) : (
+                    <Circle className="h-5 w-5 text-gray-300 flex-shrink-0" />
+                  )}
+                  <step.icon className={`h-4 w-4 ${step.completed ? 'text-green-600' : 'text-gray-400'}`} />
+                  <span className={`flex-1 ${step.completed ? 'text-green-700' : 'text-gray-700'}`}>
+                    {step.label}
+                  </span>
+                  {!step.completed && (
+                    <ArrowRight className="h-4 w-4 text-gray-400" />
+                  )}
+                </Link>
+              ))}
+            </div>
+
+            {/* Go Live Button */}
+            <Button
+              onClick={handleGoLive}
+              disabled={!isOnboardingComplete || isGoingLive}
+              className="w-full"
+              size="lg"
+            >
+              {isGoingLive ? (
+                'Going Live...'
+              ) : isOnboardingComplete ? (
+                <>
+                  <Rocket className="h-5 w-5 mr-2" />
+                  Go Live!
+                </>
+              ) : (
+                'Complete all steps to Go Live'
+              )}
+            </Button>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Stats Grid */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">

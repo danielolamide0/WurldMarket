@@ -4,13 +4,22 @@ import { User } from '@/types'
 import { users } from '@/data/users'
 import { generateId } from '@/lib/utils'
 
+interface SignupOptions {
+  username: string
+  password: string
+  name: string
+  email?: string
+  role?: 'customer' | 'vendor'
+  companyName?: string // Required for vendor signup
+}
+
 interface AuthState {
   user: User | null
   isAuthenticated: boolean
   isLoading: boolean
   error: string | null
   login: (username: string, password: string) => Promise<boolean>
-  signup: (username: string, password: string, name: string, email?: string) => Promise<{ success: boolean; error?: string }>
+  signup: (options: SignupOptions) => Promise<{ success: boolean; error?: string; vendorId?: string }>
   checkUsernameExists: (username: string) => boolean
   resetPassword: (username: string) => Promise<{ success: boolean; error?: string }>
   logout: () => void
@@ -81,7 +90,8 @@ export const useAuthStore = create<AuthState>()(
         }
       },
 
-      signup: async (username: string, password: string, name: string, email?: string) => {
+      signup: async (options: SignupOptions) => {
+        const { username, password, name, email, role = 'customer', companyName } = options
         set({ isLoading: true, error: null })
 
         // Simulate API delay
@@ -106,14 +116,48 @@ export const useAuthStore = create<AuthState>()(
           return { success: false, error: 'Username already exists' }
         }
 
+        // For vendor signup, create vendor profile
+        let vendorId: string | undefined
+        if (role === 'vendor') {
+          if (!companyName) {
+            set({
+              isLoading: false,
+              error: 'Company name is required for vendor signup.',
+            })
+            return { success: false, error: 'Company name required' }
+          }
+
+          // Create vendor ID based on company name
+          const slug = companyName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')
+          vendorId = `vendor-${slug}-${generateId()}`
+
+          // Store vendor in localStorage
+          const storedVendors = localStorage.getItem('wurldbasket-vendors')
+          const registeredVendors = storedVendors ? JSON.parse(storedVendors) : []
+          const newVendor = {
+            id: vendorId,
+            name: companyName,
+            slug,
+            description: '',
+            storeIds: [],
+            contactEmail: email || '',
+            contactPhone: '',
+            isLive: false,
+            createdAt: new Date().toISOString(),
+          }
+          registeredVendors.push(newVendor)
+          localStorage.setItem('wurldbasket-vendors', JSON.stringify(registeredVendors))
+        }
+
         // Create new user
         const newUser: User = {
-          id: `cust-${generateId()}`,
+          id: role === 'vendor' ? `vendor-user-${generateId()}` : `cust-${generateId()}`,
           username,
           password, // In production, this should be hashed
-          role: 'customer',
+          role,
           name,
           email,
+          vendorId, // Will be undefined for customers
           createdAt: new Date().toISOString(),
         }
 
@@ -130,7 +174,7 @@ export const useAuthStore = create<AuthState>()(
           error: null,
         })
 
-        return { success: true }
+        return { success: true, vendorId }
       },
 
       checkUsernameExists: (username: string) => {

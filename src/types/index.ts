@@ -21,6 +21,8 @@ export interface Vendor {
   storeIds: string[]
   contactEmail: string
   contactPhone: string
+  isLive: boolean // Whether the store is visible to customers
+  createdAt: string
 }
 
 // Store Types

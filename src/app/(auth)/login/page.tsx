@@ -7,9 +7,10 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent } from '@/components/ui/card'
 import { useToast } from '@/components/ui/toast'
-import { User, Lock, Store, ShoppingBasket, Mail } from 'lucide-react'
+import { User, Lock, Store, ShoppingBasket, Mail, Building2 } from 'lucide-react'
 
 type ViewMode = 'login' | 'signup' | 'forgot-password'
+type SignupRole = 'customer' | 'vendor'
 
 export default function LoginPage() {
   const router = useRouter()
@@ -21,6 +22,8 @@ export default function LoginPage() {
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
+  const [signupRole, setSignupRole] = useState<SignupRole>('customer')
+  const [companyName, setCompanyName] = useState('')
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -51,10 +54,27 @@ export default function LoginPage() {
       return
     }
 
-    const result = await signup(username, password, name, email || undefined)
+    if (signupRole === 'vendor' && !companyName.trim()) {
+      addToast('Company name is required for vendor accounts', 'error')
+      return
+    }
+
+    const result = await signup({
+      username,
+      password,
+      name,
+      email: email || undefined,
+      role: signupRole,
+      companyName: signupRole === 'vendor' ? companyName : undefined,
+    })
+
     if (result.success) {
       addToast('Account created successfully!', 'success')
-      router.push('/')
+      if (signupRole === 'vendor') {
+        router.push('/dashboard')
+      } else {
+        router.push('/')
+      }
     }
   }
 
@@ -115,6 +135,8 @@ export default function LoginPage() {
                 clearError()
                 setPassword('')
                 setConfirmPassword('')
+                setSignupRole('customer')
+                setCompanyName('')
               }}
               className={`flex-1 py-4 text-center font-medium transition-colors ${
                 viewMode === 'signup'
@@ -186,6 +208,56 @@ export default function LoginPage() {
 
             {viewMode === 'signup' && (
               <form onSubmit={handleSignup} className="space-y-4">
+                {/* Role Selection */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    I want to sign up as a
+                  </label>
+                  <div className="grid grid-cols-2 gap-3">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSignupRole('customer')
+                        setCompanyName('')
+                      }}
+                      className={`p-4 rounded-xl border-2 transition-all text-center ${
+                        signupRole === 'customer'
+                          ? 'border-terracotta bg-terracotta/5'
+                          : 'border-gray-200 hover:border-gray-300'
+                      }`}
+                    >
+                      <ShoppingBasket className={`h-6 w-6 mx-auto mb-2 ${signupRole === 'customer' ? 'text-terracotta' : 'text-gray-400'}`} />
+                      <p className={`font-medium ${signupRole === 'customer' ? 'text-terracotta' : 'text-gray-700'}`}>Customer</p>
+                      <p className="text-xs text-gray-500 mt-1">Shop & order</p>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setSignupRole('vendor')}
+                      className={`p-4 rounded-xl border-2 transition-all text-center ${
+                        signupRole === 'vendor'
+                          ? 'border-terracotta bg-terracotta/5'
+                          : 'border-gray-200 hover:border-gray-300'
+                      }`}
+                    >
+                      <Store className={`h-6 w-6 mx-auto mb-2 ${signupRole === 'vendor' ? 'text-terracotta' : 'text-gray-400'}`} />
+                      <p className={`font-medium ${signupRole === 'vendor' ? 'text-terracotta' : 'text-gray-700'}`}>Vendor</p>
+                      <p className="text-xs text-gray-500 mt-1">Sell products</p>
+                    </button>
+                  </div>
+                </div>
+
+                {/* Company Name - only for vendors */}
+                {signupRole === 'vendor' && (
+                  <Input
+                    label="Company Name"
+                    placeholder="Enter your business name"
+                    value={companyName}
+                    onChange={(e) => setCompanyName(e.target.value)}
+                    icon={<Building2 className="h-5 w-5" />}
+                    required
+                  />
+                )}
+
                 <Input
                   label="Full Name"
                   placeholder="Enter your full name"
@@ -205,12 +277,13 @@ export default function LoginPage() {
                 />
 
                 <Input
-                  label="Email (Optional)"
+                  label={signupRole === 'vendor' ? 'Business Email' : 'Email (Optional)'}
                   type="email"
                   placeholder="Enter your email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   icon={<Mail className="h-5 w-5" />}
+                  required={signupRole === 'vendor'}
                 />
 
                 <Input
@@ -243,7 +316,7 @@ export default function LoginPage() {
                   size="lg"
                   isLoading={isLoading}
                 >
-                  Create Account
+                  {signupRole === 'vendor' ? 'Create Vendor Account' : 'Create Account'}
                 </Button>
 
                 <div className="text-center">
