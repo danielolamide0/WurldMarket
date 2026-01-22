@@ -2,11 +2,11 @@
 
 import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { ArrowLeft, Minus, Plus, ShoppingCart, Store, AlertCircle } from 'lucide-react'
 import { useProductStore } from '@/stores/productStore'
 import { useCartStore } from '@/stores/cartStore'
-import { stores } from '@/data/stores'
+import { useVendorStore } from '@/stores/vendorStore'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Card } from '@/components/ui/card'
@@ -21,8 +21,16 @@ export default function ProductDetailPage() {
   const { addToast } = useToast()
 
   const product = useProductStore((state) => state.getProductById(productId))
+  const fetchProducts = useProductStore((state) => state.fetchProducts)
   const { addItem, getItemQuantity } = useCartStore()
+  const { stores, fetchStores } = useVendorStore()
   const [quantity, setQuantity] = useState(1)
+
+  // Fetch data on mount
+  useEffect(() => {
+    fetchProducts({})
+    fetchStores()
+  }, [fetchProducts, fetchStores])
 
   const quantityInCart = product ? getItemQuantity(product.id) : 0
   const store = product ? stores.find((s) => s.id === product.storeId) : null

@@ -10,7 +10,7 @@ import { useOrderStore } from '@/stores/orderStore'
 import { useProductStore } from '@/stores/productStore'
 import { useCustomerStore } from '@/stores/customerStore'
 import { useAddressStore } from '@/stores/addressStore'
-import { stores } from '@/data/stores'
+import { useVendorStore } from '@/stores/vendorStore'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -28,7 +28,13 @@ export default function CheckoutPage() {
   const { decrementStock } = useProductStore()
   const { recordPurchase } = useCustomerStore()
   const { getAddressesByUser, getPrimaryAddress } = useAddressStore()
+  const { stores, fetchStores } = useVendorStore()
   const { addToast } = useToast()
+
+  // Fetch stores on mount
+  useEffect(() => {
+    fetchStores()
+  }, [fetchStores])
 
   const [orderType, setOrderType] = useState<'delivery' | 'pickup'>('delivery')
   const [customerName, setCustomerName] = useState(user?.name || '')

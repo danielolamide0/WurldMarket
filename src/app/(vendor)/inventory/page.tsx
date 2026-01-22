@@ -1,11 +1,11 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { Plus, Search, Edit, Trash2, Package, AlertTriangle } from 'lucide-react'
 import { useAuthStore } from '@/stores/authStore'
 import { useProductStore } from '@/stores/productStore'
-import { stores } from '@/data/stores'
+import { useVendorStore } from '@/stores/vendorStore'
 import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -21,16 +21,25 @@ export default function InventoryPage() {
   const products = useProductStore((state) =>
     user?.vendorId ? state.getProductsByVendor(user.vendorId) : []
   )
+  const fetchProducts = useProductStore((state) => state.fetchProducts)
   const deleteProduct = useProductStore((state) => state.deleteProduct)
   const updateProduct = useProductStore((state) => state.updateProduct)
+
+  const vendorStores = useVendorStore((state) => state.getStoresByVendor(user?.vendorId || ''))
+  const fetchStores = useVendorStore((state) => state.fetchStores)
 
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedStore, setSelectedStore] = useState<string>('all')
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null)
   const [editStock, setEditStock] = useState<{ id: string; stock: number } | null>(null)
 
-  // Get stores for this vendor
-  const vendorStores = stores.filter((s) => s.vendorId === user?.vendorId)
+  // Fetch data on mount
+  useEffect(() => {
+    if (user?.vendorId) {
+      fetchProducts({ vendorId: user.vendorId })
+      fetchStores(user.vendorId)
+    }
+  }, [user?.vendorId, fetchProducts, fetchStores])
 
   // Filter products
   const filteredProducts = products.filter((product) => {
@@ -130,7 +139,7 @@ export default function InventoryPage() {
                 </thead>
                 <tbody className="divide-y divide-gray-100">
                   {filteredProducts.map((product) => {
-                    const store = stores.find((s) => s.id === product.storeId)
+                    const store = vendorStores.find((s) => s.id === product.storeId)
                     const isLowStock = product.stock <= 10
 
                     return (
@@ -202,7 +211,7 @@ export default function InventoryPage() {
           {/* Mobile Cards */}
           <div className="lg:hidden space-y-4">
             {filteredProducts.map((product) => {
-              const store = stores.find((s) => s.id === product.storeId)
+              const store = vendorStores.find((s) => s.id === product.storeId)
               const isLowStock = product.stock <= 10
 
               return (

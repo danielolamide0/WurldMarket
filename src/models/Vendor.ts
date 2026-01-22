@@ -49,7 +49,7 @@ const VendorSchema = new Schema<IVendor>(
   { timestamps: true }
 )
 
-VendorSchema.index({ slug: 1 })
+// slug already has unique: true which creates an index
 VendorSchema.index({ isLive: 1 })
 
 const Vendor: Model<IVendor> = mongoose.models.Vendor || mongoose.model<IVendor>('Vendor', VendorSchema)

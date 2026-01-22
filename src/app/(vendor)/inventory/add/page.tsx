@@ -1,12 +1,12 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { ArrowLeft } from 'lucide-react'
 import { useAuthStore } from '@/stores/authStore'
 import { useProductStore } from '@/stores/productStore'
-import { stores } from '@/data/stores'
+import { useVendorStore } from '@/stores/vendorStore'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -21,7 +21,8 @@ export default function AddProductPage() {
   const addProduct = useProductStore((state) => state.addProduct)
   const { addToast } = useToast()
 
-  const vendorStores = stores.filter((s) => s.vendorId === user?.vendorId)
+  const vendorStores = useVendorStore((state) => state.getStoresByVendor(user?.vendorId || ''))
+  const fetchStores = useVendorStore((state) => state.fetchStores)
 
   const [formData, setFormData] = useState({
     name: '',
@@ -30,10 +31,24 @@ export default function AddProductPage() {
     price: '',
     unit: '',
     stock: '',
-    storeId: vendorStores[0]?.id || '',
+    storeId: '',
     image: 'https://images.unsplash.com/photo-1586201375761-83865001e31c?w=400',
   })
   const [isSubmitting, setIsSubmitting] = useState(false)
+
+  // Fetch stores on mount and set default storeId
+  useEffect(() => {
+    if (user?.vendorId) {
+      fetchStores(user.vendorId)
+    }
+  }, [user?.vendorId, fetchStores])
+
+  // Set default storeId when stores are loaded
+  useEffect(() => {
+    if (vendorStores.length > 0 && !formData.storeId) {
+      setFormData((prev) => ({ ...prev, storeId: vendorStores[0].id }))
+    }
+  }, [vendorStores, formData.storeId])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -45,10 +60,7 @@ export default function AddProductPage() {
 
     setIsSubmitting(true)
 
-    // Simulate API delay
-    await new Promise((resolve) => setTimeout(resolve, 500))
-
-    addProduct({
+    const newProduct = await addProduct({
       vendorId: user?.vendorId || '',
       storeId: formData.storeId,
       name: formData.name,
@@ -61,8 +73,13 @@ export default function AddProductPage() {
       isActive: true,
     })
 
-    addToast('Product added successfully!', 'success')
-    router.push('/inventory')
+    if (newProduct) {
+      addToast('Product added successfully!', 'success')
+      router.push('/inventory')
+    } else {
+      addToast('Failed to add product', 'error')
+      setIsSubmitting(false)
+    }
   }
 
   return (

@@ -35,7 +35,7 @@ const CustomerDataSchema = new Schema<ICustomerData>(
   { timestamps: true }
 )
 
-CustomerDataSchema.index({ userId: 1 })
+// userId already has unique: true which creates an index
 
 const CustomerData: Model<ICustomerData> =
   mongoose.models.CustomerData || mongoose.model<ICustomerData>('CustomerData', CustomerDataSchema)

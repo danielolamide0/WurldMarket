@@ -21,7 +21,6 @@ import { useAuthStore } from '@/stores/authStore'
 import { useProductStore } from '@/stores/productStore'
 import { useOrderStore } from '@/stores/orderStore'
 import { useVendorStore } from '@/stores/vendorStore'
-import { vendors as staticVendors } from '@/data/users'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -31,30 +30,26 @@ import { Vendor } from '@/types'
 
 export default function VendorDashboardPage() {
   const { user } = useAuthStore()
-  const { getVendorById, goLive, canGoLive, getStoresByVendor } = useVendorStore()
+  const { getVendorById, goLive, canGoLive, getStoresByVendor, fetchVendors, fetchStores } = useVendorStore()
+  const fetchProducts = useProductStore((state) => state.fetchProducts)
+  const fetchOrders = useOrderStore((state) => state.fetchOrders)
   const [vendor, setVendor] = useState<Vendor | undefined>(undefined)
   const [isGoingLive, setIsGoingLive] = useState(false)
 
-  // Get vendor from store or static data
+  // Fetch data on mount
   useEffect(() => {
     if (user?.vendorId) {
-      // First check vendorStore (for dynamically created vendors)
-      let v = getVendorById(user.vendorId)
+      fetchVendors()
+      fetchStores(user.vendorId)
+      fetchProducts({ vendorId: user.vendorId })
+      fetchOrders({ vendorId: user.vendorId })
+    }
+  }, [user?.vendorId, fetchVendors, fetchStores, fetchProducts, fetchOrders])
 
-      // If not found, check static vendors
-      if (!v) {
-        v = staticVendors.find((sv) => sv.id === user.vendorId)
-      }
-
-      // If still not found, check localStorage directly
-      if (!v) {
-        const storedVendors = localStorage.getItem('wurldbasket-vendors')
-        if (storedVendors) {
-          const parsedVendors = JSON.parse(storedVendors)
-          v = parsedVendors.find((sv: Vendor) => sv.id === user.vendorId)
-        }
-      }
-
+  // Get vendor from store
+  useEffect(() => {
+    if (user?.vendorId) {
+      const v = getVendorById(user.vendorId)
       setVendor(v)
     }
   }, [user?.vendorId, getVendorById])

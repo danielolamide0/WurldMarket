@@ -48,7 +48,7 @@ const SavedAddressSchema = new Schema<ISavedAddress>(
   { timestamps: true }
 )
 
-SavedAddressSchema.index({ userId: 1 })
+// Compound index covers both use cases
 SavedAddressSchema.index({ userId: 1, isPrimary: 1 })
 
 const SavedAddress: Model<ISavedAddress> =

@@ -6,7 +6,7 @@ import Link from 'next/link'
 import { ArrowLeft } from 'lucide-react'
 import { useAuthStore } from '@/stores/authStore'
 import { useProductStore } from '@/stores/productStore'
-import { stores } from '@/data/stores'
+import { useVendorStore } from '@/stores/vendorStore'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -20,11 +20,20 @@ export default function EditProductPage() {
   const params = useParams()
   const productId = params.productId as string
   const { user } = useAuthStore()
-  const { getProductById, updateProduct } = useProductStore()
+  const { getProductById, updateProduct, fetchProducts } = useProductStore()
+  const { getStoresByVendor, fetchStores } = useVendorStore()
   const { addToast } = useToast()
 
   const product = getProductById(productId)
-  const vendorStores = stores.filter((s) => s.vendorId === user?.vendorId)
+  const vendorStores = getStoresByVendor(user?.vendorId || '')
+
+  // Fetch data on mount
+  useEffect(() => {
+    if (user?.vendorId) {
+      fetchProducts({ vendorId: user.vendorId })
+      fetchStores(user.vendorId)
+    }
+  }, [user?.vendorId, fetchProducts, fetchStores])
 
   const [formData, setFormData] = useState({
     name: '',

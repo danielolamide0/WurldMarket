@@ -1,11 +1,11 @@
 'use client'
 
-import { Suspense } from 'react'
+import { Suspense, useEffect } from 'react'
 import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { Search, MapPin, ArrowLeft, Loader2 } from 'lucide-react'
 import { useProductStore } from '@/stores/productStore'
-import { stores } from '@/data/stores'
+import { useVendorStore } from '@/stores/vendorStore'
 import { ProductCard } from '@/components/products/ProductCard'
 import { Card } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -15,6 +15,14 @@ function SearchResults() {
   const searchParams = useSearchParams()
   const query = searchParams.get('q') || ''
   const products = useProductStore((state) => state.products)
+  const fetchProducts = useProductStore((state) => state.fetchProducts)
+  const { stores, fetchStores } = useVendorStore()
+
+  // Fetch data on mount
+  useEffect(() => {
+    fetchProducts({})
+    fetchStores()
+  }, [fetchProducts, fetchStores])
 
   const searchQuery = query.toLowerCase()
 

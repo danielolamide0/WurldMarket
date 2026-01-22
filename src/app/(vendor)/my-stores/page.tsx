@@ -19,8 +19,6 @@ import {
 import { useAuthStore } from '@/stores/authStore'
 import { useProductStore } from '@/stores/productStore'
 import { useVendorStore } from '@/stores/vendorStore'
-import { stores as staticStores } from '@/data/stores'
-import { vendors as staticVendors } from '@/data/users'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -31,7 +29,7 @@ import { Vendor, StoreLocation } from '@/types'
 
 export default function VendorStoresPage() {
   const { user } = useAuthStore()
-  const { getVendorById, updateVendor, getStoresByVendor, createStore, deleteStore } = useVendorStore()
+  const { getVendorById, updateVendor, getStoresByVendor, createStore, deleteStore, fetchVendors, fetchStores } = useVendorStore()
   const { addToast } = useToast()
 
   const [vendor, setVendor] = useState<Vendor | undefined>(undefined)
@@ -62,25 +60,18 @@ export default function VendorStoresPage() {
     user?.vendorId ? state.getProductsByVendor(user.vendorId) : []
   )
 
-  // Load vendor data
+  // Fetch data on mount
   useEffect(() => {
     if (user?.vendorId) {
-      // Check vendorStore first
-      let v = getVendorById(user.vendorId)
+      fetchVendors()
+      fetchStores(user.vendorId)
+    }
+  }, [user?.vendorId, fetchVendors, fetchStores])
 
-      // If not found, check static vendors
-      if (!v) {
-        v = staticVendors.find((sv) => sv.id === user.vendorId)
-      }
-
-      // If still not found, check localStorage
-      if (!v) {
-        const storedVendors = localStorage.getItem('wurldbasket-vendors')
-        if (storedVendors) {
-          const parsedVendors = JSON.parse(storedVendors)
-          v = parsedVendors.find((sv: Vendor) => sv.id === user.vendorId)
-        }
-      }
+  // Load vendor data from store
+  useEffect(() => {
+    if (user?.vendorId) {
+      const v = getVendorById(user.vendorId)
 
       if (v) {
         setVendor(v)
@@ -90,10 +81,7 @@ export default function VendorStoresPage() {
       }
 
       // Get stores
-      let stores = getStoresByVendor(user.vendorId)
-      if (stores.length === 0) {
-        stores = staticStores.filter((s) => s.vendorId === user.vendorId)
-      }
+      const stores = getStoresByVendor(user.vendorId)
       setVendorStores(stores)
     }
   }, [user?.vendorId, getVendorById, getStoresByVendor])
