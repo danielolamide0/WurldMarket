@@ -36,7 +36,26 @@ export const useProductStore = create<ProductState>()(
           const data = await response.json()
 
           if (response.ok) {
-            set({ products: data.products || [], isLoading: false })
+            const newProducts = data.products || []
+            const currentProducts = get().products
+            
+            // Merge products: use Map to deduplicate by ID, keeping the latest version
+            const productMap = new Map<string, Product>()
+            
+            // Add existing products to map
+            currentProducts.forEach((product) => {
+              productMap.set(product.id, product)
+            })
+            
+            // Update/add new products (newer data takes precedence)
+            newProducts.forEach((product: Product) => {
+              productMap.set(product.id, product)
+            })
+            
+            // Convert back to array
+            const mergedProducts = Array.from(productMap.values())
+            
+            set({ products: mergedProducts, isLoading: false })
           } else {
             set({ isLoading: false })
           }
