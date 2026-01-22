@@ -26,7 +26,7 @@ import { ORDER_STATUS_LABELS, ORDER_STATUS_COLORS } from '@/lib/constants'
 const menuItems = [
   { icon: ShoppingBasket, label: 'Regulars', href: '/regulars' },
   { icon: Package, label: 'Your Orders', href: '/orders' },
-  { icon: MapPin, label: 'Saved Addresses', href: '#' },
+  { icon: MapPin, label: 'Saved Addresses', href: '/account/addresses' },
   { icon: CreditCard, label: 'Payment Methods', href: '#' },
   { icon: Bell, label: 'Notifications', href: '#' },
   { icon: HelpCircle, label: 'Help & Support', href: '#' },

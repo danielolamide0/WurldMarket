@@ -138,3 +138,15 @@ export interface VendorAnalytics {
   lowStockProducts: number
   recentOrders: Order[]
 }
+
+// Address Types
+export interface SavedAddress {
+  id: string
+  userId: string
+  label: string // e.g., "Home", "Work", "Other"
+  fullAddress: string
+  city: string
+  postcode: string
+  isPrimary: boolean
+  createdAt: string
+}

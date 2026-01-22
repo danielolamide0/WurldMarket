@@ -1,14 +1,15 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { ArrowLeft, MapPin, Store, CheckCircle, Truck } from 'lucide-react'
+import { ArrowLeft, MapPin, Store, CheckCircle, Truck, Plus, Home, Briefcase, MapPinned } from 'lucide-react'
 import { useCartStore } from '@/stores/cartStore'
 import { useAuthStore } from '@/stores/authStore'
 import { useOrderStore } from '@/stores/orderStore'
 import { useProductStore } from '@/stores/productStore'
 import { useCustomerStore } from '@/stores/customerStore'
+import { useAddressStore } from '@/stores/addressStore'
 import { stores } from '@/data/stores'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
@@ -16,6 +17,7 @@ import { Input } from '@/components/ui/input'
 import { useToast } from '@/components/ui/toast'
 import { formatPrice } from '@/lib/utils'
 import { DELIVERY_FEE, FREE_DELIVERY_THRESHOLD } from '@/lib/constants'
+import { SavedAddress } from '@/types'
 
 export default function CheckoutPage() {
   const router = useRouter()
@@ -24,6 +26,7 @@ export default function CheckoutPage() {
   const { createOrder } = useOrderStore()
   const { decrementStock } = useProductStore()
   const { recordPurchase } = useCustomerStore()
+  const { getAddressesByUser, getPrimaryAddress } = useAddressStore()
   const { addToast } = useToast()
 
   const [orderType, setOrderType] = useState<'delivery' | 'pickup'>('delivery')
@@ -34,6 +37,43 @@ export default function CheckoutPage() {
   const [isProcessing, setIsProcessing] = useState(false)
   const [orderComplete, setOrderComplete] = useState(false)
   const [orderId, setOrderId] = useState('')
+  const [selectedAddressId, setSelectedAddressId] = useState<string | null>(null)
+  const [useNewAddress, setUseNewAddress] = useState(false)
+
+  // Get saved addresses
+  const savedAddresses = user ? getAddressesByUser(user.id) : []
+  const primaryAddress = user ? getPrimaryAddress(user.id) : undefined
+
+  // Set primary address as default when component mounts
+  useEffect(() => {
+    if (primaryAddress && !selectedAddressId && !useNewAddress) {
+      setSelectedAddressId(primaryAddress.id)
+      setAddress(`${primaryAddress.fullAddress}, ${primaryAddress.city} ${primaryAddress.postcode}`)
+    }
+  }, [primaryAddress, selectedAddressId, useNewAddress])
+
+  const handleAddressSelect = (addr: SavedAddress) => {
+    setSelectedAddressId(addr.id)
+    setUseNewAddress(false)
+    setAddress(`${addr.fullAddress}, ${addr.city} ${addr.postcode}`)
+  }
+
+  const handleUseNewAddress = () => {
+    setSelectedAddressId(null)
+    setUseNewAddress(true)
+    setAddress('')
+  }
+
+  const getLabelIcon = (label: string) => {
+    switch (label) {
+      case 'Home':
+        return Home
+      case 'Work':
+        return Briefcase
+      default:
+        return MapPinned
+    }
+  }
 
   const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0)
   const deliveryFee = orderType === 'delivery' && subtotal < FREE_DELIVERY_THRESHOLD ? DELIVERY_FEE : 0
@@ -211,15 +251,98 @@ export default function CheckoutPage() {
         {/* Delivery Address or Pickup Location */}
         {orderType === 'delivery' ? (
           <Card className="p-4">
-            <h2 className="font-semibold text-gray-900 mb-4">Delivery Address</h2>
-            <Input
-              label="Address"
-              placeholder="Enter your full address"
-              value={address}
-              onChange={(e) => setAddress(e.target.value)}
-              required
-              icon={<MapPin className="h-5 w-5" />}
-            />
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="font-semibold text-gray-900">Delivery Address</h2>
+              {isAuthenticated && (
+                <Link
+                  href="/account/addresses"
+                  className="text-sm text-terracotta font-medium hover:underline"
+                >
+                  Manage Addresses
+                </Link>
+              )}
+            </div>
+
+            {/* Saved Addresses */}
+            {savedAddresses.length > 0 && (
+              <div className="space-y-2 mb-4">
+                {savedAddresses.map((addr) => {
+                  const LabelIcon = getLabelIcon(addr.label)
+                  const isSelected = selectedAddressId === addr.id && !useNewAddress
+                  return (
+                    <button
+                      key={addr.id}
+                      onClick={() => handleAddressSelect(addr)}
+                      className={`w-full flex items-start gap-3 p-3 rounded-xl border-2 text-left transition-all ${
+                        isSelected
+                          ? 'border-terracotta bg-terracotta/5'
+                          : 'border-gray-200 hover:border-gray-300'
+                      }`}
+                    >
+                      <div
+                        className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
+                          isSelected ? 'bg-terracotta/10' : 'bg-gray-100'
+                        }`}
+                      >
+                        <LabelIcon
+                          className={`h-4 w-4 ${isSelected ? 'text-terracotta' : 'text-gray-500'}`}
+                        />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2">
+                          <span className="font-medium text-gray-900">{addr.label}</span>
+                          {addr.isPrimary && (
+                            <span className="text-xs bg-terracotta/10 text-terracotta px-2 py-0.5 rounded-full">
+                              Primary
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-sm text-gray-600 truncate">{addr.fullAddress}</p>
+                        <p className="text-xs text-gray-500">
+                          {addr.city}, {addr.postcode}
+                        </p>
+                      </div>
+                      {isSelected && (
+                        <CheckCircle className="h-5 w-5 text-terracotta flex-shrink-0" />
+                      )}
+                    </button>
+                  )
+                })}
+
+                {/* Use different address option */}
+                <button
+                  onClick={handleUseNewAddress}
+                  className={`w-full flex items-center gap-3 p-3 rounded-xl border-2 text-left transition-all ${
+                    useNewAddress
+                      ? 'border-terracotta bg-terracotta/5'
+                      : 'border-dashed border-gray-300 hover:border-gray-400'
+                  }`}
+                >
+                  <div
+                    className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                      useNewAddress ? 'bg-terracotta/10' : 'bg-gray-100'
+                    }`}
+                  >
+                    <Plus className={`h-4 w-4 ${useNewAddress ? 'text-terracotta' : 'text-gray-500'}`} />
+                  </div>
+                  <span className={`font-medium ${useNewAddress ? 'text-terracotta' : 'text-gray-600'}`}>
+                    Use a different address
+                  </span>
+                </button>
+              </div>
+            )}
+
+            {/* Manual address input - shown when no saved addresses or using new address */}
+            {(savedAddresses.length === 0 || useNewAddress) && (
+              <Input
+                label={savedAddresses.length > 0 ? 'New Address' : 'Address'}
+                placeholder="Enter your full address"
+                value={address}
+                onChange={(e) => setAddress(e.target.value)}
+                required
+                icon={<MapPin className="h-5 w-5" />}
+              />
+            )}
           </Card>
         ) : (
           <Card className="p-4">
