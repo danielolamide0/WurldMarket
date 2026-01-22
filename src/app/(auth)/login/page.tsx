@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent } from '@/components/ui/card'
 import { useToast } from '@/components/ui/toast'
-import { User, Lock, Store, ShoppingBasket, Mail, Building2 } from 'lucide-react'
+import { User, Lock, Store, ShoppingBasket, Mail, Building2, Phone } from 'lucide-react'
 
 type ViewMode = 'login' | 'signup' | 'forgot-password'
 type SignupRole = 'customer' | 'vendor'
@@ -21,6 +21,7 @@ export default function LoginPage() {
   const [password, setPassword] = useState('')
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
+  const [phone, setPhone] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [signupRole, setSignupRole] = useState<SignupRole>('customer')
   const [companyName, setCompanyName] = useState('')
@@ -64,6 +65,7 @@ export default function LoginPage() {
       password,
       name,
       email: email || undefined,
+      phone: signupRole === 'customer' ? (phone || undefined) : undefined,
       role: signupRole,
       companyName: signupRole === 'vendor' ? companyName : undefined,
     })
@@ -119,6 +121,7 @@ export default function LoginPage() {
                 setConfirmPassword('')
                 setName('')
                 setEmail('')
+                setPhone('')
               }}
               className={`flex-1 py-4 text-center font-medium transition-colors ${
                 viewMode === 'login'
@@ -137,6 +140,7 @@ export default function LoginPage() {
                 setConfirmPassword('')
                 setSignupRole('customer')
                 setCompanyName('')
+                setPhone('')
               }}
               className={`flex-1 py-4 text-center font-medium transition-colors ${
                 viewMode === 'signup'
@@ -285,6 +289,17 @@ export default function LoginPage() {
                   icon={<Mail className="h-5 w-5" />}
                   required={signupRole === 'vendor'}
                 />
+
+                {signupRole === 'customer' && (
+                  <Input
+                    label="Phone Number (Optional)"
+                    type="tel"
+                    placeholder="07123 456789"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    icon={<Phone className="h-5 w-5" />}
+                  />
+                )}
 
                 <Input
                   label="Password"

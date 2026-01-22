@@ -9,6 +9,7 @@ interface SignupOptions {
   password: string
   name: string
   email?: string
+  phone?: string // Optional phone number for customers
   role?: 'customer' | 'vendor'
   companyName?: string // Required for vendor signup
 }
@@ -22,6 +23,7 @@ interface AuthState {
   signup: (options: SignupOptions) => Promise<{ success: boolean; error?: string; vendorId?: string }>
   checkUsernameExists: (username: string) => boolean
   resetPassword: (username: string) => Promise<{ success: boolean; error?: string }>
+  updateUser: (updates: Partial<User>) => Promise<boolean>
   logout: () => void
   clearError: () => void
 }
@@ -91,7 +93,7 @@ export const useAuthStore = create<AuthState>()(
       },
 
       signup: async (options: SignupOptions) => {
-        const { username, password, name, email, role = 'customer', companyName } = options
+        const { username, password, name, email, phone, role = 'customer', companyName } = options
         set({ isLoading: true, error: null })
 
         // Simulate API delay
@@ -157,6 +159,7 @@ export const useAuthStore = create<AuthState>()(
           role,
           name,
           email,
+          phone, // Optional phone number
           vendorId, // Will be undefined for customers
           createdAt: new Date().toISOString(),
         }
@@ -221,6 +224,39 @@ export const useAuthStore = create<AuthState>()(
         })
 
         return { success: true }
+      },
+
+      updateUser: async (updates: Partial<User>) => {
+        set({ isLoading: true, error: null })
+
+        // Simulate API delay
+        await new Promise((resolve) => setTimeout(resolve, 300))
+
+        const currentUser = useAuthStore.getState().user
+        if (!currentUser) {
+          set({ isLoading: false, error: 'No user logged in' })
+          return false
+        }
+
+        // Update user in localStorage
+        const storedUsers = localStorage.getItem('wurldbasket-users')
+        if (storedUsers) {
+          const registeredUsers: User[] = JSON.parse(storedUsers)
+          const updatedUsers = registeredUsers.map((u) =>
+            u.id === currentUser.id ? { ...u, ...updates } : u
+          )
+          localStorage.setItem('wurldbasket-users', JSON.stringify(updatedUsers))
+        }
+
+        // Update current user in state
+        const updatedUser = { ...currentUser, ...updates }
+        set({
+          user: updatedUser,
+          isLoading: false,
+          error: null,
+        })
+
+        return true
       },
 
       logout: () => {

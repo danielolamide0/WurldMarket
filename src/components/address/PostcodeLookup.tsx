@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Search, MapPin, Loader2, Check } from 'lucide-react'
+import { Search, MapPin, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 
@@ -10,12 +10,11 @@ interface Address {
   line2?: string
   city: string
   postcode: string
-  fullAddress: string
 }
 
 interface PostcodeLookupProps {
   onAddressSelect: (address: Address) => void
-  initialPostcode?: string
+  onManualEntry?: () => void
 }
 
 interface IdealPostcodesAddress {
@@ -35,10 +34,8 @@ interface IdealPostcodesResponse {
 
 // Real UK address lookup using Ideal Postcodes API
 async function lookupPostcode(postcode: string): Promise<Address[]> {
-  // Clean postcode - remove spaces and convert to uppercase
   const cleanPostcode = postcode.toUpperCase().replace(/\s+/g, '')
 
-  // Validate UK postcode format
   const postcodeRegex = /^[A-Z]{1,2}[0-9][0-9A-Z]?[0-9][A-Z]{2}$/
   if (!postcodeRegex.test(cleanPostcode)) {
     throw new Error('Please enter a valid UK postcode')
@@ -69,10 +66,8 @@ async function lookupPostcode(postcode: string): Promise<Address[]> {
       throw new Error('No addresses found for this postcode')
     }
 
-    // Format postcode properly (e.g., SW1A1AA -> SW1A 1AA)
     const formattedPostcode = cleanPostcode.slice(0, -3) + ' ' + cleanPostcode.slice(-3)
 
-    // Transform API response to our Address format
     return data.result.map((addr) => {
       const lines = [addr.line_1, addr.line_2, addr.line_3].filter(Boolean)
       const line1 = lines.join(', ')
@@ -82,7 +77,6 @@ async function lookupPostcode(postcode: string): Promise<Address[]> {
         line2: addr.line_2 || undefined,
         city: addr.post_town,
         postcode: formattedPostcode,
-        fullAddress: `${line1}, ${addr.post_town} ${formattedPostcode}`,
       }
     })
   } catch (error) {
@@ -93,53 +87,35 @@ async function lookupPostcode(postcode: string): Promise<Address[]> {
   }
 }
 
-// Fallback function when API key is not available (for development/demo)
 function fallbackLookup(cleanPostcode: string): Address[] {
   const formattedPostcode = cleanPostcode.slice(0, -3) + ' ' + cleanPostcode.slice(-3)
 
-  // Determine city based on postcode area
   const postcodeArea = cleanPostcode.slice(0, 2)
   const cities: Record<string, string> = {
-    'SW': 'London',
-    'SE': 'London',
-    'EC': 'London',
-    'WC': 'London',
-    'NW': 'London',
-    'LS': 'Leeds',
-    'M1': 'Manchester',
-    'M2': 'Manchester',
-    'B1': 'Birmingham',
-    'BS': 'Bristol',
-    'EH': 'Edinburgh',
-    'G1': 'Glasgow',
-    'CF': 'Cardiff',
-    'SO': 'Southampton',
+    'SW': 'London', 'SE': 'London', 'EC': 'London', 'WC': 'London', 'NW': 'London',
+    'LS': 'Leeds', 'M1': 'Manchester', 'M2': 'Manchester', 'B1': 'Birmingham',
+    'BS': 'Bristol', 'EH': 'Edinburgh', 'G1': 'Glasgow', 'CF': 'Cardiff', 'SO': 'Southampton',
   }
 
   const city = cities[postcodeArea] || cities[cleanPostcode.charAt(0)] || 'London'
-
   const streetNames = ['High Street', 'Station Road', 'Church Lane', 'Victoria Road', 'Park Avenue']
 
   return streetNames.slice(0, 4).map((street, i) => {
     const houseNumber = (i + 1) * 10 + Math.floor(Math.random() * 10)
-    const line1 = `${houseNumber} ${street}`
     return {
-      line1,
+      line1: `${houseNumber} ${street}`,
       city,
       postcode: formattedPostcode,
-      fullAddress: `${line1}, ${city} ${formattedPostcode}`,
     }
   })
 }
 
-export function PostcodeLookup({ onAddressSelect, initialPostcode = '' }: PostcodeLookupProps) {
-  const [postcode, setPostcode] = useState(initialPostcode)
+export function PostcodeLookup({ onAddressSelect, onManualEntry }: PostcodeLookupProps) {
+  const [postcode, setPostcode] = useState('')
   const [addresses, setAddresses] = useState<Address[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [showDropdown, setShowDropdown] = useState(false)
-  const [selectedAddress, setSelectedAddress] = useState<Address | null>(null)
-  const [manualEntry, setManualEntry] = useState(false)
 
   const handleSearch = async () => {
     if (!postcode.trim()) {
@@ -150,7 +126,6 @@ export function PostcodeLookup({ onAddressSelect, initialPostcode = '' }: Postco
     setIsLoading(true)
     setError(null)
     setAddresses([])
-    setSelectedAddress(null)
 
     try {
       const results = await lookupPostcode(postcode)
@@ -164,9 +139,13 @@ export function PostcodeLookup({ onAddressSelect, initialPostcode = '' }: Postco
   }
 
   const handleSelectAddress = (address: Address) => {
-    setSelectedAddress(address)
     setShowDropdown(false)
     onAddressSelect(address)
+  }
+
+  const handleManualEntry = () => {
+    setShowDropdown(false)
+    onManualEntry()
   }
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -220,7 +199,7 @@ export function PostcodeLookup({ onAddressSelect, initialPostcode = '' }: Postco
 
       {/* Address Dropdown */}
       {showDropdown && addresses.length > 0 && (
-        <div className="relative">
+        <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Select your address ({addresses.length} found)
           </label>
@@ -230,68 +209,24 @@ export function PostcodeLookup({ onAddressSelect, initialPostcode = '' }: Postco
                 key={index}
                 type="button"
                 onClick={() => handleSelectAddress(address)}
-                className={`w-full px-4 py-3 text-left hover:bg-gray-50 flex items-center justify-between border-b border-gray-100 last:border-0 transition-colors ${
-                  selectedAddress?.fullAddress === address.fullAddress ? 'bg-terracotta/5' : ''
-                }`}
+                className="w-full px-4 py-3 text-left hover:bg-gray-50 flex items-start gap-3 border-b border-gray-100 last:border-0 transition-colors"
               >
-                <div className="flex items-start gap-3">
-                  <MapPin className="h-4 w-4 text-gray-400 mt-0.5 flex-shrink-0" />
-                  <div>
-                    <p className="font-medium text-gray-900">{address.line1}</p>
-                    <p className="text-sm text-gray-500">{address.city} {address.postcode}</p>
-                  </div>
+                <MapPin className="h-4 w-4 text-gray-400 mt-0.5 flex-shrink-0" />
+                <div>
+                  <p className="font-medium text-gray-900">{address.line1}</p>
+                  <p className="text-sm text-gray-500">{address.city} {address.postcode}</p>
                 </div>
-                {selectedAddress?.fullAddress === address.fullAddress && (
-                  <Check className="h-5 w-5 text-terracotta flex-shrink-0" />
-                )}
               </button>
             ))}
           </div>
 
-          {/* Can't find address option */}
           <button
             type="button"
-            onClick={() => {
-              setManualEntry(true)
-              setShowDropdown(false)
-            }}
+            onClick={handleManualEntry}
             className="w-full mt-2 text-sm text-terracotta hover:underline text-center py-2"
           >
             Can&apos;t find your address? Enter manually
           </button>
-        </div>
-      )}
-
-      {/* Selected Address Display */}
-      {selectedAddress && !showDropdown && (
-        <div className="p-4 bg-green-50 border border-green-200 rounded-xl">
-          <div className="flex items-start justify-between">
-            <div className="flex items-start gap-3">
-              <Check className="h-5 w-5 text-green-600 mt-0.5" />
-              <div>
-                <p className="font-medium text-gray-900">{selectedAddress.line1}</p>
-                <p className="text-sm text-gray-600">{selectedAddress.city} {selectedAddress.postcode}</p>
-              </div>
-            </div>
-            <button
-              type="button"
-              onClick={() => {
-                setShowDropdown(true)
-              }}
-              className="text-sm text-terracotta hover:underline"
-            >
-              Change
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* Manual Entry Notice */}
-      {manualEntry && (
-        <div className="p-3 bg-amber-50 border border-amber-200 rounded-xl">
-          <p className="text-sm text-amber-800">
-            Please fill in your address details below. Make sure the address is accurate for delivery.
-          </p>
         </div>
       )}
     </div>

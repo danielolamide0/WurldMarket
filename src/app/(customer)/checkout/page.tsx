@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { ArrowLeft, MapPin, Store, CheckCircle, Truck, Plus, Home, Briefcase, MapPinned, Check } from 'lucide-react'
+import { ArrowLeft, MapPin, Store, CheckCircle, Truck, Plus, Home, Briefcase, MapPinned, Check, Phone } from 'lucide-react'
 import { useCartStore } from '@/stores/cartStore'
 import { useAuthStore } from '@/stores/authStore'
 import { useOrderStore } from '@/stores/orderStore'
@@ -32,7 +32,8 @@ export default function CheckoutPage() {
 
   const [orderType, setOrderType] = useState<'delivery' | 'pickup'>('delivery')
   const [customerName, setCustomerName] = useState(user?.name || '')
-  const [customerPhone, setCustomerPhone] = useState('')
+  const [customerPhone, setCustomerPhone] = useState(user?.phone || '')
+  const [useSavedPhone, setUseSavedPhone] = useState(true)
   const [address, setAddress] = useState('')
   const [notes, setNotes] = useState('')
   const [isProcessing, setIsProcessing] = useState(false)
@@ -41,6 +42,9 @@ export default function CheckoutPage() {
   const [selectedAddressId, setSelectedAddressId] = useState<string | null>(null)
   const [useNewAddress, setUseNewAddress] = useState(false)
   const [newAddressSelected, setNewAddressSelected] = useState(false)
+  const [newAddressLine, setNewAddressLine] = useState('')
+  const [newCity, setNewCity] = useState('')
+  const [newPostcode, setNewPostcode] = useState('')
 
   // Get saved addresses
   const savedAddresses = user ? getAddressesByUser(user.id) : []
@@ -53,6 +57,13 @@ export default function CheckoutPage() {
       setAddress(`${primaryAddress.fullAddress}, ${primaryAddress.city} ${primaryAddress.postcode}`)
     }
   }, [primaryAddress, selectedAddressId, useNewAddress])
+
+  // Set saved phone number as default when component mounts
+  useEffect(() => {
+    if (user?.phone && useSavedPhone) {
+      setCustomerPhone(user.phone)
+    }
+  }, [user?.phone, useSavedPhone])
 
   const handleAddressSelect = (addr: SavedAddress) => {
     setSelectedAddressId(addr.id)
@@ -67,9 +78,27 @@ export default function CheckoutPage() {
     setNewAddressSelected(false)
   }
 
-  const handleNewAddressSelect = (addr: { line1: string; city: string; postcode: string; fullAddress: string }) => {
-    setAddress(addr.fullAddress)
+  const handleNewAddressSelect = (addr: { line1: string; city: string; postcode: string }) => {
+    setNewAddressLine(addr.line1)
+    setNewCity(addr.city)
+    setNewPostcode(addr.postcode)
+    setAddress(`${addr.line1}, ${addr.city} ${addr.postcode}`)
     setNewAddressSelected(true)
+  }
+
+  const handleManualEntry = () => {
+    setNewAddressLine('')
+    setNewCity('')
+    setNewPostcode('')
+    setAddress('')
+    setNewAddressSelected(true)
+  }
+
+  // Update address string when individual fields change
+  const updateAddressFromFields = () => {
+    if (newAddressLine && newCity && newPostcode) {
+      setAddress(`${newAddressLine}, ${newCity} ${newPostcode}`)
+    }
   }
 
   const getLabelIcon = (label: string) => {
@@ -245,14 +274,64 @@ export default function CheckoutPage() {
               onChange={(e) => setCustomerName(e.target.value)}
               required
             />
-            <Input
-              label="Phone Number"
-              type="tel"
-              placeholder="07123 456789"
-              value={customerPhone}
-              onChange={(e) => setCustomerPhone(e.target.value)}
-              required
-            />
+            
+            {/* Phone Number Section */}
+            {isAuthenticated && user?.phone && (
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <label className="block text-sm font-medium text-gray-700">
+                    Phone Number
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setUseSavedPhone(!useSavedPhone)
+                      if (!useSavedPhone) {
+                        setCustomerPhone(user.phone || '')
+                      } else {
+                        setCustomerPhone('')
+                      }
+                    }}
+                    className="text-sm text-terracotta hover:underline"
+                  >
+                    {useSavedPhone ? 'Use different number' : 'Use saved number'}
+                  </button>
+                </div>
+                
+                {useSavedPhone ? (
+                  <div className="p-3 bg-gray-50 rounded-xl border border-gray-200">
+                    <div className="flex items-center gap-2">
+                      <Phone className="h-4 w-4 text-gray-500" />
+                      <span className="text-gray-900 font-medium">{user.phone}</span>
+                      <span className="ml-auto text-xs bg-terracotta/10 text-terracotta px-2 py-0.5 rounded-full">
+                        Saved
+                      </span>
+                    </div>
+                  </div>
+                ) : (
+                  <Input
+                    type="tel"
+                    placeholder="07123 456789"
+                    value={customerPhone}
+                    onChange={(e) => setCustomerPhone(e.target.value)}
+                    icon={<Phone className="h-5 w-5" />}
+                    required
+                  />
+                )}
+              </div>
+            )}
+            
+            {(!isAuthenticated || !user?.phone) && (
+              <Input
+                label="Phone Number"
+                type="tel"
+                placeholder="07123 456789"
+                value={customerPhone}
+                onChange={(e) => setCustomerPhone(e.target.value)}
+                icon={<Phone className="h-5 w-5" />}
+                required
+              />
+            )}
           </div>
         </Card>
 
@@ -343,29 +422,68 @@ export default function CheckoutPage() {
             {/* Postcode lookup - shown when no saved addresses or using new address */}
             {(savedAddresses.length === 0 || useNewAddress) && (
               <div className="space-y-4">
-                <PostcodeLookup onAddressSelect={handleNewAddressSelect} />
+                {!newAddressSelected && (
+                  <PostcodeLookup
+                    onAddressSelect={handleNewAddressSelect}
+                    onManualEntry={handleManualEntry}
+                  />
+                )}
 
-                {/* Show selected address or manual entry */}
+                {/* Editable address fields */}
                 {newAddressSelected && (
-                  <div className="p-4 bg-green-50 border border-green-200 rounded-xl">
-                    <div className="flex items-start justify-between">
-                      <div className="flex items-start gap-3">
-                        <Check className="h-5 w-5 text-green-600 mt-0.5" />
-                        <div>
-                          <p className="font-medium text-gray-900">Delivery Address</p>
-                          <p className="text-sm text-gray-600">{address}</p>
-                        </div>
-                      </div>
+                  <div className="space-y-4 p-4 bg-gray-50 rounded-xl">
+                    <div className="flex items-center justify-between mb-2">
+                      <p className="font-medium text-gray-900">Delivery Address</p>
                       <button
                         type="button"
                         onClick={() => {
                           setNewAddressSelected(false)
+                          setNewAddressLine('')
+                          setNewCity('')
+                          setNewPostcode('')
                           setAddress('')
                         }}
                         className="text-sm text-terracotta hover:underline"
                       >
-                        Change
+                        Change Postcode
                       </button>
+                    </div>
+                    <Input
+                      label="Street Address"
+                      placeholder="123 Main Street, Flat 4B"
+                      value={newAddressLine}
+                      onChange={(e) => {
+                        setNewAddressLine(e.target.value)
+                        if (e.target.value && newCity && newPostcode) {
+                          setAddress(`${e.target.value}, ${newCity} ${newPostcode}`)
+                        }
+                      }}
+                      icon={<MapPin className="h-5 w-5" />}
+                    />
+                    <div className="grid grid-cols-2 gap-4">
+                      <Input
+                        label="City"
+                        placeholder="London"
+                        value={newCity}
+                        onChange={(e) => {
+                          setNewCity(e.target.value)
+                          if (newAddressLine && e.target.value && newPostcode) {
+                            setAddress(`${newAddressLine}, ${e.target.value} ${newPostcode}`)
+                          }
+                        }}
+                      />
+                      <Input
+                        label="Postcode"
+                        placeholder="SW1A 1AA"
+                        value={newPostcode}
+                        onChange={(e) => {
+                          setNewPostcode(e.target.value.toUpperCase())
+                          if (newAddressLine && newCity && e.target.value) {
+                            setAddress(`${newAddressLine}, ${newCity} ${e.target.value.toUpperCase()}`)
+                          }
+                        }}
+                        className="uppercase"
+                      />
                     </div>
                   </div>
                 )}

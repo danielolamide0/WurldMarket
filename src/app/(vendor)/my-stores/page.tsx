@@ -298,7 +298,10 @@ export default function VendorStoresPage() {
               />
 
               {/* Postcode Lookup */}
-              <PostcodeLookup onAddressSelect={handleStoreAddressSelect} />
+              <PostcodeLookup
+                onAddressSelect={handleStoreAddressSelect}
+                onManualEntry={() => setStoreAddressSelected(true)}
+              />
 
               {/* Show selected address fields */}
               {storeAddressSelected && (

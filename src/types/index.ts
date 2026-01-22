@@ -8,6 +8,7 @@ export interface User {
   role: UserRole
   name: string
   email?: string
+  phone?: string // Customer phone number
   vendorId?: string // Links vendor user to their vendor profile
   createdAt: string
 }

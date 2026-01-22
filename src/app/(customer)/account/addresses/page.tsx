@@ -178,16 +178,32 @@ export default function SavedAddressesPage() {
             </div>
 
             {/* Postcode Lookup - only for new addresses */}
-            {!editingId && (
+            {!editingId && !addressSelected && (
               <PostcodeLookup
                 onAddressSelect={handleAddressSelect}
-                initialPostcode={postcode}
+                onManualEntry={() => setAddressSelected(true)}
               />
             )}
 
             {/* Manual fields - shown after postcode lookup or when editing */}
             {(addressSelected || editingId) && (
-              <div className="space-y-4 mt-4">
+              <div className="space-y-4 mt-4 p-4 bg-gray-50 rounded-xl">
+                {!editingId && (
+                  <div className="flex justify-end -mt-2 mb-2">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setAddressSelected(false)
+                        setFullAddress('')
+                        setCity('')
+                        setPostcode('')
+                      }}
+                      className="text-sm text-terracotta hover:underline"
+                    >
+                      Change Postcode
+                    </button>
+                  </div>
+                )}
                 <Input
                   label="Street Address"
                   placeholder="123 Main Street, Apartment 4B"

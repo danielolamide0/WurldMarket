@@ -1,5 +1,6 @@
 'use client'
 
+import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import {
@@ -14,12 +15,18 @@ import {
   Store,
   ShoppingBasket,
   Package,
+  Phone,
+  Edit2,
+  Check,
+  X,
 } from 'lucide-react'
 import { useAuthStore } from '@/stores/authStore'
 import { useOrderStore } from '@/stores/orderStore'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
+import { Input } from '@/components/ui/input'
+import { useToast } from '@/components/ui/toast'
 import { formatPrice, formatDateTime } from '@/lib/utils'
 import { ORDER_STATUS_LABELS, ORDER_STATUS_COLORS } from '@/lib/constants'
 
@@ -34,14 +41,33 @@ const menuItems = [
 
 export default function AccountPage() {
   const router = useRouter()
-  const { user, isAuthenticated, logout } = useAuthStore()
+  const { user, isAuthenticated, logout, updateUser } = useAuthStore()
+  const { addToast } = useToast()
   const orders = useOrderStore((state) =>
     user ? state.getOrdersByCustomer(user.id) : []
   )
 
+  const [isEditingPhone, setIsEditingPhone] = useState(false)
+  const [phoneValue, setPhoneValue] = useState(user?.phone || '')
+
   const handleLogout = () => {
     logout()
     router.push('/')
+  }
+
+  const handleSavePhone = async () => {
+    const success = await updateUser({ phone: phoneValue || undefined })
+    if (success) {
+      addToast('Phone number updated successfully', 'success')
+      setIsEditingPhone(false)
+    } else {
+      addToast('Failed to update phone number', 'error')
+    }
+  }
+
+  const handleCancelEdit = () => {
+    setPhoneValue(user?.phone || '')
+    setIsEditingPhone(false)
   }
 
   if (!isAuthenticated) {
@@ -77,6 +103,12 @@ export default function AccountPage() {
             <div>
               <h1 className="text-xl font-bold">{user?.name}</h1>
               <p className="text-white/70">{user?.email}</p>
+              {user?.phone && (
+                <p className="text-white/70 text-sm mt-1 flex items-center gap-1">
+                  <Phone className="h-3 w-3" />
+                  {user.phone}
+                </p>
+              )}
             </div>
           </div>
 
@@ -92,6 +124,72 @@ export default function AccountPage() {
       </div>
 
       <div className="max-w-3xl mx-auto px-4 py-6">
+        {/* Phone Number Section */}
+        <Card className="mb-6">
+          <div className="p-4">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-3">
+                <Phone className="h-5 w-5 text-gray-500" />
+                <div>
+                  <h3 className="font-semibold text-gray-900">Phone Number</h3>
+                  <p className="text-sm text-gray-500">Used for order updates and delivery</p>
+                </div>
+              </div>
+              {!isEditingPhone && (
+                <button
+                  onClick={() => setIsEditingPhone(true)}
+                  className="p-2 rounded-xl hover:bg-gray-100 transition-colors"
+                >
+                  <Edit2 className="h-4 w-4 text-gray-600" />
+                </button>
+              )}
+            </div>
+
+            {isEditingPhone ? (
+              <div className="space-y-3">
+                <Input
+                  label="Phone Number"
+                  type="tel"
+                  placeholder="07123 456789"
+                  value={phoneValue}
+                  onChange={(e) => setPhoneValue(e.target.value)}
+                  icon={<Phone className="h-5 w-5" />}
+                />
+                <div className="flex gap-2">
+                  <Button
+                    onClick={handleSavePhone}
+                    size="sm"
+                    className="flex-1"
+                  >
+                    <Check className="h-4 w-4 mr-2" />
+                    Save
+                  </Button>
+                  <Button
+                    onClick={handleCancelEdit}
+                    variant="outline"
+                    size="sm"
+                    className="flex-1"
+                  >
+                    <X className="h-4 w-4 mr-2" />
+                    Cancel
+                  </Button>
+                </div>
+              </div>
+            ) : (
+              <div className="p-3 bg-gray-50 rounded-xl">
+                <p className="text-gray-900 font-medium">
+                  {user?.phone || 'No phone number saved'}
+                </p>
+                {!user?.phone && (
+                  <p className="text-sm text-gray-500 mt-1">
+                    Add a phone number to receive order updates
+                  </p>
+                )}
+              </div>
+            )}
+          </div>
+        </Card>
+
         {/* Menu Items */}
         <div>
             <Card className="divide-y divide-gray-100">
