@@ -1,5 +1,6 @@
 'use client'
 
+import { useEffect } from 'react'
 import { useParams } from 'next/navigation'
 import Link from 'next/link'
 import { ArrowLeft } from 'lucide-react'
@@ -14,6 +15,12 @@ export default function CategoryPage() {
   const slug = params.slug as string
   const category = CATEGORIES.find((c) => c.slug === slug)
   const products = useProductStore((state) => state.getProductsByCategory(slug as ProductCategory))
+  const fetchProducts = useProductStore((state) => state.fetchProducts)
+
+  // Fetch products for this category when page loads
+  useEffect(() => {
+    fetchProducts({ category: slug })
+  }, [slug, fetchProducts])
 
   if (!category) {
     return (
