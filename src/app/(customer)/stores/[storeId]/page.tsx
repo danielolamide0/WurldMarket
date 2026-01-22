@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useParams } from 'next/navigation'
 import Link from 'next/link'
 import { ArrowLeft, MapPin, Clock, Phone, ExternalLink } from 'lucide-react'
@@ -10,21 +10,28 @@ import { ProductCard } from '@/components/products/ProductCard'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { CATEGORIES } from '@/lib/constants'
+import { ProductCategory } from '@/types'
 
 export default function StoreDetailPage() {
   const params = useParams()
   const storeId = params.storeId as string
+  const [selectedCategory, setSelectedCategory] = useState<ProductCategory | null>(null)
 
   const stores = useVendorStore((state) => state.stores)
   const vendors = useVendorStore((state) => state.vendors)
   const fetchStores = useVendorStore((state) => state.fetchStores)
   const fetchVendors = useVendorStore((state) => state.fetchVendors)
 
-  const products = useProductStore((state) => state.getProductsByStore(storeId))
+  const allProducts = useProductStore((state) => state.getProductsByStore(storeId))
   const fetchProducts = useProductStore((state) => state.fetchProducts)
 
   const store = stores.find((s) => s.id === storeId)
   const vendor = store ? vendors.find((v) => v.id === store.vendorId) : null
+
+  // Filter products by selected category
+  const products = selectedCategory
+    ? allProducts.filter((p) => p.category === selectedCategory)
+    : allProducts
 
   // Ensure data is fetched
   useEffect(() => {
@@ -47,7 +54,7 @@ export default function StoreDetailPage() {
   }
 
   // Get unique categories for this store's products
-  const storeCategories = Array.from(new Set(products.map((p) => p.category)))
+  const storeCategories = Array.from(new Set(allProducts.map((p) => p.category)))
 
   return (
     <div className="min-h-screen">
@@ -111,14 +118,28 @@ export default function StoreDetailPage() {
         {storeCategories.length > 0 && (
           <div className="mb-6 overflow-x-auto">
             <div className="flex gap-2">
+              <button
+                onClick={() => setSelectedCategory(null)}
+                className={`px-4 py-2 rounded-xl text-sm font-medium transition-colors whitespace-nowrap ${
+                  selectedCategory === null
+                    ? 'bg-terracotta text-white'
+                    : 'bg-white text-gray-700 hover:bg-terracotta hover:text-white'
+                }`}
+              >
+                All
+              </button>
               {CATEGORIES.filter((c) => storeCategories.includes(c.id)).map((category) => (
-                <Link
+                <button
                   key={category.id}
-                  href={`/category/${category.slug}`}
-                  className="px-4 py-2 bg-white rounded-xl text-sm font-medium text-gray-700 hover:bg-terracotta hover:text-white transition-colors whitespace-nowrap"
+                  onClick={() => setSelectedCategory(category.id as ProductCategory)}
+                  className={`px-4 py-2 rounded-xl text-sm font-medium transition-colors whitespace-nowrap ${
+                    selectedCategory === category.id
+                      ? 'bg-terracotta text-white'
+                      : 'bg-white text-gray-700 hover:bg-terracotta hover:text-white'
+                  }`}
                 >
                   {category.name}
-                </Link>
+                </button>
               ))}
             </div>
           </div>
