@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Search, MapPin, Loader2, ChevronDown, Check } from 'lucide-react'
+import { Search, MapPin, Loader2, Check } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 
@@ -18,12 +18,24 @@ interface PostcodeLookupProps {
   initialPostcode?: string
 }
 
-// Simulated UK address lookup - In production, replace with real API like GetAddress.io or Ideal Postcodes
-async function lookupPostcode(postcode: string): Promise<Address[]> {
-  // Simulate API delay
-  await new Promise((resolve) => setTimeout(resolve, 800))
+interface IdealPostcodesAddress {
+  line_1: string
+  line_2: string
+  line_3: string
+  post_town: string
+  postcode: string
+  country: string
+}
 
-  // Clean postcode
+interface IdealPostcodesResponse {
+  result: IdealPostcodesAddress[]
+  code: number
+  message?: string
+}
+
+// Real UK address lookup using Ideal Postcodes API
+async function lookupPostcode(postcode: string): Promise<Address[]> {
+  // Clean postcode - remove spaces and convert to uppercase
   const cleanPostcode = postcode.toUpperCase().replace(/\s+/g, '')
 
   // Validate UK postcode format
@@ -32,95 +44,91 @@ async function lookupPostcode(postcode: string): Promise<Address[]> {
     throw new Error('Please enter a valid UK postcode')
   }
 
-  // Format postcode properly (e.g., SW1A1AA -> SW1A 1AA)
+  const apiKey = process.env.NEXT_PUBLIC_IDEAL_POSTCODES_API_KEY
+
+  if (!apiKey) {
+    console.warn('Ideal Postcodes API key not configured, using fallback')
+    return fallbackLookup(cleanPostcode)
+  }
+
+  try {
+    const response = await fetch(
+      `https://api.ideal-postcodes.co.uk/v1/postcodes/${cleanPostcode}?api_key=${apiKey}`
+    )
+
+    if (!response.ok) {
+      if (response.status === 404) {
+        throw new Error('Postcode not found. Please check and try again.')
+      }
+      throw new Error('Failed to lookup postcode. Please try again.')
+    }
+
+    const data: IdealPostcodesResponse = await response.json()
+
+    if (data.code !== 2000 || !data.result || data.result.length === 0) {
+      throw new Error('No addresses found for this postcode')
+    }
+
+    // Format postcode properly (e.g., SW1A1AA -> SW1A 1AA)
+    const formattedPostcode = cleanPostcode.slice(0, -3) + ' ' + cleanPostcode.slice(-3)
+
+    // Transform API response to our Address format
+    return data.result.map((addr) => {
+      const lines = [addr.line_1, addr.line_2, addr.line_3].filter(Boolean)
+      const line1 = lines.join(', ')
+
+      return {
+        line1,
+        line2: addr.line_2 || undefined,
+        city: addr.post_town,
+        postcode: formattedPostcode,
+        fullAddress: `${line1}, ${addr.post_town} ${formattedPostcode}`,
+      }
+    })
+  } catch (error) {
+    if (error instanceof Error) {
+      throw error
+    }
+    throw new Error('Failed to lookup postcode. Please try again.')
+  }
+}
+
+// Fallback function when API key is not available (for development/demo)
+function fallbackLookup(cleanPostcode: string): Address[] {
   const formattedPostcode = cleanPostcode.slice(0, -3) + ' ' + cleanPostcode.slice(-3)
-
-  // Simulated addresses for demo - In production, this would come from a real API
-  // Using realistic UK address patterns
-  const streetNames = [
-    'High Street',
-    'Station Road',
-    'Church Lane',
-    'Victoria Road',
-    'Green Lane',
-    'Manor Road',
-    'Park Avenue',
-    'Queens Road',
-    'Kings Road',
-    'Mill Lane',
-  ]
-
-  const buildingTypes = [
-    { prefix: '', suffix: '' },
-    { prefix: 'Flat 1, ', suffix: '' },
-    { prefix: 'Flat 2, ', suffix: '' },
-    { prefix: '', suffix: ' House' },
-    { prefix: 'Ground Floor, ', suffix: '' },
-  ]
 
   // Determine city based on postcode area
   const postcodeArea = cleanPostcode.slice(0, 2)
   const cities: Record<string, string> = {
     'SW': 'London',
     'SE': 'London',
-    'E1': 'London',
-    'E2': 'London',
     'EC': 'London',
     'WC': 'London',
-    'W1': 'London',
-    'N1': 'London',
     'NW': 'London',
     'LS': 'Leeds',
     'M1': 'Manchester',
     'M2': 'Manchester',
     'B1': 'Birmingham',
-    'B2': 'Birmingham',
     'BS': 'Bristol',
     'EH': 'Edinburgh',
     'G1': 'Glasgow',
-    'G2': 'Glasgow',
     'CF': 'Cardiff',
     'SO': 'Southampton',
-    'PO': 'Portsmouth',
-    'OX': 'Oxford',
-    'CB': 'Cambridge',
-    'NG': 'Nottingham',
-    'LE': 'Leicester',
-    'CV': 'Coventry',
-    'L1': 'Liverpool',
-    'L2': 'Liverpool',
   }
 
   const city = cities[postcodeArea] || cities[cleanPostcode.charAt(0)] || 'London'
 
-  // Generate realistic addresses
-  const addresses: Address[] = []
-  const usedNumbers = new Set<number>()
+  const streetNames = ['High Street', 'Station Road', 'Church Lane', 'Victoria Road', 'Park Avenue']
 
-  for (let i = 0; i < 6; i++) {
-    let houseNumber: number
-    do {
-      houseNumber = Math.floor(Math.random() * 150) + 1
-    } while (usedNumbers.has(houseNumber))
-    usedNumbers.add(houseNumber)
-
-    const street = streetNames[i % streetNames.length]
-    const building = buildingTypes[i % buildingTypes.length]
-    const line1 = `${building.prefix}${houseNumber}${building.suffix} ${street}`
-
-    addresses.push({
+  return streetNames.slice(0, 4).map((street, i) => {
+    const houseNumber = (i + 1) * 10 + Math.floor(Math.random() * 10)
+    const line1 = `${houseNumber} ${street}`
+    return {
       line1,
       city,
       postcode: formattedPostcode,
       fullAddress: `${line1}, ${city} ${formattedPostcode}`,
-    })
-  }
-
-  // Sort by house number
-  return addresses.sort((a, b) => {
-    const numA = parseInt(a.line1.match(/\d+/)?.[0] || '0')
-    const numB = parseInt(b.line1.match(/\d+/)?.[0] || '0')
-    return numA - numB
+    }
   })
 }
 
@@ -214,7 +222,7 @@ export function PostcodeLookup({ onAddressSelect, initialPostcode = '' }: Postco
       {showDropdown && addresses.length > 0 && (
         <div className="relative">
           <label className="block text-sm font-medium text-gray-700 mb-1">
-            Select your address
+            Select your address ({addresses.length} found)
           </label>
           <div className="border border-gray-300 rounded-xl overflow-hidden bg-white shadow-lg max-h-64 overflow-y-auto">
             {addresses.map((address, index) => (
