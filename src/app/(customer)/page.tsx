@@ -41,118 +41,120 @@ export default function HomePage() {
         </div>
 
         {/* Content Cards */}
-        <div className="px-4 space-y-4 pb-24">
-          {/* Most Recent Order */}
-          {mostRecentOrder ? (
-            <Card className="overflow-hidden">
-              <div className="bg-gray-50 px-4 py-3 border-b border-gray-100">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium text-gray-600">Most Recent Order</span>
-                  <Badge className={ORDER_STATUS_COLORS[mostRecentOrder.status]} size="sm">
-                    {ORDER_STATUS_LABELS[mostRecentOrder.status]}
-                  </Badge>
-                </div>
-              </div>
-              <div className="p-4">
-                <div className="flex items-center justify-between mb-3">
-                  <div>
-                    <p className="font-semibold text-gray-900">{mostRecentOrder.id}</p>
-                    <p className="text-sm text-gray-500">{mostRecentOrder.storeName}</p>
+        <div className="px-4 pb-24">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Most Recent Order */}
+            {mostRecentOrder ? (
+              <Card className="overflow-hidden">
+                <div className="bg-gray-50 px-4 py-3 border-b border-gray-100">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium text-gray-600">Most Recent Order</span>
+                    <Badge className={ORDER_STATUS_COLORS[mostRecentOrder.status]} size="sm">
+                      {ORDER_STATUS_LABELS[mostRecentOrder.status]}
+                    </Badge>
                   </div>
-                  <p className="text-lg font-bold text-terracotta">{formatPrice(mostRecentOrder.total)}</p>
                 </div>
-                <p className="text-sm text-gray-500 mb-4">
-                  {mostRecentOrder.items.length} item{mostRecentOrder.items.length !== 1 ? 's' : ''} • {formatDate(mostRecentOrder.createdAt)}
-                </p>
-                <Link href={`/orders/${mostRecentOrder.id}`}>
-                  <Button variant="outline" className="w-full text-forest border-forest hover:bg-forest hover:text-white">
-                    View order
+                <div className="p-4">
+                  <div className="flex items-center justify-between mb-3">
+                    <div>
+                      <p className="font-semibold text-gray-900">{mostRecentOrder.id}</p>
+                      <p className="text-sm text-gray-500">{mostRecentOrder.storeName}</p>
+                    </div>
+                    <p className="text-lg font-bold text-terracotta">{formatPrice(mostRecentOrder.total)}</p>
+                  </div>
+                  <p className="text-sm text-gray-500 mb-4">
+                    {mostRecentOrder.items.length} item{mostRecentOrder.items.length !== 1 ? 's' : ''} • {formatDate(mostRecentOrder.createdAt)}
+                  </p>
+                  <Link href={`/orders/${mostRecentOrder.id}`}>
+                    <Button variant="outline" className="w-full text-forest border-forest hover:bg-forest hover:text-white">
+                      View order
+                    </Button>
+                  </Link>
+                </div>
+              </Card>
+            ) : (
+              <Card className="p-4">
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center">
+                    <Package className="h-6 w-6 text-gray-400" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="font-medium text-gray-900">No orders yet</p>
+                    <p className="text-sm text-gray-500">Start shopping to see your orders here</p>
+                  </div>
+                </div>
+              </Card>
+            )}
+
+            {/* Your Regulars */}
+            <Card className="overflow-hidden">
+              <div className="p-4">
+                <div className="flex items-center gap-4 mb-4">
+                  <div className="w-12 h-12 bg-forest/10 rounded-xl flex items-center justify-center">
+                    <ShoppingBasket className="h-6 w-6 text-forest" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="font-semibold text-gray-900">Your regulars</p>
+                    <p className="text-sm text-gray-500">Your one stop shopping list</p>
+                  </div>
+                  {regularsCount > 0 && (
+                    <Badge variant="outline">{regularsCount} items</Badge>
+                  )}
+                </div>
+                <Link href="/regulars">
+                  <Button className="w-full bg-forest hover:bg-forest-dark">
+                    Shop regulars
                   </Button>
                 </Link>
               </div>
             </Card>
-          ) : (
-            <Card className="p-4">
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center">
-                  <Package className="h-6 w-6 text-gray-400" />
+
+            {/* Favourites */}
+            <Card className="overflow-hidden">
+              <div className="p-4">
+                <div className="flex items-center gap-4 mb-4">
+                  <div className="w-12 h-12 bg-terracotta/10 rounded-xl flex items-center justify-center">
+                    <Heart className="h-6 w-6 text-terracotta" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="font-semibold text-gray-900">Your favourites</p>
+                    <p className="text-sm text-gray-500">Items you have saved</p>
+                  </div>
+                  {favouritesCount > 0 && (
+                    <Badge variant="outline">{favouritesCount} items</Badge>
+                  )}
                 </div>
-                <div className="flex-1">
-                  <p className="font-medium text-gray-900">No orders yet</p>
-                  <p className="text-sm text-gray-500">Start shopping to see your orders here</p>
-                </div>
+                <Link href="/regulars?tab=favourites">
+                  <Button variant="outline" className="w-full text-terracotta border-terracotta hover:bg-terracotta hover:text-white">
+                    View favourites
+                  </Button>
+                </Link>
               </div>
             </Card>
-          )}
 
-          {/* Your Regulars */}
-          <Card className="overflow-hidden">
-            <div className="p-4">
-              <div className="flex items-center gap-4 mb-4">
-                <div className="w-12 h-12 bg-forest/10 rounded-xl flex items-center justify-center">
-                  <ShoppingBasket className="h-6 w-6 text-forest" />
+            {/* Manage Orders */}
+            <Card className="overflow-hidden">
+              <div className="p-4">
+                <div className="flex items-center gap-4 mb-4">
+                  <div className="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center">
+                    <ClipboardList className="h-6 w-6 text-gray-600" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="font-semibold text-gray-900">Manage your orders</p>
+                    <p className="text-sm text-gray-500">View and track your orders</p>
+                  </div>
+                  {customerOrders.length > 0 && (
+                    <Badge variant="outline">{customerOrders.length} orders</Badge>
+                  )}
                 </div>
-                <div className="flex-1">
-                  <p className="font-semibold text-gray-900">Your regulars</p>
-                  <p className="text-sm text-gray-500">Your one stop shopping list</p>
-                </div>
-                {regularsCount > 0 && (
-                  <Badge variant="outline">{regularsCount} items</Badge>
-                )}
+                <Link href="/orders">
+                  <Button variant="outline" className="w-full">
+                    View orders
+                  </Button>
+                </Link>
               </div>
-              <Link href="/regulars">
-                <Button className="w-full bg-forest hover:bg-forest-dark">
-                  Shop regulars
-                </Button>
-              </Link>
-            </div>
-          </Card>
-
-          {/* Favourites */}
-          <Card className="overflow-hidden">
-            <div className="p-4">
-              <div className="flex items-center gap-4 mb-4">
-                <div className="w-12 h-12 bg-terracotta/10 rounded-xl flex items-center justify-center">
-                  <Heart className="h-6 w-6 text-terracotta" />
-                </div>
-                <div className="flex-1">
-                  <p className="font-semibold text-gray-900">Your favourites</p>
-                  <p className="text-sm text-gray-500">Items you have saved</p>
-                </div>
-                {favouritesCount > 0 && (
-                  <Badge variant="outline">{favouritesCount} items</Badge>
-                )}
-              </div>
-              <Link href="/regulars?tab=favourites">
-                <Button variant="outline" className="w-full text-terracotta border-terracotta hover:bg-terracotta hover:text-white">
-                  View favourites
-                </Button>
-              </Link>
-            </div>
-          </Card>
-
-          {/* Manage Orders */}
-          <Card className="overflow-hidden">
-            <div className="p-4">
-              <div className="flex items-center gap-4 mb-4">
-                <div className="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center">
-                  <ClipboardList className="h-6 w-6 text-gray-600" />
-                </div>
-                <div className="flex-1">
-                  <p className="font-semibold text-gray-900">Manage your orders</p>
-                  <p className="text-sm text-gray-500">View and track your orders</p>
-                </div>
-                {customerOrders.length > 0 && (
-                  <Badge variant="outline">{customerOrders.length} orders</Badge>
-                )}
-              </div>
-              <Link href="/orders">
-                <Button variant="outline" className="w-full">
-                  View orders
-                </Button>
-              </Link>
-            </div>
-          </Card>
+            </Card>
+          </div>
 
           {/* Quick Shop Section */}
           <div className="mt-6">
