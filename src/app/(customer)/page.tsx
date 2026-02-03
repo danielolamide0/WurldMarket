@@ -227,20 +227,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Order from places */}
-      <section className="py-6 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="flex items-center gap-2 mb-4">
-            <span className="text-lg font-bold text-gray-900">Order from {stores.length > 0 ? stores.length : '400'}+ places</span>
-            <button className="p-1 rounded-full bg-gray-200">
-              <svg className="h-4 w-4 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-            </button>
-          </div>
-        </div>
-      </section>
-
       {/* Popular Products */}
       <section className="py-6">
         <div className="max-w-7xl mx-auto px-4">
