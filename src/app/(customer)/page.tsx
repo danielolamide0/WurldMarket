@@ -152,11 +152,11 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Hello Card - Compact, always show for logged-in users */}
+      {/* Hello Card - Right after Find your flavour */}
       {isAuthenticated && user?.role === 'customer' && (
-        <section className="py-3 bg-gray-50">
+        <section className="py-3">
           <div className="max-w-7xl mx-auto px-4">
-            <Card className="p-4">
+            <Card className="p-4 bg-gray-50">
               <h2 className="text-lg font-bold text-gray-900">
                 Hello {user.name.split(' ')[0]}
               </h2>
@@ -210,14 +210,6 @@ export default function HomePage() {
           </div>
         </div>
       </section>
-
-      {/* Order from X places - Info line */}
-      <div className="px-4 py-2 border-t border-gray-100">
-        <p className="text-sm text-gray-600 flex items-center gap-1">
-          Order from {sortedStores.length > 0 ? sortedStores.length : '400'}+ places
-          <span className="w-4 h-4 rounded-full border border-gray-400 text-gray-400 text-xs flex items-center justify-center">i</span>
-        </p>
-      </div>
 
       {/* Your Regulars - Only show if user has regulars, below the fold */}
       {isAuthenticated && user?.role === 'customer' && regularsCount > 0 && (
