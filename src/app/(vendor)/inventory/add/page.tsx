@@ -129,7 +129,7 @@ export default function AddProductPage() {
                 placeholder="Describe your product..."
                 value={formData.description}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                className="w-full px-4 py-2.5 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-terracotta focus:border-transparent resize-none"
+                className="w-full px-4 py-2.5 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent resize-none"
                 rows={3}
               />
             </div>

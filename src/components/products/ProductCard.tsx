@@ -69,8 +69,8 @@ export function ProductCard({ product }: ProductCardProps) {
             onClick={handleToggleFavourite}
             className={`absolute top-2 right-2 p-2 rounded-full transition-all ${
               isFav
-                ? 'bg-terracotta text-white'
-                : 'bg-white/90 text-gray-400 hover:bg-white hover:text-terracotta'
+                ? 'bg-primary text-white'
+                : 'bg-white/90 text-gray-400 hover:bg-white hover:text-primary'
             }`}
             title={isFav ? 'Remove from favourites' : 'Add to favourites'}
           >
@@ -97,7 +97,7 @@ export function ProductCard({ product }: ProductCardProps) {
           <p className="text-sm text-gray-500 mb-3">{product.unit}</p>
 
           <div className="flex items-center justify-between">
-            <span className="text-lg font-bold text-terracotta">{formatPrice(product.price)}</span>
+            <span className="text-lg font-bold text-primary">{formatPrice(product.price)}</span>
 
             <button
               onClick={handleAddToCart}
@@ -107,7 +107,7 @@ export function ProductCard({ product }: ProductCardProps) {
                   ? 'bg-forest text-white'
                   : isOutOfStock
                   ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                  : 'bg-terracotta text-white hover:bg-terracotta-dark'
+                  : 'bg-primary text-white hover:bg-primary-dark'
               }`}
             >
               {isInCart ? (

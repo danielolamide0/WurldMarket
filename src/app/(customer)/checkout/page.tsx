@@ -193,7 +193,7 @@ export default function CheckoutPage() {
           <p className="text-gray-600 mb-4">
             Thank you for your order. Your order number is:
           </p>
-          <p className="text-2xl font-mono font-bold text-terracotta mb-8">{orderId}</p>
+          <p className="text-2xl font-mono font-bold text-primary mb-8">{orderId}</p>
 
           <Card className="p-4 mb-8 text-left">
             <h3 className="font-medium text-gray-900 mb-2">What&apos;s Next?</h3>
@@ -253,11 +253,11 @@ export default function CheckoutPage() {
               onClick={() => setOrderType('delivery')}
               className={`p-4 rounded-xl border-2 transition-all ${
                 orderType === 'delivery'
-                  ? 'border-terracotta bg-terracotta/5'
+                  ? 'border-primary bg-primary/5'
                   : 'border-gray-200 hover:border-gray-300'
               }`}
             >
-              <Truck className={`h-6 w-6 mx-auto mb-2 ${orderType === 'delivery' ? 'text-terracotta' : 'text-gray-400'}`} />
+              <Truck className={`h-6 w-6 mx-auto mb-2 ${orderType === 'delivery' ? 'text-primary' : 'text-gray-400'}`} />
               <p className="font-medium">Delivery</p>
               <p className="text-sm text-gray-500">To your door</p>
             </button>
@@ -265,11 +265,11 @@ export default function CheckoutPage() {
               onClick={() => setOrderType('pickup')}
               className={`p-4 rounded-xl border-2 transition-all ${
                 orderType === 'pickup'
-                  ? 'border-terracotta bg-terracotta/5'
+                  ? 'border-primary bg-primary/5'
                   : 'border-gray-200 hover:border-gray-300'
               }`}
             >
-              <Store className={`h-6 w-6 mx-auto mb-2 ${orderType === 'pickup' ? 'text-terracotta' : 'text-gray-400'}`} />
+              <Store className={`h-6 w-6 mx-auto mb-2 ${orderType === 'pickup' ? 'text-primary' : 'text-gray-400'}`} />
               <p className="font-medium">Pickup</p>
               <p className="text-sm text-gray-500">Collect in store</p>
             </button>
@@ -305,7 +305,7 @@ export default function CheckoutPage() {
                         setCustomerPhone('')
                       }
                     }}
-                    className="text-sm text-terracotta hover:underline"
+                    className="text-sm text-primary hover:underline"
                   >
                     {useSavedPhone ? 'Use different number' : 'Use saved number'}
                   </button>
@@ -316,7 +316,7 @@ export default function CheckoutPage() {
                     <div className="flex items-center gap-2">
                       <Phone className="h-4 w-4 text-gray-500" />
                       <span className="text-gray-900 font-medium">{user.phone}</span>
-                      <span className="ml-auto text-xs bg-terracotta/10 text-terracotta px-2 py-0.5 rounded-full">
+                      <span className="ml-auto text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full">
                         Saved
                       </span>
                     </div>
@@ -356,7 +356,7 @@ export default function CheckoutPage() {
               {isAuthenticated && (
                 <Link
                   href="/account/addresses"
-                  className="text-sm text-terracotta font-medium hover:underline"
+                  className="text-sm text-primary font-medium hover:underline"
                 >
                   Manage Addresses
                 </Link>
@@ -375,24 +375,24 @@ export default function CheckoutPage() {
                       onClick={() => handleAddressSelect(addr)}
                       className={`w-full flex items-start gap-3 p-3 rounded-xl border-2 text-left transition-all ${
                         isSelected
-                          ? 'border-terracotta bg-terracotta/5'
+                          ? 'border-primary bg-primary/5'
                           : 'border-gray-200 hover:border-gray-300'
                       }`}
                     >
                       <div
                         className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
-                          isSelected ? 'bg-terracotta/10' : 'bg-gray-100'
+                          isSelected ? 'bg-primary/10' : 'bg-gray-100'
                         }`}
                       >
                         <LabelIcon
-                          className={`h-4 w-4 ${isSelected ? 'text-terracotta' : 'text-gray-500'}`}
+                          className={`h-4 w-4 ${isSelected ? 'text-primary' : 'text-gray-500'}`}
                         />
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2">
                           <span className="font-medium text-gray-900">{addr.label}</span>
                           {addr.isPrimary && (
-                            <span className="text-xs bg-terracotta/10 text-terracotta px-2 py-0.5 rounded-full">
+                            <span className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full">
                               Primary
                             </span>
                           )}
@@ -403,7 +403,7 @@ export default function CheckoutPage() {
                         </p>
                       </div>
                       {isSelected && (
-                        <CheckCircle className="h-5 w-5 text-terracotta flex-shrink-0" />
+                        <CheckCircle className="h-5 w-5 text-primary flex-shrink-0" />
                       )}
                     </button>
                   )
@@ -414,18 +414,18 @@ export default function CheckoutPage() {
                   onClick={handleUseNewAddress}
                   className={`w-full flex items-center gap-3 p-3 rounded-xl border-2 text-left transition-all ${
                     useNewAddress
-                      ? 'border-terracotta bg-terracotta/5'
+                      ? 'border-primary bg-primary/5'
                       : 'border-dashed border-gray-300 hover:border-gray-400'
                   }`}
                 >
                   <div
                     className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                      useNewAddress ? 'bg-terracotta/10' : 'bg-gray-100'
+                      useNewAddress ? 'bg-primary/10' : 'bg-gray-100'
                     }`}
                   >
-                    <Plus className={`h-4 w-4 ${useNewAddress ? 'text-terracotta' : 'text-gray-500'}`} />
+                    <Plus className={`h-4 w-4 ${useNewAddress ? 'text-primary' : 'text-gray-500'}`} />
                   </div>
-                  <span className={`font-medium ${useNewAddress ? 'text-terracotta' : 'text-gray-600'}`}>
+                  <span className={`font-medium ${useNewAddress ? 'text-primary' : 'text-gray-600'}`}>
                     Use a different address
                   </span>
                 </button>
@@ -456,7 +456,7 @@ export default function CheckoutPage() {
                           setNewPostcode('')
                           setAddress('')
                         }}
-                        className="text-sm text-terracotta hover:underline"
+                        className="text-sm text-primary hover:underline"
                       >
                         Change Postcode
                       </button>
@@ -507,7 +507,7 @@ export default function CheckoutPage() {
           <Card className="p-4">
             <h2 className="font-semibold text-gray-900 mb-4">Pickup Location</h2>
             <div className="flex items-start gap-3 p-3 bg-gray-50 rounded-xl">
-              <Store className="h-5 w-5 text-terracotta mt-0.5" />
+              <Store className="h-5 w-5 text-primary mt-0.5" />
               <div>
                 <p className="font-medium">{pickupStore?.name}</p>
                 <p className="text-sm text-gray-600">
@@ -525,7 +525,7 @@ export default function CheckoutPage() {
             placeholder="Any special instructions?"
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
-            className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-terracotta focus:border-transparent resize-none"
+            className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent resize-none"
             rows={3}
           />
         </Card>
@@ -558,7 +558,7 @@ export default function CheckoutPage() {
             </div>
             <div className="flex justify-between text-lg font-semibold pt-2 border-t border-gray-100">
               <span>Total</span>
-              <span className="text-terracotta">{formatPrice(total)}</span>
+              <span className="text-primary">{formatPrice(total)}</span>
             </div>
           </div>
         </Card>

@@ -141,7 +141,7 @@ export default function StoresPage() {
                   <Card
                     key={store.id}
                     className={`overflow-hidden cursor-pointer transition-all ${
-                      isSelected ? 'ring-2 ring-terracotta shadow-lg' : 'hover:shadow-md'
+                      isSelected ? 'ring-2 ring-primary shadow-lg' : 'hover:shadow-md'
                     }`}
                     onClick={() => setSelectedStore(store)}
                   >
@@ -170,7 +170,7 @@ export default function StoresPage() {
 
                         <div className="flex flex-wrap items-center gap-3 text-sm">
                           {distance && (
-                            <span className="text-terracotta font-medium">
+                            <span className="text-primary font-medium">
                               {distance} miles away
                             </span>
                           )}

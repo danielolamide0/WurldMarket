@@ -70,7 +70,7 @@ export default function VendorOrdersPage() {
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="px-4 py-2.5 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-terracotta"
+            className="px-4 py-2.5 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-primary"
           >
             <option value="all">All Statuses</option>
             {statusOptions.map((status) => (
@@ -127,7 +127,7 @@ export default function VendorOrdersPage() {
                       </div>
                     </div>
                     <div className="text-right">
-                      <p className="text-xl font-bold text-terracotta">{formatPrice(order.total)}</p>
+                      <p className="text-xl font-bold text-primary">{formatPrice(order.total)}</p>
                       {isExpanded ? (
                         <ChevronUp className="h-5 w-5 text-gray-400 mt-2 ml-auto" />
                       ) : (
@@ -193,7 +193,7 @@ export default function VendorOrdersPage() {
                             </div>
                             <div className="flex justify-between font-medium mt-1">
                               <span>Total</span>
-                              <span className="text-terracotta">{formatPrice(order.total)}</span>
+                              <span className="text-primary">{formatPrice(order.total)}</span>
                             </div>
                           </div>
                         </div>

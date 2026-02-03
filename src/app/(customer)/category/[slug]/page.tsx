@@ -27,7 +27,7 @@ export default function CategoryPage() {
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900 mb-4">Category not found</h1>
-          <Link href="/" className="text-terracotta hover:underline">
+          <Link href="/" className="text-primary hover:underline">
             Back to Home
           </Link>
         </div>
@@ -62,7 +62,7 @@ export default function CategoryPage() {
         {products.length === 0 ? (
           <div className="bg-white rounded-2xl p-12 text-center">
             <p className="text-gray-500 mb-4">No products found in this category.</p>
-            <Link href="/" className="text-terracotta font-medium hover:underline">
+            <Link href="/" className="text-primary font-medium hover:underline">
               Browse all products
             </Link>
           </div>

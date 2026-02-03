@@ -128,11 +128,11 @@ export default function AccountPage() {
           <Card className="overflow-hidden">
             <div className="px-4 py-3 border-b border-gray-100 flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Clock className="h-5 w-5 text-terracotta" />
+                <Clock className="h-5 w-5 text-primary" />
                 <h2 className="font-semibold text-gray-900">Recent Orders</h2>
               </div>
               {orders.length > 0 && (
-                <Link href="/orders" className="text-sm text-terracotta font-medium">
+                <Link href="/orders" className="text-sm text-primary font-medium">
                   View all
                 </Link>
               )}
@@ -162,7 +162,7 @@ export default function AccountPage() {
                       <p className="text-sm text-gray-600">
                         {order.items.length} item{order.items.length !== 1 ? 's' : ''}
                       </p>
-                      <p className="font-semibold text-terracotta">{formatPrice(order.total)}</p>
+                      <p className="font-semibold text-primary">{formatPrice(order.total)}</p>
                     </div>
                   </Link>
                 ))}

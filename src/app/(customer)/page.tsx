@@ -79,7 +79,7 @@ export default function HomePage() {
                       <p className="font-semibold text-gray-900">{mostRecentOrder.id}</p>
                       <p className="text-sm text-gray-500">{mostRecentOrder.storeName}</p>
                     </div>
-                    <p className="text-lg font-bold text-terracotta">{formatPrice(mostRecentOrder.total)}</p>
+                    <p className="text-lg font-bold text-primary">{formatPrice(mostRecentOrder.total)}</p>
                   </div>
                   <p className="text-sm text-gray-500 mb-4">
                     {mostRecentOrder.items.length} item{mostRecentOrder.items.length !== 1 ? 's' : ''} • {formatDate(mostRecentOrder.createdAt)}
@@ -132,8 +132,8 @@ export default function HomePage() {
             <Card className="overflow-hidden">
               <div className="p-4">
                 <div className="flex items-center gap-4 mb-4">
-                  <div className="w-12 h-12 bg-terracotta/10 rounded-xl flex items-center justify-center">
-                    <Heart className="h-6 w-6 text-terracotta" />
+                  <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center">
+                    <Heart className="h-6 w-6 text-primary" />
                   </div>
                   <div className="flex-1">
                     <p className="font-semibold text-gray-900">Your favourites</p>
@@ -144,7 +144,7 @@ export default function HomePage() {
                   )}
                 </div>
                 <Link href="/regulars?tab=favourites">
-                  <Button variant="outline" className="w-full text-terracotta border-terracotta hover:bg-terracotta hover:text-white">
+                  <Button variant="outline" className="w-full text-primary border-primary hover:bg-primary hover:text-white">
                     View favourites
                   </Button>
                 </Link>
@@ -219,7 +219,7 @@ export default function HomePage() {
       <section className="bg-gradient-to-br from-forest-dark via-forest to-forest-light text-white">
         <div className="max-w-7xl mx-auto px-4 py-12 md:py-20">
           <div className="max-w-2xl">
-            <Badge className="bg-terracotta text-white mb-4">Now Serving Leeds & Southampton</Badge>
+            <Badge className="bg-primary text-white mb-4">Now Serving Leeds & Southampton</Badge>
             <h1 className="text-4xl md:text-5xl font-bold mb-4">
               Flavours of the World,<br />Delivered to You
             </h1>
@@ -248,8 +248,8 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-4">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="flex items-center gap-4 p-4">
-              <div className="w-12 h-12 bg-terracotta/10 rounded-xl flex items-center justify-center">
-                <Truck className="h-6 w-6 text-terracotta" />
+              <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center">
+                <Truck className="h-6 w-6 text-primary" />
               </div>
               <div>
                 <h3 className="font-semibold text-gray-900">Fast Delivery</h3>
@@ -266,8 +266,8 @@ export default function HomePage() {
               </div>
             </div>
             <div className="flex items-center gap-4 p-4">
-              <div className="w-12 h-12 bg-terracotta/10 rounded-xl flex items-center justify-center">
-                <Clock className="h-6 w-6 text-terracotta" />
+              <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center">
+                <Clock className="h-6 w-6 text-primary" />
               </div>
               <div>
                 <h3 className="font-semibold text-gray-900">Easy Pickup</h3>
@@ -293,7 +293,7 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-4">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-2xl font-bold text-gray-900">Our Partner Stores</h2>
-            <Link href="/stores" className="text-terracotta font-medium flex items-center gap-1 hover:underline">
+            <Link href="/stores" className="text-primary font-medium flex items-center gap-1 hover:underline">
               View All <ArrowRight className="h-4 w-4" />
             </Link>
           </div>
@@ -334,7 +334,7 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-4">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-2xl font-bold text-gray-900">Popular Products</h2>
-            <Link href="/category/grains-rice" className="text-terracotta font-medium flex items-center gap-1 hover:underline">
+            <Link href="/category/grains-rice" className="text-primary font-medium flex items-center gap-1 hover:underline">
               View All <ArrowRight className="h-4 w-4" />
             </Link>
           </div>
@@ -347,7 +347,7 @@ export default function HomePage() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-12 bg-terracotta">
+      <section className="py-12 bg-primary">
         <div className="max-w-7xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold text-white mb-4">Ready to Start Shopping?</h2>
           <p className="text-white/80 mb-8 max-w-xl mx-auto">

@@ -11,6 +11,20 @@ import { useVendorStore } from '@/stores/vendorStore'
 import { Button } from '@/components/ui/button'
 import { Product, StoreLocation } from '@/types'
 
+// Popular searches for the dropdown
+const POPULAR_SEARCHES = [
+  'Chicken',
+  'Eggs',
+  'Milk',
+  'Bread',
+  'Cheese',
+  'Crisps',
+  'Carrots',
+  'Rice',
+  'Plantain',
+  'Palm Oil',
+]
+
 export function Header() {
   const router = useRouter()
   const { user, isAuthenticated, logout } = useAuthStore()
@@ -64,7 +78,7 @@ export function Header() {
       .slice(0, 3)
 
     setSearchResults({ products: matchedProducts, stores: matchedStores })
-  }, [searchQuery, products])
+  }, [searchQuery, products, stores])
 
   // Close search dropdown when clicking outside
   useEffect(() => {
@@ -95,6 +109,13 @@ export function Header() {
     router.push(path)
   }
 
+  const handlePopularSearchClick = (term: string) => {
+    setSearchQuery(term)
+    const path = `/search?q=${encodeURIComponent(term)}`
+    setIsSearchOpen(false)
+    router.push(path)
+  }
+
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     if (searchQuery.trim()) {
@@ -105,6 +126,28 @@ export function Header() {
   }
 
   const hasResults = searchResults.products.length > 0 || searchResults.stores.length > 0
+  const showPopularSearches = isSearchOpen && searchQuery.length < 2
+
+  // Popular Searches Component
+  const PopularSearchesDropdown = ({ isMobile = false }: { isMobile?: boolean }) => (
+    <div className={`${isMobile ? '' : 'absolute top-full left-0 right-0 mt-2 rounded-xl shadow-lg border border-gray-100'} bg-white overflow-hidden z-50`}>
+      <div className="px-4 py-2 bg-gray-50 text-xs font-semibold text-gray-500 uppercase tracking-wide">
+        Popular Searches
+      </div>
+      <div className="py-2">
+        {POPULAR_SEARCHES.map((term) => (
+          <button
+            key={term}
+            onClick={() => handlePopularSearchClick(term)}
+            className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-primary/5 active:bg-primary/10 transition-colors text-left"
+          >
+            <Search className="h-4 w-4 text-primary" />
+            <span className="text-gray-700 hover:text-primary">{term}</span>
+          </button>
+        ))}
+      </div>
+    </div>
+  )
 
   // Search Results Component (shared between mobile and desktop)
   const SearchResultsDropdown = ({ isMobile = false }: { isMobile?: boolean }) => (
@@ -136,7 +179,7 @@ export function Header() {
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="font-medium text-gray-900 truncate">{product.name}</p>
-                    <p className="text-sm text-terracotta">£{product.price.toFixed(2)}</p>
+                    <p className="text-sm text-primary">£{product.price.toFixed(2)}</p>
                   </div>
                   <Package className={`${isMobile ? 'h-5 w-5' : 'h-4 w-4'} text-gray-400 flex-shrink-0`} />
                 </button>
@@ -176,7 +219,7 @@ export function Header() {
           {/* View All Results */}
           <button
             onClick={handleSearchSubmit}
-            className="w-full px-4 py-3 bg-gray-50 text-terracotta font-medium hover:bg-gray-100 active:bg-gray-200 transition-colors text-center border-t border-gray-100"
+            className="w-full px-4 py-3 bg-gray-50 text-primary font-medium hover:bg-gray-100 active:bg-gray-200 transition-colors text-center border-t border-gray-100"
           >
             View all results for &ldquo;{searchQuery}&rdquo;
           </button>
@@ -203,17 +246,17 @@ export function Header() {
           <div className="hidden md:flex flex-1 max-w-md mx-8" ref={desktopSearchRef}>
             <div className="relative w-full">
               <form onSubmit={handleSearchSubmit}>
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-primary" />
                 <input
                   type="text"
-                  placeholder="Search products or stores..."
+                  placeholder="Looking for items?"
                   value={searchQuery}
                   onChange={(e) => {
                     setSearchQuery(e.target.value)
                     setIsSearchOpen(true)
                   }}
                   onFocus={() => setIsSearchOpen(true)}
-                  className="w-full pl-10 pr-10 py-2 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-terracotta focus:border-transparent"
+                  className="w-full pl-10 pr-10 py-2.5 rounded-full border-2 border-primary bg-white focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary placeholder-gray-400"
                 />
                 {searchQuery && (
                   <button
@@ -228,6 +271,11 @@ export function Header() {
                   </button>
                 )}
               </form>
+
+              {/* Desktop Popular Searches Dropdown */}
+              {showPopularSearches && (
+                <PopularSearchesDropdown />
+              )}
 
               {/* Desktop Search Results Dropdown */}
               {isSearchOpen && searchQuery.length >= 2 && (
@@ -245,7 +293,7 @@ export function Header() {
             >
               <ShoppingCart className="h-6 w-6 text-gray-700" />
               {totalItems > 0 && (
-                <span className="absolute -top-1 -right-1 w-5 h-5 bg-terracotta text-white text-xs font-bold rounded-full flex items-center justify-center">
+                <span className="absolute -top-1 -right-1 w-5 h-5 bg-primary text-white text-xs font-bold rounded-full flex items-center justify-center">
                   {totalItems}
                 </span>
               )}
@@ -291,17 +339,17 @@ export function Header() {
         <div className="md:hidden pb-3">
           <div className="relative" ref={mobileSearchRef}>
             <form onSubmit={handleSearchSubmit}>
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-primary" />
               <input
                 type="text"
-                placeholder="Search products or stores..."
+                placeholder="Looking for items?"
                 value={searchQuery}
                 onChange={(e) => {
                   setSearchQuery(e.target.value)
                   setIsSearchOpen(true)
                 }}
                 onFocus={() => setIsSearchOpen(true)}
-                className="w-full pl-10 pr-10 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-terracotta focus:border-transparent bg-gray-50"
+                className="w-full pl-10 pr-10 py-2.5 rounded-full border-2 border-primary bg-white focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary placeholder-gray-400"
               />
               {searchQuery && (
                 <button
@@ -317,6 +365,13 @@ export function Header() {
                 </button>
               )}
             </form>
+
+            {/* Mobile Popular Searches Dropdown */}
+            {showPopularSearches && (
+              <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden z-50">
+                <PopularSearchesDropdown isMobile />
+              </div>
+            )}
 
             {/* Mobile Search Results Dropdown */}
             {isSearchOpen && searchQuery.length >= 2 && (

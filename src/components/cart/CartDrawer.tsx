@@ -39,7 +39,7 @@ export function CartDrawer() {
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-gray-100">
           <div className="flex items-center gap-2">
-            <ShoppingBag className="h-5 w-5 text-terracotta" />
+            <ShoppingBag className="h-5 w-5 text-primary" />
             <h2 className="text-lg font-semibold">Your Cart</h2>
             <span className="text-sm text-gray-500">({totalItems} items)</span>
           </div>
@@ -82,7 +82,7 @@ export function CartDrawer() {
                   <div className="flex-1 min-w-0">
                     <h3 className="font-medium text-gray-900 truncate">{item.name}</h3>
                     <p className="text-sm text-gray-500">{item.unit}</p>
-                    <p className="text-terracotta font-semibold mt-1">
+                    <p className="text-primary font-semibold mt-1">
                       {formatPrice(item.price * item.quantity)}
                     </p>
                   </div>
@@ -124,7 +124,7 @@ export function CartDrawer() {
           <div className="border-t border-gray-100 p-4 space-y-4">
             <div className="flex items-center justify-between text-lg">
               <span className="font-medium">Subtotal</span>
-              <span className="font-bold text-terracotta">{formatPrice(totalPrice)}</span>
+              <span className="font-bold text-primary">{formatPrice(totalPrice)}</span>
             </div>
             <p className="text-sm text-gray-500">Delivery fees calculated at checkout</p>
             <Link href="/checkout" onClick={closeCart}>

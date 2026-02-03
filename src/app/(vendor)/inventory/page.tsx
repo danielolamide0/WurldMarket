@@ -94,7 +94,7 @@ export default function InventoryPage() {
           <select
             value={selectedStore}
             onChange={(e) => setSelectedStore(e.target.value)}
-            className="px-4 py-2.5 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-terracotta"
+            className="px-4 py-2.5 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-primary"
           >
             <option value="all">All Stores</option>
             {vendorStores.map((store) => (
@@ -228,7 +228,7 @@ export default function InventoryPage() {
                       <h3 className="font-medium text-gray-900 truncate">{product.name}</h3>
                       <p className="text-sm text-gray-500">{product.unit}</p>
                       <div className="flex items-center gap-2 mt-1">
-                        <span className="text-terracotta font-medium">{formatPrice(product.price)}</span>
+                        <span className="text-primary font-medium">{formatPrice(product.price)}</span>
                         <span className="text-gray-300">|</span>
                         <button onClick={() => setEditStock({ id: product.id, stock: product.stock })}>
                           {isLowStock ? (
@@ -297,7 +297,7 @@ export default function InventoryPage() {
             min="0"
             value={editStock?.stock || 0}
             onChange={(e) => setEditStock(prev => prev ? { ...prev, stock: parseInt(e.target.value) || 0 } : null)}
-            className="w-full px-4 py-2.5 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-terracotta"
+            className="w-full px-4 py-2.5 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary"
           />
         </div>
         <div className="flex gap-3 justify-end">

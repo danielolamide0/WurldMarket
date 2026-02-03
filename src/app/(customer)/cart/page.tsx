@@ -106,7 +106,7 @@ export default function CartPage() {
                         <Plus className="h-4 w-4" />
                       </button>
                     </div>
-                    <p className="font-semibold text-terracotta">
+                    <p className="font-semibold text-primary">
                       {formatPrice(item.price * item.quantity)}
                     </p>
                   </div>
@@ -136,7 +136,7 @@ export default function CartPage() {
             </div>
 
             {subtotal < FREE_DELIVERY_THRESHOLD && (
-              <p className="text-sm text-terracotta">
+              <p className="text-sm text-primary">
                 Add {formatPrice(FREE_DELIVERY_THRESHOLD - subtotal)} more for free delivery
               </p>
             )}
@@ -144,7 +144,7 @@ export default function CartPage() {
             <div className="border-t border-gray-100 pt-3">
               <div className="flex justify-between text-lg font-semibold">
                 <span>Total</span>
-                <span className="text-terracotta">{formatPrice(total)}</span>
+                <span className="text-primary">{formatPrice(total)}</span>
               </div>
             </div>
           </div>

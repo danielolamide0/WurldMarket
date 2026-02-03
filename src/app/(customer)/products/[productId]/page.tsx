@@ -100,7 +100,7 @@ export default function ProductDetailPage() {
           <p className="text-gray-600 mb-4">{product.description}</p>
 
           <div className="flex items-baseline gap-2 mb-4">
-            <span className="text-3xl font-bold text-terracotta">{formatPrice(product.price)}</span>
+            <span className="text-3xl font-bold text-primary">{formatPrice(product.price)}</span>
             <span className="text-gray-500">/ {product.unit}</span>
           </div>
 
@@ -124,8 +124,8 @@ export default function ProductDetailPage() {
           <Link href={`/stores/${store.id}`}>
             <Card className="p-4 mb-6 hover:shadow-md transition-shadow">
               <div className="flex items-center gap-3">
-                <div className="w-12 h-12 bg-terracotta/10 rounded-xl flex items-center justify-center">
-                  <Store className="h-6 w-6 text-terracotta" />
+                <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center">
+                  <Store className="h-6 w-6 text-primary" />
                 </div>
                 <div>
                   <p className="text-sm text-gray-500">Available at</p>

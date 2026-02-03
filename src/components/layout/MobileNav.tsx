@@ -27,7 +27,7 @@ export function MobileNav() {
               href={href}
               className={cn(
                 'flex flex-col items-center justify-center flex-1 h-full relative',
-                isActive ? 'text-terracotta' : 'text-gray-500'
+                isActive ? 'text-primary' : 'text-gray-500'
               )}
             >
               <div className="relative">
@@ -35,7 +35,7 @@ export function MobileNav() {
               </div>
               <span className="text-xs mt-1 font-medium">{label}</span>
               {isActive && (
-                <span className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-1 bg-terracotta rounded-b-full" />
+                <span className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-1 bg-primary rounded-b-full" />
               )}
             </Link>
           )

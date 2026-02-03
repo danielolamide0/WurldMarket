@@ -176,8 +176,8 @@ export default function VendorStoresPage() {
         <CardContent className="p-6">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 bg-terracotta/10 rounded-xl flex items-center justify-center">
-                <Building2 className="h-6 w-6 text-terracotta" />
+              <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center">
+                <Building2 className="h-6 w-6 text-primary" />
               </div>
               <div>
                 <h2 className="font-semibold text-gray-900">{vendor?.name}</h2>
@@ -202,7 +202,7 @@ export default function VendorStoresPage() {
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                   placeholder="Tell customers about your business..."
-                  className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-terracotta focus:border-transparent resize-none"
+                  className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent resize-none"
                   rows={3}
                 />
               </div>
@@ -279,7 +279,7 @@ export default function VendorStoresPage() {
 
       {/* Add Store Form */}
       {isAddingStore && (
-        <Card className="mb-6 border-2 border-dashed border-terracotta/30">
+        <Card className="mb-6 border-2 border-dashed border-primary/30">
           <CardContent className="p-4">
             <h3 className="font-medium text-gray-900 mb-4">Add New Store Location</h3>
             <div className="space-y-4">

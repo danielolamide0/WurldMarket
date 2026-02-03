@@ -58,7 +58,7 @@ function SearchResults() {
             Back to Home
           </Link>
           <div className="flex items-center gap-3">
-            <Search className="h-6 w-6 text-terracotta" />
+            <Search className="h-6 w-6 text-primary" />
             <div>
               <h1 className="text-2xl font-bold text-gray-900">
                 Search results for &ldquo;{query}&rdquo;
@@ -143,7 +143,7 @@ function SearchLoading() {
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center">
       <div className="text-center">
-        <Loader2 className="h-8 w-8 animate-spin text-terracotta mx-auto mb-4" />
+        <Loader2 className="h-8 w-8 animate-spin text-primary mx-auto mb-4" />
         <p className="text-gray-600">Loading search results...</p>
       </div>
     </div>

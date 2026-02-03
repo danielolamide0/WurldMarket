@@ -166,7 +166,7 @@ export default function SavedAddressesPage() {
                     onClick={() => setLabel(value)}
                     className={`flex items-center gap-2 px-4 py-2 rounded-xl border-2 transition-all ${
                       label === value
-                        ? 'border-terracotta bg-terracotta/5 text-terracotta'
+                        ? 'border-primary bg-primary/5 text-primary'
                         : 'border-gray-200 hover:border-gray-300 text-gray-600'
                     }`}
                   >
@@ -198,7 +198,7 @@ export default function SavedAddressesPage() {
                         setCity('')
                         setPostcode('')
                       }}
-                      className="text-sm text-terracotta hover:underline"
+                      className="text-sm text-primary hover:underline"
                     >
                       Change Postcode
                     </button>
@@ -265,18 +265,18 @@ export default function SavedAddressesPage() {
               return (
                 <Card
                   key={address.id}
-                  className={`p-4 ${address.isPrimary ? 'ring-2 ring-terracotta' : ''}`}
+                  className={`p-4 ${address.isPrimary ? 'ring-2 ring-primary' : ''}`}
                 >
                   <div className="flex items-start justify-between gap-4">
                     <div className="flex items-start gap-3 flex-1 min-w-0">
                       <div
                         className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 ${
-                          address.isPrimary ? 'bg-terracotta/10' : 'bg-gray-100'
+                          address.isPrimary ? 'bg-primary/10' : 'bg-gray-100'
                         }`}
                       >
                         <LabelIcon
                           className={`h-5 w-5 ${
-                            address.isPrimary ? 'text-terracotta' : 'text-gray-500'
+                            address.isPrimary ? 'text-primary' : 'text-gray-500'
                           }`}
                         />
                       </div>
@@ -286,7 +286,7 @@ export default function SavedAddressesPage() {
                             {address.label}
                           </span>
                           {address.isPrimary && (
-                            <span className="text-xs bg-terracotta/10 text-terracotta px-2 py-0.5 rounded-full font-medium">
+                            <span className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full font-medium">
                               Primary
                             </span>
                           )}
@@ -302,7 +302,7 @@ export default function SavedAddressesPage() {
                       {!address.isPrimary && (
                         <button
                           onClick={() => handleSetPrimary(address.id)}
-                          className="p-2 text-gray-400 hover:text-terracotta hover:bg-terracotta/5 rounded-lg transition-colors"
+                          className="p-2 text-gray-400 hover:text-primary hover:bg-primary/5 rounded-lg transition-colors"
                           title="Set as primary"
                         >
                           <Check className="h-4 w-4" />

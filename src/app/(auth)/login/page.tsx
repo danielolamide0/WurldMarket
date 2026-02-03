@@ -126,7 +126,7 @@ export default function LoginPage() {
               }}
               className={`flex-1 py-4 text-center font-medium transition-colors ${
                 viewMode === 'login'
-                  ? 'text-terracotta border-b-2 border-terracotta bg-terracotta/5'
+                  ? 'text-primary border-b-2 border-primary bg-primary/5'
                   : 'text-gray-500 hover:text-gray-700'
               }`}
             >
@@ -145,7 +145,7 @@ export default function LoginPage() {
               }}
               className={`flex-1 py-4 text-center font-medium transition-colors ${
                 viewMode === 'signup'
-                  ? 'text-terracotta border-b-2 border-terracotta bg-terracotta/5'
+                  ? 'text-primary border-b-2 border-primary bg-primary/5'
                   : 'text-gray-500 hover:text-gray-700'
               }`}
             >
@@ -182,7 +182,7 @@ export default function LoginPage() {
                       <button
                         type="button"
                         onClick={() => setViewMode('forgot-password')}
-                        className="text-sm text-terracotta hover:underline w-full text-left"
+                        className="text-sm text-primary hover:underline w-full text-left"
                       >
                         Forgot your password?
                       </button>
@@ -203,7 +203,7 @@ export default function LoginPage() {
                   <button
                     type="button"
                     onClick={() => setViewMode('forgot-password')}
-                    className="text-sm text-terracotta hover:underline"
+                    className="text-sm text-primary hover:underline"
                   >
                     Forgot your password?
                   </button>
@@ -227,12 +227,12 @@ export default function LoginPage() {
                       }}
                       className={`p-4 rounded-xl border-2 transition-all text-center ${
                         signupRole === 'customer'
-                          ? 'border-terracotta bg-terracotta/5'
+                          ? 'border-primary bg-primary/5'
                           : 'border-gray-200 hover:border-gray-300'
                       }`}
                     >
-                      <ShoppingBag className={`h-6 w-6 mx-auto mb-2 ${signupRole === 'customer' ? 'text-terracotta' : 'text-gray-400'}`} />
-                      <p className={`font-medium ${signupRole === 'customer' ? 'text-terracotta' : 'text-gray-700'}`}>Customer</p>
+                      <ShoppingBag className={`h-6 w-6 mx-auto mb-2 ${signupRole === 'customer' ? 'text-primary' : 'text-gray-400'}`} />
+                      <p className={`font-medium ${signupRole === 'customer' ? 'text-primary' : 'text-gray-700'}`}>Customer</p>
                       <p className="text-xs text-gray-500 mt-1">Shop & order</p>
                     </button>
                     <button
@@ -240,12 +240,12 @@ export default function LoginPage() {
                       onClick={() => setSignupRole('vendor')}
                       className={`p-4 rounded-xl border-2 transition-all text-center ${
                         signupRole === 'vendor'
-                          ? 'border-terracotta bg-terracotta/5'
+                          ? 'border-primary bg-primary/5'
                           : 'border-gray-200 hover:border-gray-300'
                       }`}
                     >
-                      <Store className={`h-6 w-6 mx-auto mb-2 ${signupRole === 'vendor' ? 'text-terracotta' : 'text-gray-400'}`} />
-                      <p className={`font-medium ${signupRole === 'vendor' ? 'text-terracotta' : 'text-gray-700'}`}>Vendor</p>
+                      <Store className={`h-6 w-6 mx-auto mb-2 ${signupRole === 'vendor' ? 'text-primary' : 'text-gray-400'}`} />
+                      <p className={`font-medium ${signupRole === 'vendor' ? 'text-primary' : 'text-gray-700'}`}>Vendor</p>
                       <p className="text-xs text-gray-500 mt-1">Sell products</p>
                     </button>
                   </div>
@@ -344,7 +344,7 @@ export default function LoginPage() {
                     }}
                     className="text-sm text-gray-600 hover:text-gray-900"
                   >
-                    Already have an account? <span className="text-terracotta font-medium">Sign In</span>
+                    Already have an account? <span className="text-primary font-medium">Sign In</span>
                   </button>
                 </div>
               </form>
@@ -389,7 +389,7 @@ export default function LoginPage() {
                     }}
                     className="text-sm text-gray-600 hover:text-gray-900"
                   >
-                    Back to <span className="text-terracotta font-medium">Sign In</span>
+                    Back to <span className="text-primary font-medium">Sign In</span>
                   </button>
                 </div>
               </form>

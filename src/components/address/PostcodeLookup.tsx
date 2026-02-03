@@ -223,7 +223,7 @@ export function PostcodeLookup({ onAddressSelect, onManualEntry }: PostcodeLooku
           <button
             type="button"
             onClick={handleManualEntry}
-            className="w-full mt-2 text-sm text-terracotta hover:underline text-center py-2"
+            className="w-full mt-2 text-sm text-primary hover:underline text-center py-2"
           >
             Can&apos;t find your address? Enter manually
           </button>

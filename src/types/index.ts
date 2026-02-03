@@ -47,10 +47,31 @@ export interface StoreLocation {
 
 // Product Types
 export type ProductCategory =
+  | 'fresh-produce'
+  | 'tubers-roots'
+  | 'fresh-vegetables'
+  | 'fresh-fruits'
+  | 'fresh-meat'
+  | 'fresh-fish-seafood'
+  | 'smoked-dried-fish-meat'
+  | 'frozen-foods'
+  | 'rice-grains'
+  | 'flour-meal'
+  | 'beans-lentils-pulses'
+  | 'spices-seasonings'
+  | 'sauces-pastes'
+  | 'cooking-oils-fats'
+  | 'noodles-pasta'
+  | 'ready-to-cook-foods'
+  | 'packaged-canned-foods'
+  | 'snacks-sweets'
+  | 'drinks-beverages'
+  | 'dairy-eggs'
+  | 'household-essentials'
+  // Legacy categories for backward compatibility
   | 'grains-rice'
   | 'spices'
   | 'frozen'
-  | 'fresh-produce'
   | 'snacks'
   | 'beverages'
 

@@ -139,7 +139,7 @@ export default function OrderDetailPage() {
             </div>
             <div className="flex justify-between font-semibold text-lg pt-2 border-t border-gray-100">
               <span className="text-gray-900">Total</span>
-              <span className="text-terracotta">{formatPrice(order.total)}</span>
+              <span className="text-primary">{formatPrice(order.total)}</span>
             </div>
           </div>
         </Card>

@@ -9,6 +9,13 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
+        // New primary blue (matching logo)
+        primary: {
+          DEFAULT: '#1E4D8C',
+          light: '#2E6AB8',
+          dark: '#153A6B',
+        },
+        // Keep terracotta for accents/legacy
         terracotta: {
           DEFAULT: '#E85D04',
           light: '#F28A3D',

@@ -29,7 +29,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
             type={type}
             className={cn(
               'w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white text-gray-900 placeholder-gray-400',
-              'focus:outline-none focus:ring-2 focus:ring-terracotta focus:border-transparent',
+              'focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent',
               'transition-all duration-200',
               'disabled:bg-gray-100 disabled:cursor-not-allowed',
               icon && 'pl-10',

@@ -24,7 +24,7 @@ const Select = forwardRef<HTMLSelectElement, SelectProps>(
             ref={ref}
             className={cn(
               'w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white text-gray-900',
-              'focus:outline-none focus:ring-2 focus:ring-terracotta focus:border-transparent',
+              'focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent',
               'transition-all duration-200 appearance-none cursor-pointer',
               'disabled:bg-gray-100 disabled:cursor-not-allowed',
               error && 'border-red-500 focus:ring-red-500',

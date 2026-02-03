@@ -48,7 +48,7 @@ export function StoreMap({ stores, userLocation, onStoreSelect, selectedStoreId 
     return (
       <div className="w-full h-full bg-gray-100 rounded-2xl flex items-center justify-center">
         <div className="text-center">
-          <div className="w-8 h-8 border-4 border-terracotta border-t-transparent rounded-full animate-spin mx-auto mb-2" />
+          <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-2" />
           <p className="text-gray-500">Loading map...</p>
         </div>
       </div>
@@ -148,7 +148,7 @@ export function StoreMap({ stores, userLocation, onStoreSelect, selectedStoreId 
                 href={`https://www.google.com/maps/dir/?api=1&destination=${store.coordinates.lat},${store.coordinates.lng}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-sm text-terracotta font-medium hover:underline"
+                className="text-sm text-primary font-medium hover:underline"
               >
                 Get Directions
               </a>

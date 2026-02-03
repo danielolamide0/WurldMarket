@@ -82,7 +82,7 @@ export default function CustomerOrdersPage() {
                         </p>
                       </div>
                       <div className="text-right flex-shrink-0">
-                        <p className="text-lg font-bold text-terracotta">{formatPrice(order.total)}</p>
+                        <p className="text-lg font-bold text-primary">{formatPrice(order.total)}</p>
                         <ChevronRight className="h-5 w-5 text-gray-400 mt-2 ml-auto" />
                       </div>
                     </div>

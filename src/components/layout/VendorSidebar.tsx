@@ -68,7 +68,7 @@ export function VendorSidebar() {
                   className={cn(
                     'flex items-center gap-3 px-4 py-3 rounded-xl transition-colors',
                     isActive
-                      ? 'bg-terracotta text-white'
+                      ? 'bg-primary text-white'
                       : 'text-gray-700 hover:bg-gray-100'
                   )}
                 >

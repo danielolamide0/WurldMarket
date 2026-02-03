@@ -147,7 +147,7 @@ export default function VendorDashboardPage() {
       label: 'Revenue',
       value: formatPrice(totalRevenue),
       icon: DollarSign,
-      color: 'bg-terracotta/10 text-terracotta',
+      color: 'bg-primary/10 text-primary',
       href: '/vendor/orders',
     },
     {
@@ -185,11 +185,11 @@ export default function VendorDashboardPage() {
 
       {/* Onboarding Section - Only show if not live */}
       {!isLive && (
-        <Card className="mb-8 border-2 border-dashed border-terracotta/30 bg-terracotta/5">
+        <Card className="mb-8 border-2 border-dashed border-primary/30 bg-primary/5">
           <CardContent className="p-6">
             <div className="flex items-start gap-4 mb-6">
-              <div className="w-12 h-12 bg-terracotta/10 rounded-xl flex items-center justify-center flex-shrink-0">
-                <Rocket className="h-6 w-6 text-terracotta" />
+              <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center flex-shrink-0">
+                <Rocket className="h-6 w-6 text-primary" />
               </div>
               <div className="flex-1">
                 <h2 className="text-lg font-semibold text-gray-900 mb-1">
@@ -200,7 +200,7 @@ export default function VendorDashboardPage() {
                 </p>
               </div>
               <div className="text-right">
-                <p className="text-2xl font-bold text-terracotta">{completedSteps}/{onboardingSteps.length}</p>
+                <p className="text-2xl font-bold text-primary">{completedSteps}/{onboardingSteps.length}</p>
                 <p className="text-xs text-gray-500">completed</p>
               </div>
             </div>
@@ -208,7 +208,7 @@ export default function VendorDashboardPage() {
             {/* Progress bar */}
             <div className="w-full bg-gray-200 rounded-full h-2 mb-6">
               <div
-                className="bg-terracotta h-2 rounded-full transition-all duration-500"
+                className="bg-primary h-2 rounded-full transition-all duration-500"
                 style={{ width: `${(completedSteps / onboardingSteps.length) * 100}%` }}
               />
             </div>
@@ -285,7 +285,7 @@ export default function VendorDashboardPage() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between">
             <h2 className="font-semibold text-gray-900">Recent Orders</h2>
-            <Link href="/vendor/orders" className="text-sm text-terracotta hover:underline flex items-center gap-1">
+            <Link href="/vendor/orders" className="text-sm text-primary hover:underline flex items-center gap-1">
               View All <ArrowRight className="h-4 w-4" />
             </Link>
           </CardHeader>
@@ -309,7 +309,7 @@ export default function VendorDashboardPage() {
                       <Badge className={ORDER_STATUS_COLORS[order.status]} size="sm">
                         {ORDER_STATUS_LABELS[order.status]}
                       </Badge>
-                      <p className="text-sm font-medium text-terracotta mt-1">
+                      <p className="text-sm font-medium text-primary mt-1">
                         {formatPrice(order.total)}
                       </p>
                     </div>
@@ -327,7 +327,7 @@ export default function VendorDashboardPage() {
               <AlertTriangle className="h-5 w-5 text-amber-500" />
               <h2 className="font-semibold text-gray-900">Low Stock Alert</h2>
             </div>
-            <Link href="/inventory" className="text-sm text-terracotta hover:underline flex items-center gap-1">
+            <Link href="/inventory" className="text-sm text-primary hover:underline flex items-center gap-1">
               Manage <ArrowRight className="h-4 w-4" />
             </Link>
           </CardHeader>

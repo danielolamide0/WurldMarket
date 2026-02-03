@@ -85,16 +85,16 @@ export default function StoreDetailPage() {
 
               <div className="flex flex-wrap gap-4 text-sm">
                 <span className="flex items-center gap-1 text-gray-600">
-                  <MapPin className="h-4 w-4 text-terracotta" />
+                  <MapPin className="h-4 w-4 text-primary" />
                   {store.address}, {store.city} {store.postcode}
                 </span>
                 <span className="flex items-center gap-1 text-gray-600">
-                  <Clock className="h-4 w-4 text-terracotta" />
+                  <Clock className="h-4 w-4 text-primary" />
                   9:00 AM - 9:00 PM
                 </span>
                 {vendor && (
                   <span className="flex items-center gap-1 text-gray-600">
-                    <Phone className="h-4 w-4 text-terracotta" />
+                    <Phone className="h-4 w-4 text-primary" />
                     {vendor.contactPhone}
                   </span>
                 )}
@@ -122,8 +122,8 @@ export default function StoreDetailPage() {
                 onClick={() => setSelectedCategory(null)}
                 className={`px-4 py-2 rounded-xl text-sm font-medium transition-colors whitespace-nowrap ${
                   selectedCategory === null
-                    ? 'bg-terracotta text-white'
-                    : 'bg-white text-gray-700 hover:bg-terracotta hover:text-white'
+                    ? 'bg-primary text-white'
+                    : 'bg-white text-gray-700 hover:bg-primary hover:text-white'
                 }`}
               >
                 All
@@ -134,8 +134,8 @@ export default function StoreDetailPage() {
                   onClick={() => setSelectedCategory(category.id as ProductCategory)}
                   className={`px-4 py-2 rounded-xl text-sm font-medium transition-colors whitespace-nowrap ${
                     selectedCategory === category.id
-                      ? 'bg-terracotta text-white'
-                      : 'bg-white text-gray-700 hover:bg-terracotta hover:text-white'
+                      ? 'bg-primary text-white'
+                      : 'bg-white text-gray-700 hover:bg-primary hover:text-white'
                   }`}
                 >
                   {category.name}
