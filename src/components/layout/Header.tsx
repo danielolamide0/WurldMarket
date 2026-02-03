@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { ShoppingBasket, ShoppingCart, User, Search, LogOut, X, MapPin, Package } from 'lucide-react'
+import { ShoppingCart, User, Search, LogOut, X, MapPin, Package } from 'lucide-react'
 import { useAuthStore } from '@/stores/authStore'
 import { useCartStore } from '@/stores/cartStore'
 import { useProductStore } from '@/stores/productStore'
@@ -191,11 +191,12 @@ export function Header() {
         {/* Main Header Row */}
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2 flex-shrink-0">
-            <div className="w-10 h-10 bg-terracotta rounded-xl flex items-center justify-center">
-              <ShoppingBasket className="h-5 w-5 text-white" />
-            </div>
-            <span className="text-lg sm:text-xl font-bold text-gray-900">WurldBasket</span>
+          <Link href="/" className="flex items-center flex-shrink-0">
+            <img
+              src="/logo.png"
+              alt="WurldBasket"
+              className="h-10 w-auto"
+            />
           </Link>
 
           {/* Search - Desktop */}

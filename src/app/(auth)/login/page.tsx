@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent } from '@/components/ui/card'
 import { useToast } from '@/components/ui/toast'
-import { User, Lock, Store, ShoppingBasket, Mail, Building2, Phone } from 'lucide-react'
+import { User, Lock, Store, Mail, Building2, Phone, ShoppingBag } from 'lucide-react'
 
 type ViewMode = 'login' | 'signup' | 'forgot-password'
 type SignupRole = 'customer' | 'vendor'
@@ -102,10 +102,11 @@ export default function LoginPage() {
       <div className="w-full max-w-md">
         {/* Logo */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-terracotta rounded-2xl mb-4">
-            <ShoppingBasket className="h-8 w-8 text-white" />
-          </div>
-          <h1 className="text-3xl font-bold text-white">WurldBasket</h1>
+          <img
+            src="/logo.png"
+            alt="WurldBasket"
+            className="h-20 w-auto mx-auto mb-4"
+          />
           <p className="text-forest-light mt-2">Global Food Marketplace</p>
         </div>
 
@@ -230,7 +231,7 @@ export default function LoginPage() {
                           : 'border-gray-200 hover:border-gray-300'
                       }`}
                     >
-                      <ShoppingBasket className={`h-6 w-6 mx-auto mb-2 ${signupRole === 'customer' ? 'text-terracotta' : 'text-gray-400'}`} />
+                      <ShoppingBag className={`h-6 w-6 mx-auto mb-2 ${signupRole === 'customer' ? 'text-terracotta' : 'text-gray-400'}`} />
                       <p className={`font-medium ${signupRole === 'customer' ? 'text-terracotta' : 'text-gray-700'}`}>Customer</p>
                       <p className="text-xs text-gray-500 mt-1">Shop & order</p>
                     </button>

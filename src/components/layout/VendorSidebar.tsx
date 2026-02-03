@@ -11,7 +11,6 @@ import {
   ChevronLeft,
   Menu,
   X,
-  ShoppingBasket,
 } from 'lucide-react'
 import { useAuthStore } from '@/stores/authStore'
 import { cn } from '@/lib/utils'
@@ -39,11 +38,12 @@ export function VendorSidebar() {
     <>
       {/* Logo */}
       <div className="p-4 border-b border-gray-100">
-        <Link href="/dashboard" className="flex items-center gap-2">
-          <div className="w-10 h-10 bg-terracotta rounded-xl flex items-center justify-center">
-            <ShoppingBasket className="h-5 w-5 text-white" />
-          </div>
-          <span className="text-xl font-bold text-gray-900">WurldBasket</span>
+        <Link href="/dashboard" className="flex items-center">
+          <img
+            src="/logo.png"
+            alt="WurldBasket"
+            className="h-10 w-auto"
+          />
         </Link>
         <p className="text-sm text-gray-500 mt-2">Vendor Portal</p>
       </div>
@@ -106,11 +106,12 @@ export function VendorSidebar() {
       {/* Mobile Header */}
       <div className="lg:hidden fixed top-0 left-0 right-0 z-40 bg-white border-b border-gray-100 px-4 py-3">
         <div className="flex items-center justify-between">
-          <Link href="/dashboard" className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-terracotta rounded-lg flex items-center justify-center">
-              <ShoppingBasket className="h-4 w-4 text-white" />
-            </div>
-            <span className="font-bold text-gray-900">WurldBasket</span>
+          <Link href="/dashboard" className="flex items-center">
+            <img
+              src="/logo.png"
+              alt="WurldBasket"
+              className="h-8 w-auto"
+            />
           </Link>
           <button
             onClick={() => setIsMobileOpen(!isMobileOpen)}
