@@ -3,11 +3,12 @@
 import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { ShoppingCart, User, Search, LogOut, X, MapPin, Package, Menu, ChevronDown } from 'lucide-react'
+import { ShoppingCart, User, Search, LogOut, X, MapPin, Package, Menu, ChevronDown, Check } from 'lucide-react'
 import { useAuthStore } from '@/stores/authStore'
 import { useCartStore } from '@/stores/cartStore'
 import { useProductStore } from '@/stores/productStore'
 import { useVendorStore } from '@/stores/vendorStore'
+import { useAddressStore } from '@/stores/addressStore'
 import { Button } from '@/components/ui/button'
 import { Product, StoreLocation } from '@/types'
 
@@ -31,17 +32,49 @@ export function Header() {
   const { items, openCart } = useCartStore()
   const products = useProductStore((state) => state.products)
   const stores = useVendorStore((state) => state.stores)
+  const { getAddressesByUser, getPrimaryAddress, setPrimaryAddress, fetchAddresses } = useAddressStore()
   const totalItems = items.reduce((sum, item) => sum + item.quantity, 0)
 
   const [searchQuery, setSearchQuery] = useState('')
   const [isSearchOpen, setIsSearchOpen] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const [isAddressDropdownOpen, setIsAddressDropdownOpen] = useState(false)
   const [searchResults, setSearchResults] = useState<{
     products: Product[]
     stores: StoreLocation[]
   }>({ products: [], stores: [] })
   const desktopSearchRef = useRef<HTMLDivElement>(null)
   const mobileSearchRef = useRef<HTMLDivElement>(null)
+  const addressDropdownRef = useRef<HTMLDivElement>(null)
+
+  // Get user's addresses
+  const userAddresses = user ? getAddressesByUser(user.id) : []
+  const primaryAddress = user ? getPrimaryAddress(user.id) : undefined
+
+  // Fetch addresses when user logs in
+  useEffect(() => {
+    if (isAuthenticated && user?.id) {
+      fetchAddresses(user.id)
+    }
+  }, [isAuthenticated, user?.id, fetchAddresses])
+
+  // Close address dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (addressDropdownRef.current && !addressDropdownRef.current.contains(event.target as Node)) {
+        setIsAddressDropdownOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
+
+  const handleAddressSelect = (addressId: string) => {
+    if (user) {
+      setPrimaryAddress(user.id, addressId)
+      setIsAddressDropdownOpen(false)
+    }
+  }
 
   const handleLogout = () => {
     logout()
@@ -292,18 +325,65 @@ export function Header() {
                       setIsSearchOpen(true)
                     }}
                     onFocus={() => setIsSearchOpen(true)}
-                    className="w-full pl-11 pr-4 py-3 rounded-l-full border-2 border-r-0 border-primary bg-white focus:outline-none placeholder-gray-400"
+                    className={`w-full pl-11 pr-4 py-3 border-2 border-primary bg-white focus:outline-none placeholder-gray-400 ${
+                      isAuthenticated ? 'rounded-l-full border-r-0' : 'rounded-full'
+                    }`}
                   />
                 </div>
-                {/* Location Selector */}
-                <button
-                  type="button"
-                  className="flex items-center gap-2 px-4 py-3 bg-primary text-white rounded-r-full border-2 border-primary hover:bg-primary-dark transition-colors"
-                >
-                  <MapPin className="h-4 w-4" />
-                  <span className="text-sm font-medium">SO15 2</span>
-                  <ChevronDown className="h-4 w-4" />
-                </button>
+                {/* Location Selector - Only show for authenticated users */}
+                {isAuthenticated && userAddresses.length > 0 ? (
+                  <div className="relative" ref={addressDropdownRef}>
+                    <button
+                      type="button"
+                      onClick={() => setIsAddressDropdownOpen(!isAddressDropdownOpen)}
+                      className="flex items-center gap-2 px-4 py-3 bg-primary text-white rounded-r-full border-2 border-primary hover:bg-primary-dark transition-colors"
+                    >
+                      <MapPin className="h-4 w-4" />
+                      <span className="text-sm font-medium">{primaryAddress?.postcode || userAddresses[0]?.postcode}</span>
+                      <ChevronDown className={`h-4 w-4 transition-transform ${isAddressDropdownOpen ? 'rotate-180' : ''}`} />
+                    </button>
+
+                    {/* Address Dropdown */}
+                    {isAddressDropdownOpen && (
+                      <div className="absolute top-full right-0 mt-2 w-64 bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden z-50">
+                        <div className="px-4 py-2 bg-gray-50 text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                          Deliver to
+                        </div>
+                        {userAddresses.map((addr) => (
+                          <button
+                            key={addr.id}
+                            onClick={() => handleAddressSelect(addr.id)}
+                            className="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-50 text-left"
+                          >
+                            <MapPin className="h-4 w-4 text-gray-400 flex-shrink-0" />
+                            <div className="flex-1 min-w-0">
+                              <p className="font-medium text-gray-900 text-sm">{addr.label}</p>
+                              <p className="text-xs text-gray-500 truncate">{addr.postcode}</p>
+                            </div>
+                            {addr.isPrimary && (
+                              <Check className="h-4 w-4 text-primary flex-shrink-0" />
+                            )}
+                          </button>
+                        ))}
+                        <Link
+                          href="/account/addresses"
+                          onClick={() => setIsAddressDropdownOpen(false)}
+                          className="block px-4 py-3 text-sm text-primary font-medium hover:bg-gray-50 border-t border-gray-100"
+                        >
+                          Manage addresses
+                        </Link>
+                      </div>
+                    )}
+                  </div>
+                ) : isAuthenticated ? (
+                  <Link
+                    href="/account/addresses"
+                    className="flex items-center gap-2 px-4 py-3 bg-primary text-white rounded-r-full border-2 border-primary hover:bg-primary-dark transition-colors"
+                  >
+                    <MapPin className="h-4 w-4" />
+                    <span className="text-sm font-medium">Add address</span>
+                  </Link>
+                ) : null}
               </form>
 
               {/* Desktop Popular Searches Dropdown */}
@@ -333,19 +413,64 @@ export function Header() {
                       setIsSearchOpen(true)
                     }}
                     onFocus={() => setIsSearchOpen(true)}
-                    className="w-full pl-11 pr-4 py-3 rounded-l-full border-2 border-r-0 border-primary bg-white focus:outline-none placeholder-gray-400"
+                    className={`w-full pl-11 pr-4 py-3 border-2 border-primary bg-white focus:outline-none placeholder-gray-400 ${
+                      isAuthenticated ? 'rounded-l-full border-r-0' : 'rounded-full'
+                    }`}
                   />
                 </div>
-                {/* Location Selector */}
-                <button
-                  type="button"
-                  className="flex items-center gap-1 px-3 py-3 bg-primary text-white rounded-r-full border-2 border-primary"
-                >
-                  <MapPin className="h-4 w-4" />
-                  <span className="text-xs font-medium">SO15 2</span>
-                  <ChevronDown className="h-3 w-3" />
-                </button>
+                {/* Location Selector - Only show for authenticated users */}
+                {isAuthenticated && userAddresses.length > 0 ? (
+                  <button
+                    type="button"
+                    onClick={() => setIsAddressDropdownOpen(!isAddressDropdownOpen)}
+                    className="flex items-center gap-1 px-3 py-3 bg-primary text-white rounded-r-full border-2 border-primary"
+                  >
+                    <MapPin className="h-4 w-4" />
+                    <span className="text-xs font-medium">{primaryAddress?.postcode || userAddresses[0]?.postcode}</span>
+                    <ChevronDown className={`h-3 w-3 transition-transform ${isAddressDropdownOpen ? 'rotate-180' : ''}`} />
+                  </button>
+                ) : isAuthenticated ? (
+                  <Link
+                    href="/account/addresses"
+                    className="flex items-center gap-1 px-3 py-3 bg-primary text-white rounded-r-full border-2 border-primary"
+                  >
+                    <MapPin className="h-4 w-4" />
+                    <span className="text-xs font-medium">Add</span>
+                  </Link>
+                ) : null}
               </form>
+
+              {/* Mobile Address Dropdown */}
+              {isAddressDropdownOpen && isAuthenticated && userAddresses.length > 0 && (
+                <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden z-50">
+                  <div className="px-4 py-2 bg-gray-50 text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                    Deliver to
+                  </div>
+                  {userAddresses.map((addr) => (
+                    <button
+                      key={addr.id}
+                      onClick={() => handleAddressSelect(addr.id)}
+                      className="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-50 text-left"
+                    >
+                      <MapPin className="h-4 w-4 text-gray-400 flex-shrink-0" />
+                      <div className="flex-1 min-w-0">
+                        <p className="font-medium text-gray-900 text-sm">{addr.label}</p>
+                        <p className="text-xs text-gray-500 truncate">{addr.fullAddress}, {addr.postcode}</p>
+                      </div>
+                      {addr.isPrimary && (
+                        <Check className="h-4 w-4 text-primary flex-shrink-0" />
+                      )}
+                    </button>
+                  ))}
+                  <Link
+                    href="/account/addresses"
+                    onClick={() => setIsAddressDropdownOpen(false)}
+                    className="block px-4 py-3 text-sm text-primary font-medium hover:bg-gray-50 border-t border-gray-100"
+                  >
+                    Manage addresses
+                  </Link>
+                </div>
+              )}
 
               {/* Mobile Popular Searches Dropdown */}
               {showPopularSearches && (

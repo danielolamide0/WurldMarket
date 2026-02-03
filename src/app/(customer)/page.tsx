@@ -193,7 +193,7 @@ export default function HomePage() {
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-bold text-gray-900">Shops in your area</h2>
             <Link href="/stores" className="text-primary text-sm font-medium flex items-center gap-1">
-              View all <ChevronRight className="h-4 w-4" />
+              Show all <ChevronRight className="h-4 w-4" />
             </Link>
           </div>
           <div className="flex gap-4 overflow-x-auto scrollbar-hide pb-2">
@@ -233,7 +233,7 @@ export default function HomePage() {
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-bold text-gray-900">Popular Products</h2>
             <Link href="/stores" className="text-primary text-sm font-medium flex items-center gap-1">
-              View all <ChevronRight className="h-4 w-4" />
+              Show all <ChevronRight className="h-4 w-4" />
             </Link>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
