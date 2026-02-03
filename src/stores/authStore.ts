@@ -104,12 +104,12 @@ export const useAuthStore = create<AuthState>()(
             return { success: false, error: data.error }
           }
 
-          set({
+        set({
             user: data.user,
-            isAuthenticated: true,
-            isLoading: false,
-            error: null,
-          })
+          isAuthenticated: true,
+          isLoading: false,
+          error: null,
+        })
 
           return { success: true, vendorId: data.vendorId }
         } catch (error) {
@@ -127,7 +127,7 @@ export const useAuthStore = create<AuthState>()(
           const data = await response.json()
           return data.exists
         } catch {
-          return false
+        return false
         }
       },
 
@@ -140,18 +140,18 @@ export const useAuthStore = create<AuthState>()(
           const exists = await get().checkUsernameExists(username)
 
           if (!exists) {
-            set({
-              isLoading: false,
-              error: 'Username not found',
-            })
-            return { success: false, error: 'Username not found' }
-          }
-
           set({
             isLoading: false,
-            error: null,
+            error: 'Username not found',
           })
-          return { success: true }
+          return { success: false, error: 'Username not found' }
+        }
+
+        set({
+          isLoading: false,
+          error: null,
+        })
+        return { success: true }
         } catch {
           set({
             isLoading: false,

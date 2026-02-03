@@ -37,7 +37,7 @@ export const useProductStore = create<ProductState>()(
 
           if (response.ok) {
             const newProducts = data.products || []
-            const currentProducts = get().products
+        const currentProducts = get().products
             
             // Merge products: use Map to deduplicate by ID, keeping the latest version
             const productMap = new Map<string, Product>()
@@ -76,10 +76,10 @@ export const useProductStore = create<ProductState>()(
 
           if (response.ok) {
             const newProduct = data.product
-            set((state) => ({
-              products: [...state.products, newProduct],
-            }))
-            return newProduct
+        set((state) => ({
+          products: [...state.products, newProduct],
+        }))
+        return newProduct
           }
           return null
         } catch {

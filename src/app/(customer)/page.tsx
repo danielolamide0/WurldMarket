@@ -172,17 +172,20 @@ export default function HomePage() {
       {/* Categories Row - Compact */}
       <section className="border-b border-gray-100">
         <div className="max-w-7xl mx-auto px-4 py-3">
-          <div className="flex gap-3 overflow-x-auto scrollbar-hide md:justify-between">
+          <div className="flex gap-3 overflow-x-auto scrollbar-hide">
             {CATEGORIES.map((cat) => {
-              const Icon = iconMap[cat.icon] || Circle
               return (
                 <Link
                   key={cat.id}
                   href={`/category/${cat.slug}`}
-                  className="flex flex-col items-center gap-1 min-w-[60px] md:min-w-0 md:flex-1 md:max-w-[100px]"
+                  className="flex flex-col items-center gap-1 min-w-[80px] flex-shrink-0"
                 >
-                  <div className="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center hover:bg-gray-200 transition-colors">
-                    <Icon className="h-6 w-6 text-gray-600" />
+                  <div className="w-12 h-12 bg-gray-100 rounded-xl overflow-hidden hover:bg-gray-200 transition-colors">
+                    <img
+                      src={cat.image}
+                      alt={cat.name}
+                      className="w-full h-full object-cover"
+                    />
                   </div>
                   <span className="text-[10px] text-gray-600 whitespace-nowrap text-center leading-tight">{cat.name}</span>
                 </Link>
