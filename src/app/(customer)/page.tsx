@@ -253,7 +253,7 @@ export default function HomePage() {
       <section className="py-4">
         <div className="max-w-7xl mx-auto px-4">
           <h2 className="text-lg font-bold text-primary mb-1">Popular offers ending soon</h2>
-          <p className="text-sm text-gray-500 mb-3">Don't miss the chance to shop our trusted sellers</p>
+          <p className="text-sm text-gray-500 mb-3">Don&apos;t miss the chance to shop our trusted sellers</p>
           <div className="flex gap-3 overflow-x-auto scrollbar-hide pb-2">
             {featuredProducts.slice(0, 6).map((product) => {
               const store = sortedStores.find(s => s.id === product.storeId)
