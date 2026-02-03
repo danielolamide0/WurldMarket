@@ -125,12 +125,12 @@ export default function HomePage() {
       {/* Quick Categories Row - Compact */}
       <section className="border-b border-gray-100">
         <div className="max-w-7xl mx-auto px-4 py-3">
-          <div className="flex gap-3 overflow-x-auto scrollbar-hide">
+          <div className="flex gap-3 overflow-x-auto scrollbar-hide md:justify-between">
             {QUICK_CATEGORIES.map((cat) => (
               <Link
                 key={cat.id}
                 href={cat.href}
-                className="flex flex-col items-center gap-1 min-w-[60px]"
+                className="flex flex-col items-center gap-1 min-w-[60px] md:min-w-0 md:flex-1 md:max-w-[100px]"
               >
                 <div className="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center text-xl hover:bg-gray-200 transition-colors">
                   {cat.icon}
@@ -146,12 +146,12 @@ export default function HomePage() {
       <section className="py-3">
         <div className="max-w-7xl mx-auto px-4">
           <h2 className="text-base font-bold text-gray-900 mb-2">Find your flavour</h2>
-          <div className="flex gap-3 overflow-x-auto scrollbar-hide">
+          <div className="flex gap-3 overflow-x-auto scrollbar-hide md:justify-between">
             {CUISINES.map((cuisine) => (
               <Link
                 key={cuisine.id}
                 href={cuisine.href}
-                className="flex flex-col items-center gap-1 min-w-[60px]"
+                className="flex flex-col items-center gap-1 min-w-[60px] md:min-w-0 md:flex-1 md:max-w-[120px]"
               >
                 <div className="w-14 h-14 rounded-full overflow-hidden border-2 border-gray-100 hover:border-primary transition-colors">
                   <img
@@ -202,12 +202,12 @@ export default function HomePage() {
               <span className="text-sm font-medium">STORE FINDER</span>
             </Link>
           </div>
-          <div className="flex gap-3 overflow-x-auto scrollbar-hide pb-1">
+          <div className="flex gap-3 overflow-x-auto scrollbar-hide pb-1 md:justify-between">
             {sortedStores.slice(0, 6).map((store) => (
               <Link
                 key={store.id}
                 href={`/stores/${store.id}`}
-                className="flex-shrink-0 w-20"
+                className="flex-shrink-0 w-20 md:flex-1 md:max-w-[140px]"
               >
                 <div className="flex flex-col items-center">
                   <div className="w-16 h-16 bg-white border border-gray-200 rounded-xl mb-1 overflow-hidden flex items-center justify-center">
