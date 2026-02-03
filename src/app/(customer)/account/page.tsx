@@ -1,6 +1,5 @@
 'use client'
 
-import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import {
@@ -8,7 +7,6 @@ import {
   MapPin,
   CreditCard,
   Bell,
-  Clock,
   HelpCircle,
   LogOut,
   ChevronRight,
@@ -18,13 +16,8 @@ import {
   Settings,
 } from 'lucide-react'
 import { useAuthStore } from '@/stores/authStore'
-import { useOrderStore } from '@/stores/orderStore'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { useToast } from '@/components/ui/toast'
-import { formatPrice, formatDateTime } from '@/lib/utils'
-import { ORDER_STATUS_LABELS, ORDER_STATUS_COLORS } from '@/lib/constants'
 
 const menuItems = [
   { icon: ShoppingBasket, label: 'Regulars', href: '/regulars' },
@@ -39,10 +32,6 @@ const menuItems = [
 export default function AccountPage() {
   const router = useRouter()
   const { user, isAuthenticated, logout } = useAuthStore()
-  const { addToast } = useToast()
-  const orders = useOrderStore((state) =>
-    user ? state.getOrdersByCustomer(user.id) : []
-  )
 
   const handleLogout = () => {
     logout()
@@ -97,54 +86,6 @@ export default function AccountPage() {
                 <ChevronRight className="h-5 w-5 text-gray-400" />
               </Link>
             ))}
-          </Card>
-        </div>
-
-        {/* Recent Orders */}
-        <div className="mt-6">
-          <Card className="overflow-hidden">
-            <div className="px-4 py-3 border-b border-gray-100 flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Clock className="h-5 w-5 text-primary" />
-                <h2 className="font-semibold text-gray-900">Recent Orders</h2>
-              </div>
-              {orders.length > 0 && (
-                <Link href="/orders" className="text-sm text-primary font-medium">
-                  View all
-                </Link>
-              )}
-            </div>
-
-            {orders.length === 0 ? (
-              <div className="p-8 text-center">
-                <p className="text-gray-500 mb-4">No orders yet</p>
-                <Link href="/stores">
-                  <Button variant="outline">Start Shopping</Button>
-                </Link>
-              </div>
-            ) : (
-              <div className="divide-y divide-gray-100">
-                {orders.slice(0, 3).map((order) => (
-                  <Link key={order.id} href={`/orders/${order.id}`} className="block p-4 hover:bg-gray-50">
-                    <div className="flex items-start justify-between gap-4 mb-2">
-                      <div>
-                        <p className="font-medium text-gray-900">{order.storeName}</p>
-                        <p className="text-sm text-gray-500">{formatDateTime(order.createdAt)}</p>
-                      </div>
-                      <Badge className={ORDER_STATUS_COLORS[order.status]}>
-                        {ORDER_STATUS_LABELS[order.status]}
-                      </Badge>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <p className="text-sm text-gray-600">
-                        {order.items.length} item{order.items.length !== 1 ? 's' : ''}
-                      </p>
-                      <p className="font-semibold text-primary">{formatPrice(order.total)}</p>
-                    </div>
-                  </Link>
-                ))}
-              </div>
-            )}
           </Card>
         </div>
 
