@@ -43,9 +43,9 @@ export default function HomePage() {
   const { favourites, getRegulars, userId, setUserId, fetchCustomerData, purchaseHistory } = useCustomerStore()
   const stores = useVendorStore((state) => state.stores)
   const fetchStores = useVendorStore((state) => state.fetchStores)
-  const { getPrimaryAddress, fetchAddresses } = useAddressStore()
+  const { getPrimaryAddress, fetchAddresses, addresses } = useAddressStore()
 
-  // Get user's primary address for proximity sorting
+  // Get user's primary address for proximity sorting (reactive to address store changes)
   const primaryAddress = user ? getPrimaryAddress(user.id) : undefined
 
   // Fetch data on mount
@@ -87,18 +87,38 @@ export default function HomePage() {
 
   // Sort stores by proximity to user's primary address
   const sortedStores = useMemo(() => {
-    if (!primaryAddress?.coordinates) {
+    // Re-fetch primary address to ensure it's up-to-date
+    const currentPrimaryAddress = user ? getPrimaryAddress(user.id) : undefined
+    
+    if (!currentPrimaryAddress?.coordinates || !stores.length) {
       return stores
     }
 
-    const { lat: userLat, lng: userLng } = primaryAddress.coordinates
+    const { lat: userLat, lng: userLng } = currentPrimaryAddress.coordinates
 
-    return [...stores].sort((a, b) => {
+    // Filter stores that have coordinates before sorting
+    const storesWithCoords = stores.filter(store => 
+      store.coordinates && 
+      typeof store.coordinates.lat === 'number' && 
+      typeof store.coordinates.lng === 'number'
+    )
+
+    const storesWithoutCoords = stores.filter(store => 
+      !store.coordinates || 
+      typeof store.coordinates.lat !== 'number' || 
+      typeof store.coordinates.lng !== 'number'
+    )
+
+    // Sort stores with coordinates by distance
+    const sorted = [...storesWithCoords].sort((a, b) => {
       const distA = calculateDistance(userLat, userLng, a.coordinates.lat, a.coordinates.lng)
       const distB = calculateDistance(userLat, userLng, b.coordinates.lat, b.coordinates.lng)
       return distA - distB
     })
-  }, [stores, primaryAddress?.coordinates])
+
+    // Append stores without coordinates at the end
+    return [...sorted, ...storesWithoutCoords]
+  }, [stores, addresses, user?.id, getPrimaryAddress])
 
   return (
     <div className="min-h-screen bg-white">
@@ -139,7 +159,7 @@ export default function HomePage() {
                     alt={cuisine.name}
                     className="w-full h-full object-cover"
                   />
-                </div>
+              </div>
                 <span className="text-xs text-gray-700 font-medium">{cuisine.name}</span>
               </Link>
             ))}
@@ -150,7 +170,7 @@ export default function HomePage() {
       {/* Hello Card - Right after Find your flavour */}
       {isAuthenticated && user?.role === 'customer' && (
         <section className="py-3">
-          <div className="max-w-7xl mx-auto px-4">
+        <div className="max-w-7xl mx-auto px-4">
             <Card className="p-4 bg-gray-50">
               <h2 className="text-lg font-bold text-gray-900">
                 Hello {user.name.split(' ')[0]}
@@ -163,10 +183,10 @@ export default function HomePage() {
                 <Link href="/orders" className="flex-1">
                   <Button variant="outline" className="w-full py-2 text-sm">My orders</Button>
                 </Link>
-              </div>
-            </Card>
           </div>
-        </section>
+            </Card>
+        </div>
+      </section>
       )}
 
       {/* Shops in Your Area - Compact */}
