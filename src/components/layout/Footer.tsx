@@ -253,7 +253,7 @@ export function Footer() {
       </div>
 
       {/* Payment Methods */}
-      <div className="border-t border-gray-200 py-4 pb-8 bg-white">
+      <div className="border-t border-gray-200 py-4 pb-24 md:pb-8 bg-white">
         <div className="max-w-7xl mx-auto px-4">
           <h4 className="text-sm font-semibold text-gray-900 mb-3">Payment Methods</h4>
           <div className="flex flex-wrap items-center gap-4">
