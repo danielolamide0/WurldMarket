@@ -1,103 +1,142 @@
+'use client'
+
 import Link from 'next/link'
-import { Mail, Phone, MapPin } from 'lucide-react'
+import { ChevronUp } from 'lucide-react'
 
 export function Footer() {
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
   return (
-    <footer className="bg-primary-dark text-white hidden md:block">
-      <div className="max-w-7xl mx-auto px-4 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-          {/* Brand */}
-          <div>
-            <div className="flex items-center gap-2 mb-4">
+    <footer className="bg-gray-50">
+      {/* Back to Top Button */}
+      <div className="border-t border-gray-200 py-4">
+        <div className="max-w-7xl mx-auto px-4">
+          <button
+            onClick={scrollToTop}
+            className="flex items-center gap-2 mx-auto px-4 py-2 border border-gray-300 rounded bg-white hover:bg-gray-50 transition-colors text-gray-700 font-semibold text-sm"
+          >
+            Back To Top
+            <ChevronUp className="h-4 w-4" />
+          </button>
+        </div>
+      </div>
+
+      {/* Logo, Tagline, and Social Media */}
+      <div className="border-t border-gray-200 py-6 bg-white">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="flex flex-col items-center gap-4">
+            {/* Logo and Text */}
+            <div className="flex items-center gap-2">
               <img
                 src="/WurldBAsketLogo.png"
                 alt="WurldBasket"
-                className="h-10 w-auto brightness-0 invert"
+                className="h-10 w-auto"
               />
               <img
                 src="/WurldBasketText.png"
                 alt="WurldBasket"
-                className="h-6 w-auto brightness-0 invert"
+                className="h-6 w-auto"
               />
             </div>
-            <p className="text-gray-300 text-sm">
-              Your one-stop shop for authentic international groceries delivered to your door across the UK.
-            </p>
-          </div>
+            
+            {/* Tagline */}
+            <div className="text-center max-w-md">
+              <p className="text-sm font-semibold text-gray-900 mb-1">
+                Flavours of the World, Delivered to You
+              </p>
+              <p className="text-xs text-gray-600">
+                Shop authentic international groceries from local stores near you.
+              </p>
+            </div>
 
-          {/* Quick Links */}
-          <div>
-            <h3 className="font-semibold mb-4">Quick Links</h3>
-            <ul className="space-y-2 text-sm text-gray-300">
-              <li><Link href="/" className="hover:text-white transition-colors">Home</Link></li>
-              <li><Link href="/stores" className="hover:text-white transition-colors">Find Stores</Link></li>
-              <li><Link href="/category/grains-rice" className="hover:text-white transition-colors">Shop by Category</Link></li>
-              <li><Link href="/login" className="hover:text-white transition-colors">Sign In</Link></li>
-            </ul>
-          </div>
-
-          {/* Categories */}
-          <div>
-            <h3 className="font-semibold mb-4">Categories</h3>
-            <ul className="space-y-2 text-sm text-gray-300">
-              <li><Link href="/category/grains-rice" className="hover:text-white transition-colors">Grains & Rice</Link></li>
-              <li><Link href="/category/spices" className="hover:text-white transition-colors">Spices</Link></li>
-              <li><Link href="/category/frozen" className="hover:text-white transition-colors">Frozen Foods</Link></li>
-              <li><Link href="/category/fresh-produce" className="hover:text-white transition-colors">Fresh Produce</Link></li>
-            </ul>
-          </div>
-
-          {/* Contact */}
-          <div>
-            <h3 className="font-semibold mb-4">Contact Us</h3>
-            <ul className="space-y-3 text-sm text-gray-300">
-              <li className="flex items-center gap-2">
-                <Mail className="h-4 w-4" />
-                <span>hello@wurldbasket.uk</span>
-              </li>
-              <li className="flex items-center gap-2">
-                <Phone className="h-4 w-4" />
-                <span>+44 20 1234 5678</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <MapPin className="h-4 w-4 mt-0.5" />
-                <span>Serving Leeds & Southampton</span>
-              </li>
-            </ul>
-          </div>
-        </div>
-
-        {/* Company Information Links */}
-        <div className="border-t border-gray-700 mt-8 pt-8">
-          <div className="flex flex-wrap gap-4 text-sm text-gray-300 mb-6">
-            <Link href="/terms" className="hover:text-white transition-colors">Terms & Conditions</Link>
-            <Link href="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link>
-            <Link href="/cookies" className="hover:text-white transition-colors">Cookie Settings</Link>
-            <Link href="/accessibility" className="hover:text-white transition-colors">Accessibility</Link>
-            <Link href="/customer-review-policy" className="hover:text-white transition-colors">Customer Review Policy</Link>
-            <Link href="/modern-slavery" className="hover:text-white transition-colors">Modern Slavery Statement</Link>
-            <Link href="/waste-recycling" className="hover:text-white transition-colors">Waste Recycling</Link>
-          </div>
-
-          {/* Payment Methods */}
-          <div className="mb-6">
-            <h4 className="text-sm font-semibold mb-3">Payment Methods</h4>
-            <div className="flex flex-wrap items-center gap-3">
-              <div className="bg-white px-3 py-2 rounded text-xs font-semibold text-blue-600">VISA</div>
-              <div className="bg-white px-3 py-2 rounded text-xs font-semibold">
-                <span style={{ color: '#EB001B' }}>Master</span>
-                <span style={{ color: '#F79E1B' }}>card</span>
-              </div>
-              <div className="bg-white px-3 py-2 rounded text-xs font-semibold text-blue-500">AMEX</div>
-              <div className="bg-white px-3 py-2 rounded text-xs font-semibold text-gray-700">Verified by VISA</div>
-              <div className="bg-white px-3 py-2 rounded text-xs font-semibold text-gray-700">MasterCard SecureCode</div>
-              <div className="bg-white px-3 py-2 rounded text-xs font-semibold text-blue-500">American Express SafeKey</div>
+            {/* Social Media Icons */}
+            <div className="flex items-center gap-3">
+              <a
+                href="https://x.com/wurldbasket"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-100 transition-colors"
+                aria-label="X (Twitter)"
+              >
+                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                </svg>
+              </a>
+              <a
+                href="https://instagram.com/wurldbasket"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-100 transition-colors"
+                aria-label="Instagram"
+              >
+                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+                </svg>
+              </a>
+              <a
+                href="https://facebook.com/wurldbasket"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-100 transition-colors"
+                aria-label="Facebook"
+              >
+                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                </svg>
+              </a>
+              <a
+                href="https://tiktok.com/@wurldbasket"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-100 transition-colors"
+                aria-label="TikTok"
+              >
+                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z"/>
+                </svg>
+              </a>
             </div>
           </div>
+        </div>
+      </div>
 
-          {/* Copyright */}
-          <div className="text-center text-sm text-gray-400">
-            <p>&copy; {new Date().getFullYear()} WurldBasket. All rights reserved.</p>
+      {/* Legal Links */}
+      <div className="border-t border-gray-200 py-4 bg-white">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="flex flex-wrap gap-4 text-sm text-gray-600 mb-4">
+            <Link href="/modern-slavery" className="hover:text-gray-900 transition-colors">Modern Slavery Statement</Link>
+            <Link href="/waste-recycling" className="hover:text-gray-900 transition-colors">Electrical Waste Recycling</Link>
+            <Link href="/terms" className="hover:text-gray-900 transition-colors">Terms & Conditions</Link>
+            <Link href="/customer-review-policy" className="hover:text-gray-900 transition-colors">Customer Review Policy</Link>
+            <Link href="/privacy" className="hover:text-gray-900 transition-colors">Privacy Centre</Link>
+            <Link href="/cookies" className="hover:text-gray-900 transition-colors">Cookie Settings</Link>
+            <Link href="/accessibility" className="hover:text-gray-900 transition-colors">Accessibility</Link>
+          </div>
+          <p className="text-sm text-gray-500">&copy; WurldBasket {new Date().getFullYear()}</p>
+        </div>
+      </div>
+
+      {/* Payment Methods */}
+      <div className="border-t border-gray-200 py-4 bg-white">
+        <div className="max-w-7xl mx-auto px-4">
+          <h4 className="text-sm font-semibold text-gray-900 mb-3">Payment Methods</h4>
+          <div className="flex flex-wrap items-center gap-3">
+            <div className="bg-white px-3 py-2 rounded border border-gray-200 text-xs font-semibold text-blue-600">AMEX</div>
+            <div className="bg-white px-3 py-2 rounded border border-gray-200 text-xs font-semibold">
+              <span style={{ color: '#EB001B' }}>Master</span>
+              <span style={{ color: '#F79E1B' }}>card</span>
+            </div>
+            <div className="bg-white px-3 py-2 rounded border border-gray-200 text-xs font-semibold">
+              <span style={{ color: '#EB001B' }}>Master</span>
+              <span style={{ color: '#F79E1B' }}>card</span>
+            </div>
+            <div className="bg-white px-3 py-2 rounded border border-gray-200 text-xs font-semibold text-blue-600">Maestro</div>
+            <div className="bg-white px-3 py-2 rounded border border-gray-200 text-xs font-semibold text-blue-600">VISA</div>
+            <div className="bg-white px-3 py-2 rounded border border-gray-200 text-xs font-semibold text-blue-600">Verified by VISA</div>
+            <div className="bg-white px-3 py-2 rounded border border-gray-200 text-xs font-semibold text-gray-700">MasterCard. SecureCode.</div>
+            <div className="bg-white px-3 py-2 rounded border border-gray-200 text-xs font-semibold text-gray-700">American Express SafeKey</div>
           </div>
         </div>
       </div>

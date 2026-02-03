@@ -359,7 +359,7 @@ export function Header() {
 
           {/* Search Bar Row */}
           <div className="hidden md:block pb-3" ref={desktopSearchRef}>
-            <div className="relative w-full flex max-w-2xl mx-auto">
+            <div className="relative w-full flex max-w-2xl mx-auto gap-2">
               <form onSubmit={handleSearchSubmit} className="flex-1 flex">
                 <div className="relative flex-1">
                   <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 z-10" />
@@ -377,7 +377,7 @@ export function Header() {
                     }}
                     onFocus={() => setIsSearchOpen(true)}
                     className={`w-full pl-11 pr-4 py-3 border-2 border-primary bg-white focus:outline-none ${
-                      isAuthenticated ? 'rounded-l-full border-r-0' : 'rounded-full'
+                      isAuthenticated && userAddresses.length > 0 ? 'rounded-l-full border-r-0' : 'rounded-full'
                     }`}
                   />
                 </div>
@@ -436,6 +436,15 @@ export function Header() {
                   </Link>
                 ) : null}
               </form>
+              
+              {/* Store Finder Button */}
+              <Link
+                href="/stores"
+                className="flex items-center gap-1.5 px-3 py-3 bg-primary text-white rounded-full border-2 border-primary hover:bg-primary-dark transition-colors whitespace-nowrap"
+              >
+                <MapPin className="h-4 w-4" />
+                <span className="text-sm font-medium">STORE FINDER</span>
+              </Link>
 
               {/* Desktop Popular Searches Dropdown */}
               {showPopularSearches && (
@@ -451,7 +460,7 @@ export function Header() {
 
           {/* Mobile Search Bar */}
           <div className="md:hidden pb-3">
-            <div className="relative flex" ref={mobileSearchRef}>
+            <div className="relative flex gap-2" ref={mobileSearchRef}>
               <form onSubmit={handleSearchSubmit} className="flex-1 flex">
                 <div className="relative flex-1">
                   <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 z-10" />
@@ -469,7 +478,7 @@ export function Header() {
                     }}
                     onFocus={() => setIsSearchOpen(true)}
                     className={`w-full pl-11 pr-4 py-3 border-2 border-primary bg-white focus:outline-none ${
-                      isAuthenticated ? 'rounded-l-full border-r-0' : 'rounded-full'
+                      isAuthenticated && userAddresses.length > 0 ? 'rounded-l-full border-r-0' : 'rounded-full'
                     }`}
                   />
                 </div>
@@ -494,6 +503,15 @@ export function Header() {
                   </Link>
                 ) : null}
               </form>
+              
+              {/* Store Finder Button - Mobile */}
+              <Link
+                href="/stores"
+                className="flex items-center gap-1 px-2 py-3 bg-primary text-white rounded-full border-2 border-primary hover:bg-primary-dark transition-colors whitespace-nowrap flex-shrink-0"
+              >
+                <MapPin className="h-4 w-4" />
+                <span className="text-xs font-medium hidden sm:inline">STORE FINDER</span>
+              </Link>
 
               {/* Mobile Address Dropdown */}
               {isAddressDropdownOpen && isAuthenticated && userAddresses.length > 0 && (

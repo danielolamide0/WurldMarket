@@ -125,12 +125,7 @@ export default function HomePage() {
       {/* Find Your Flavour - Compact */}
       <section className="py-3">
         <div className="max-w-7xl mx-auto px-4">
-          <div className="flex items-center justify-between mb-2">
-            <h2 className="text-base font-bold text-gray-900">Find your flavour</h2>
-            <Link href="/stores" className="text-primary text-sm font-medium">
-              Show all
-            </Link>
-          </div>
+          <h2 className="text-base font-bold text-gray-900 mb-2">Find your flavour</h2>
           <div className="flex gap-3 overflow-x-auto scrollbar-hide">
             {CUISINES.map((cuisine) => (
               <Link
@@ -177,12 +172,7 @@ export default function HomePage() {
       {/* Shops in Your Area - Compact */}
       <section className="py-3">
         <div className="max-w-7xl mx-auto px-4">
-          <div className="flex items-center justify-between mb-2">
-            <h2 className="text-base font-bold text-gray-900">Shops in your area</h2>
-            <Link href="/stores" className="text-primary text-sm font-medium">
-              Show all
-            </Link>
-          </div>
+          <h2 className="text-base font-bold text-gray-900 mb-2">Shops in your area</h2>
           <div className="flex gap-3 overflow-x-auto scrollbar-hide pb-1">
             {sortedStores.slice(0, 6).map((store) => (
               <Link
@@ -311,33 +301,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Hero Banner (for guests) */}
-      {!isAuthenticated && (
-        <section className="py-8 bg-primary">
-          <div className="max-w-7xl mx-auto px-4">
-            <Badge className="bg-white/20 text-white mb-3">Now Serving Leeds & Southampton</Badge>
-            <h2 className="text-2xl md:text-3xl font-bold text-white mb-3">
-              Flavours of the World,<br />Delivered to You
-            </h2>
-            <p className="text-white/80 mb-6 max-w-md">
-              Shop authentic international groceries from local stores near you.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-3">
-              <Link href="/stores">
-                <Button size="lg" className="w-full sm:w-auto bg-white text-primary hover:bg-gray-100">
-                  <MapPin className="h-5 w-5 mr-2" />
-                  Find Stores Near You
-                </Button>
-              </Link>
-              <Link href="/login">
-                <Button variant="outline" size="lg" className="w-full sm:w-auto border-white text-white hover:bg-white/10">
-                  Browse Products
-                </Button>
-              </Link>
-            </div>
-          </div>
-        </section>
-      )}
     </div>
   )
 }
