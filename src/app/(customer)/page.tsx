@@ -77,6 +77,12 @@ export default function HomePage() {
       {/* Quick Categories Row */}
       <section className="border-b border-gray-100">
         <div className="max-w-7xl mx-auto px-4 py-4">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-bold text-gray-900">Categories</h2>
+            <Link href="/stores" className="text-primary text-sm font-medium flex items-center gap-1">
+              Show all <ChevronRight className="h-4 w-4" />
+            </Link>
+          </div>
           <div className="flex gap-4 overflow-x-auto scrollbar-hide pb-2">
             {QUICK_CATEGORIES.map((cat) => (
               <Link
@@ -90,15 +96,6 @@ export default function HomePage() {
                 <span className="text-xs text-gray-600 whitespace-nowrap">{cat.name}</span>
               </Link>
             ))}
-            <Link
-              href="/stores"
-              className="flex flex-col items-center gap-2 min-w-[70px]"
-            >
-              <div className="w-14 h-14 bg-gray-100 rounded-2xl flex items-center justify-center text-sm text-primary font-medium hover:bg-gray-200 transition-colors">
-                Show all
-              </div>
-              <span className="text-xs text-gray-600 whitespace-nowrap">More</span>
-            </Link>
           </div>
         </div>
       </section>
