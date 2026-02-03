@@ -315,7 +315,7 @@ export function Header() {
         <div className="max-w-7xl mx-auto px-4">
           {/* Main Header Row */}
           <div className="flex items-center justify-between h-16">
-            {/* Left: Hamburger + Logo Icon */}
+            {/* Left: Hamburger + Logo Icon + Logo Text */}
             <div className="flex items-center gap-2">
               <button
                 onClick={() => setIsMobileMenuOpen(true)}
@@ -323,23 +323,19 @@ export function Header() {
               >
                 <Menu className="h-6 w-6 text-gray-700" />
               </button>
-              <Link href="/" className="flex items-center flex-shrink-0">
+              <Link href="/" className="flex items-center gap-2 flex-shrink-0">
                 <img
                   src="/WurldBAsketLogo.png"
                   alt="WurldBasket"
-                  className="h-12 w-auto"
+                  className="h-10 w-auto"
+                />
+                <img
+                  src="/WurldBasketText.png"
+                  alt="WurldBasket"
+                  className="h-6 w-auto"
                 />
               </Link>
             </div>
-
-            {/* Center: Logo Text */}
-            <Link href="/" className="absolute left-1/2 -translate-x-1/2">
-              <img
-                src="/WurldBasketText.png"
-                alt="WurldBasket"
-                className="h-8 w-auto"
-              />
-            </Link>
 
             {/* Right: Cart */}
             <div className="flex items-center gap-2">
