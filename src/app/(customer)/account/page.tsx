@@ -15,7 +15,6 @@ import {
   Store,
   ShoppingBasket,
   Package,
-  Phone,
   Settings,
 } from 'lucide-react'
 import { useAuthStore } from '@/stores/authStore'
@@ -71,39 +70,17 @@ export default function AccountPage() {
 
   return (
     <div className="min-h-screen">
-      {/* Profile Header */}
-      <div className="bg-gradient-to-br from-primary-dark to-primary text-white">
-        <div className="max-w-3xl mx-auto px-4 py-8">
-          <div className="flex items-center gap-4">
-            <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center">
-              <span className="text-2xl font-bold">
-                {user?.name.charAt(0).toUpperCase()}
-              </span>
-            </div>
-            <div>
-              <h1 className="text-xl font-bold">{user?.name}</h1>
-              <p className="text-white/70">{user?.email}</p>
-              {user?.phone && (
-                <p className="text-white/70 text-sm mt-1 flex items-center gap-1">
-                  <Phone className="h-3 w-3" />
-                  {user.phone}
-                </p>
-              )}
-            </div>
-          </div>
-
-          {user?.role === 'vendor' && (
-            <Link href="/dashboard" className="block mt-4">
-              <Button variant="outline" className="border-white text-white hover:bg-white hover:text-primary">
+      <div className="max-w-3xl mx-auto px-4 py-6">
+        {user?.role === 'vendor' && (
+          <div className="mb-6">
+            <Link href="/dashboard">
+              <Button variant="outline" className="w-full">
                 <Store className="h-4 w-4 mr-2" />
                 Go to Vendor Dashboard
               </Button>
             </Link>
-          )}
-        </div>
-      </div>
-
-      <div className="max-w-3xl mx-auto px-4 py-6">
+          </div>
+        )}
         {/* Menu Items */}
         <div>
           <Card className="divide-y divide-gray-100">
