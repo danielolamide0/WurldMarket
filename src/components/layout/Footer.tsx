@@ -1,15 +1,149 @@
 'use client'
 
+import { useState } from 'react'
 import Link from 'next/link'
-import { ChevronUp } from 'lucide-react'
+import { ChevronUp, ChevronDown, ChevronRight } from 'lucide-react'
 
 export function Footer() {
+  const [openSections, setOpenSections] = useState<Record<string, boolean>>({
+    help: false,
+    about: false,
+    support: false,
+  })
+
+  const toggleSection = (section: string) => {
+    setOpenSections((prev) => ({
+      ...prev,
+      [section]: !prev[section],
+    }))
+  }
+
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
   return (
     <footer className="bg-gray-50">
+      {/* Expandable Sections */}
+      <div className="border-t border-gray-200 bg-white">
+        <div className="max-w-7xl mx-auto px-4 py-4">
+          <div className="space-y-0">
+            {/* How can we help */}
+            <div className="border-b border-gray-200 last:border-b-0">
+              <button
+                onClick={() => toggleSection('help')}
+                className="w-full flex items-center justify-between py-4 text-left hover:text-primary transition-colors"
+              >
+                <span className="text-base font-semibold text-gray-900">How can we help</span>
+                {openSections.help ? (
+                  <ChevronUp className="h-5 w-5 text-gray-600" />
+                ) : (
+                  <ChevronDown className="h-5 w-5 text-gray-600" />
+                )}
+              </button>
+              {openSections.help && (
+                <div className="pb-4 space-y-2">
+                  <Link href="/account" className="flex items-center justify-between text-sm text-primary hover:text-primary-dark">
+                    <span>My Account</span>
+                    <ChevronRight className="h-4 w-4" />
+                  </Link>
+                  <Link href="/orders" className="flex items-center justify-between text-sm text-primary hover:text-primary-dark">
+                    <span>My Orders</span>
+                    <ChevronRight className="h-4 w-4" />
+                  </Link>
+                  <Link href="/help" className="flex items-center justify-between text-sm text-primary hover:text-primary-dark">
+                    <span>Help & FAQs</span>
+                    <ChevronRight className="h-4 w-4" />
+                  </Link>
+                  <Link href="/product-recall" className="flex items-center justify-between text-sm text-primary hover:text-primary-dark">
+                    <span>Product Recall</span>
+                    <ChevronRight className="h-4 w-4" />
+                  </Link>
+                  <Link href="/privacy" className="flex items-center justify-between text-sm text-primary hover:text-primary-dark">
+                    <span>Privacy Centre</span>
+                    <ChevronRight className="h-4 w-4" />
+                  </Link>
+              </div>
+              )}
+            </div>
+
+            {/* About */}
+            <div className="border-b border-gray-200 last:border-b-0">
+              <button
+                onClick={() => toggleSection('about')}
+                className="w-full flex items-center justify-between py-4 text-left hover:text-primary transition-colors"
+              >
+                <span className="text-base font-semibold text-gray-900">About</span>
+                {openSections.about ? (
+                  <ChevronUp className="h-5 w-5 text-gray-600" />
+                ) : (
+                  <ChevronDown className="h-5 w-5 text-gray-600" />
+                )}
+              </button>
+              {openSections.about && (
+                <div className="pb-4 space-y-2">
+                  <Link href="/about-us" className="flex items-center justify-between text-sm text-primary hover:text-primary-dark">
+                    <span>About Us</span>
+                    <ChevronRight className="h-4 w-4" />
+                  </Link>
+                  <Link href="/careers" className="flex items-center justify-between text-sm text-primary hover:text-primary-dark">
+                    <span>Careers</span>
+                    <ChevronRight className="h-4 w-4" />
+                  </Link>
+                  <Link href="/sustainability" className="flex items-center justify-between text-sm text-primary hover:text-primary-dark">
+                    <span>Sustainability</span>
+                    <ChevronRight className="h-4 w-4" />
+                  </Link>
+                  <Link href="/press" className="flex items-center justify-between text-sm text-primary hover:text-primary-dark">
+                    <span>Press & Media</span>
+                    <ChevronRight className="h-4 w-4" />
+                  </Link>
+                </div>
+              )}
+          </div>
+
+            {/* Support */}
+            <div className="border-b border-gray-200 last:border-b-0">
+              <button
+                onClick={() => toggleSection('support')}
+                className="w-full flex items-center justify-between py-4 text-left hover:text-primary transition-colors"
+              >
+                <span className="text-base font-semibold text-gray-900">Support</span>
+                {openSections.support ? (
+                  <ChevronUp className="h-5 w-5 text-gray-600" />
+                ) : (
+                  <ChevronDown className="h-5 w-5 text-gray-600" />
+                )}
+              </button>
+              {openSections.support && (
+                <div className="pb-4 space-y-2">
+                  <Link href="/contact" className="flex items-center justify-between text-sm text-primary hover:text-primary-dark">
+                    <span>Contact Us</span>
+                    <ChevronRight className="h-4 w-4" />
+                  </Link>
+                  <Link href="/help" className="flex items-center justify-between text-sm text-primary hover:text-primary-dark">
+                    <span>Help Centre</span>
+                    <ChevronRight className="h-4 w-4" />
+                  </Link>
+                  <Link href="/returns" className="flex items-center justify-between text-sm text-primary hover:text-primary-dark">
+                    <span>Returns & Refunds</span>
+                    <ChevronRight className="h-4 w-4" />
+                  </Link>
+                  <Link href="/delivery" className="flex items-center justify-between text-sm text-primary hover:text-primary-dark">
+                    <span>Delivery Information</span>
+                    <ChevronRight className="h-4 w-4" />
+                  </Link>
+                  <Link href="/faq" className="flex items-center justify-between text-sm text-primary hover:text-primary-dark">
+                    <span>FAQs</span>
+                    <ChevronRight className="h-4 w-4" />
+                  </Link>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Back to Top Button */}
       <div className="border-t border-gray-200 py-4">
         <div className="max-w-7xl mx-auto px-4">
@@ -39,8 +173,8 @@ export function Footer() {
                 alt="WurldBasket"
                 className="h-6 w-auto"
               />
-            </div>
-            
+          </div>
+
             {/* Tagline */}
             <div className="text-center max-w-md">
               <p className="text-sm font-semibold text-gray-900 mb-1">
@@ -100,7 +234,7 @@ export function Footer() {
             </div>
           </div>
         </div>
-      </div>
+          </div>
 
       {/* Legal Links */}
       <div className="border-t border-gray-200 py-4 bg-white">
@@ -137,8 +271,8 @@ export function Footer() {
                 <circle cx="30" cy="16" r="12" fill="#EB001B"/>
                 <circle cx="70" cy="16" r="12" fill="#F79E1B"/>
               </svg>
-            </div>
-            
+        </div>
+
             {/* American Express */}
             <div className="h-10 w-16 flex items-center justify-center bg-white border border-gray-200 rounded">
               <svg viewBox="0 0 100 32" className="h-6 w-full">
