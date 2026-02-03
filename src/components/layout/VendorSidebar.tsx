@@ -38,11 +38,16 @@ export function VendorSidebar() {
     <>
       {/* Logo */}
       <div className="p-4 border-b border-gray-100">
-        <Link href="/dashboard" className="flex items-center">
+        <Link href="/dashboard" className="flex items-center gap-2">
           <img
             src="/logo.png"
             alt="WurldBasket"
             className="h-10 w-auto"
+          />
+          <img
+            src="/logo-text.png"
+            alt="WurldBasket"
+            className="h-6 w-auto"
           />
         </Link>
         <p className="text-sm text-gray-500 mt-2">Vendor Portal</p>
@@ -106,11 +111,16 @@ export function VendorSidebar() {
       {/* Mobile Header */}
       <div className="lg:hidden fixed top-0 left-0 right-0 z-40 bg-white border-b border-gray-100 px-4 py-3">
         <div className="flex items-center justify-between">
-          <Link href="/dashboard" className="flex items-center">
+          <Link href="/dashboard" className="flex items-center gap-2">
             <img
               src="/logo.png"
               alt="WurldBasket"
               className="h-8 w-auto"
+            />
+            <img
+              src="/logo-text.png"
+              alt="WurldBasket"
+              className="h-5 w-auto"
             />
           </Link>
           <button

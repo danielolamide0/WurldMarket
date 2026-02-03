@@ -102,12 +102,19 @@ export default function LoginPage() {
       <div className="w-full max-w-md">
         {/* Logo */}
         <div className="text-center mb-8">
-          <img
-            src="/logo.png"
-            alt="WurldBasket"
-            className="h-24 w-auto mx-auto mb-4"
-          />
-          <p className="text-white/70 mt-2">Global Food Marketplace</p>
+          <div className="flex items-center justify-center gap-3 mb-4">
+            <img
+              src="/logo.png"
+              alt="WurldBasket"
+              className="h-16 w-auto"
+            />
+            <img
+              src="/logo-text.png"
+              alt="WurldBasket"
+              className="h-10 w-auto brightness-0 invert"
+            />
+          </div>
+          <p className="text-white/70">Global Food Marketplace</p>
         </div>
 
         <Card variant="elevated" className="overflow-hidden">

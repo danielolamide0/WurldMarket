@@ -8,11 +8,16 @@ export function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Brand */}
           <div>
-            <div className="flex items-center mb-4">
+            <div className="flex items-center gap-2 mb-4">
               <img
                 src="/logo.png"
                 alt="WurldBasket"
                 className="h-10 w-auto brightness-0 invert"
+              />
+              <img
+                src="/logo-text.png"
+                alt="WurldBasket"
+                className="h-6 w-auto brightness-0 invert"
               />
             </div>
             <p className="text-gray-300 text-sm">

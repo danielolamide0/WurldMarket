@@ -234,9 +234,9 @@ export function Header() {
       <header className="sticky top-0 z-40 bg-white border-b border-gray-100 shadow-sm">
         <div className="max-w-7xl mx-auto px-4">
           {/* Main Header Row */}
-          <div className="flex items-center justify-between h-20">
-            {/* Left: Hamburger + Logo */}
-            <div className="flex items-center gap-3">
+          <div className="flex items-center justify-between h-16">
+            {/* Left: Hamburger + Logo Icon */}
+            <div className="flex items-center gap-2">
               <button
                 onClick={() => setIsMobileMenuOpen(true)}
                 className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
@@ -247,51 +247,19 @@ export function Header() {
                 <img
                   src="/logo.png"
                   alt="WurldBasket"
-                  className="h-14 w-auto"
+                  className="h-12 w-auto"
                 />
               </Link>
             </div>
 
-            {/* Center: Search - Desktop */}
-            <div className="hidden md:flex flex-1 max-w-xl mx-6" ref={desktopSearchRef}>
-              <div className="relative w-full flex">
-                <form onSubmit={handleSearchSubmit} className="flex-1 flex">
-                  <div className="relative flex-1">
-                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
-                    <input
-                      type="text"
-                      placeholder="Looking for items?"
-                      value={searchQuery}
-                      onChange={(e) => {
-                        setSearchQuery(e.target.value)
-                        setIsSearchOpen(true)
-                      }}
-                      onFocus={() => setIsSearchOpen(true)}
-                      className="w-full pl-11 pr-4 py-3 rounded-l-full border-2 border-r-0 border-primary bg-white focus:outline-none placeholder-gray-400"
-                    />
-                  </div>
-                  {/* Location Selector */}
-                  <button
-                    type="button"
-                    className="flex items-center gap-2 px-4 py-3 bg-primary text-white rounded-r-full border-2 border-primary hover:bg-primary-dark transition-colors"
-                  >
-                    <MapPin className="h-4 w-4" />
-                    <span className="text-sm font-medium hidden lg:inline">SO15 2</span>
-                    <ChevronDown className="h-4 w-4" />
-                  </button>
-                </form>
-
-                {/* Desktop Popular Searches Dropdown */}
-                {showPopularSearches && (
-                  <PopularSearchesDropdown />
-                )}
-
-                {/* Desktop Search Results Dropdown */}
-                {isSearchOpen && searchQuery.length >= 2 && (
-                  <SearchResultsDropdown />
-                )}
-              </div>
-            </div>
+            {/* Center: Logo Text */}
+            <Link href="/" className="absolute left-1/2 -translate-x-1/2">
+              <img
+                src="/logo-text.png"
+                alt="WurldBasket"
+                className="h-8 w-auto"
+              />
+            </Link>
 
             {/* Right: Cart */}
             <div className="flex items-center gap-2">
@@ -306,6 +274,47 @@ export function Header() {
                   </span>
                 )}
               </button>
+            </div>
+          </div>
+
+          {/* Search Bar Row */}
+          <div className="hidden md:block pb-3" ref={desktopSearchRef}>
+            <div className="relative w-full flex max-w-2xl mx-auto">
+              <form onSubmit={handleSearchSubmit} className="flex-1 flex">
+                <div className="relative flex-1">
+                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+                  <input
+                    type="text"
+                    placeholder="Looking for items?"
+                    value={searchQuery}
+                    onChange={(e) => {
+                      setSearchQuery(e.target.value)
+                      setIsSearchOpen(true)
+                    }}
+                    onFocus={() => setIsSearchOpen(true)}
+                    className="w-full pl-11 pr-4 py-3 rounded-l-full border-2 border-r-0 border-primary bg-white focus:outline-none placeholder-gray-400"
+                  />
+                </div>
+                {/* Location Selector */}
+                <button
+                  type="button"
+                  className="flex items-center gap-2 px-4 py-3 bg-primary text-white rounded-r-full border-2 border-primary hover:bg-primary-dark transition-colors"
+                >
+                  <MapPin className="h-4 w-4" />
+                  <span className="text-sm font-medium">SO15 2</span>
+                  <ChevronDown className="h-4 w-4" />
+                </button>
+              </form>
+
+              {/* Desktop Popular Searches Dropdown */}
+              {showPopularSearches && (
+                <PopularSearchesDropdown />
+              )}
+
+              {/* Desktop Search Results Dropdown */}
+              {isSearchOpen && searchQuery.length >= 2 && (
+                <SearchResultsDropdown />
+              )}
             </div>
           </div>
 
@@ -367,7 +376,10 @@ export function Header() {
             {/* Menu Header */}
             <div className="p-4 border-b border-gray-100">
               <div className="flex items-center justify-between mb-4">
-                <img src="/logo.png" alt="WurldBasket" className="h-10 w-auto" />
+                <div className="flex items-center gap-2">
+                  <img src="/logo.png" alt="WurldBasket" className="h-10 w-auto" />
+                  <img src="/logo-text.png" alt="WurldBasket" className="h-6 w-auto" />
+                </div>
                 <button
                   onClick={() => setIsMobileMenuOpen(false)}
                   className="p-2 hover:bg-gray-100 rounded-lg"

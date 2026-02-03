@@ -49,11 +49,16 @@ export function SplashScreen({ onComplete }: SplashScreenProps) {
 
       {/* Logo Container with white background */}
       <div className="relative z-10 flex flex-col items-center">
-        <div className="bg-white/95 backdrop-blur-sm rounded-3xl p-8 shadow-2xl">
+        <div className="bg-white/95 backdrop-blur-sm rounded-3xl p-8 shadow-2xl flex items-center gap-4">
           <img
             src="/logo.png"
             alt="WurldBasket"
-            className="h-28 w-auto"
+            className="h-20 w-auto"
+          />
+          <img
+            src="/logo-text.png"
+            alt="WurldBasket"
+            className="h-12 w-auto"
           />
         </div>
         {/* Loading indicator */}
