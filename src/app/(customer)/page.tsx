@@ -2,7 +2,8 @@
 
 import { useEffect, useMemo } from 'react'
 import Link from 'next/link'
-import { MapPin, ArrowRight, Clock, ChevronRight, Utensils, ShoppingBag, Sparkles, Heart } from 'lucide-react'
+import { MapPin, ArrowRight, Clock, ChevronRight, Utensils, ShoppingBag, Sparkles, Heart, Wheat, Flame, Snowflake, Leaf, Cookie, Coffee, Carrot, Salad, Apple, Beef, Fish, Droplet, Droplets, ChefHat, Package, Egg, Home, WheatOff, Circle } from 'lucide-react'
+import { CATEGORIES } from '@/lib/constants'
 import { useProductStore } from '@/stores/productStore'
 import { useOrderStore } from '@/stores/orderStore'
 import { useAuthStore } from '@/stores/authStore'
@@ -15,14 +16,30 @@ import { Card } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { calculateDistance } from '@/lib/utils'
 
-// Quick category icons for top row
-const QUICK_CATEGORIES = [
-  { id: 'restaurants', name: 'Restaurants', icon: '🍽️', href: '/stores' },
-  { id: 'groceries', name: 'Groceries', icon: '🛒', href: '/stores' },
-  { id: 'health', name: 'Health & Beauty', icon: '💊', href: '/category/household-essentials' },
-  { id: 'alcohol', name: 'Alcohol', icon: '🍷', href: '/category/drinks-beverages' },
-  { id: 'specials', name: 'Specials', icon: '⭐', href: '/stores' },
-]
+// Icon mapping for categories
+const iconMap: { [key: string]: React.ComponentType<{ className?: string }> } = {
+  Wheat,
+  Flame,
+  Snowflake,
+  Leaf,
+  Cookie,
+  Coffee,
+  Carrot,
+  Salad,
+  Apple,
+  Beef,
+  Fish,
+  Droplet,
+  Droplets,
+  Utensils,
+  ChefHat,
+  Package,
+  Egg,
+  Home,
+  Sparkles,
+  WheatOff,
+  Bean: Circle,
+}
 
 // Find your flavour - Cuisine types
 const CUISINES = [
@@ -152,22 +169,25 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen bg-white">
-      {/* Quick Categories Row - Compact */}
+      {/* Categories Row - Compact */}
       <section className="border-b border-gray-100">
         <div className="max-w-7xl mx-auto px-4 py-3">
           <div className="flex gap-3 overflow-x-auto scrollbar-hide md:justify-between">
-            {QUICK_CATEGORIES.map((cat) => (
-              <Link
-                key={cat.id}
-                href={cat.href}
-                className="flex flex-col items-center gap-1 min-w-[60px] md:min-w-0 md:flex-1 md:max-w-[100px]"
-              >
-                <div className="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center text-xl hover:bg-gray-200 transition-colors">
-                  {cat.icon}
-                </div>
-                <span className="text-[10px] text-gray-600 whitespace-nowrap text-center leading-tight">{cat.name}</span>
-              </Link>
-            ))}
+            {CATEGORIES.map((cat) => {
+              const Icon = iconMap[cat.icon] || Circle
+              return (
+                <Link
+                  key={cat.id}
+                  href={`/category/${cat.slug}`}
+                  className="flex flex-col items-center gap-1 min-w-[60px] md:min-w-0 md:flex-1 md:max-w-[100px]"
+                >
+                  <div className="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center hover:bg-gray-200 transition-colors">
+                    <Icon className="h-6 w-6 text-gray-600" />
+                  </div>
+                  <span className="text-[10px] text-gray-600 whitespace-nowrap text-center leading-tight">{cat.name}</span>
+                </Link>
+              )
+            })}
           </div>
         </div>
       </section>
