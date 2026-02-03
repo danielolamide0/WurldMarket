@@ -36,13 +36,15 @@ function AnimatedPlaceholder() {
 
   useEffect(() => {
     const interval = setInterval(() => {
+      // Start scroll-up animation
       setIsAnimating(true)
       
+      // After animation completes, update index and reset
       setTimeout(() => {
         setCurrentIndex((prev) => (prev + 1) % SEARCH_TERMS.length)
         setIsAnimating(false)
-      }, 400) // Animation duration
-    }, 1000) // Change every second
+      }, 600) // Animation duration (600ms for smooth scroll)
+    }, 2000) // Each word stays for 2 seconds before scrolling
 
     return () => clearInterval(interval)
   }, [])
@@ -53,17 +55,21 @@ function AnimatedPlaceholder() {
     <span className="inline-flex items-center">
       <span>Looking for </span>
       <span className="relative inline-block h-[1.5em] w-[140px] ml-1 overflow-hidden">
+        {/* Current word - scrolls up and out */}
         <span
-          className={`absolute left-0 w-full transition-all duration-500 ease-in-out ${
-            isAnimating ? '-translate-y-full opacity-0' : 'translate-y-0 opacity-100'
+          className={`absolute left-0 w-full transition-transform ease-in-out ${
+            isAnimating ? '-translate-y-full' : 'translate-y-0'
           }`}
+          style={{ transitionDuration: '600ms', transitionTimingFunction: 'ease-in-out' }}
         >
           {SEARCH_TERMS[currentIndex]}
         </span>
+        {/* Next word - scrolls up from below */}
         <span
-          className={`absolute left-0 w-full transition-all duration-500 ease-in-out ${
-            isAnimating ? 'translate-y-0 opacity-100' : 'translate-y-full opacity-0'
+          className={`absolute left-0 w-full transition-transform ease-in-out ${
+            isAnimating ? 'translate-y-0' : 'translate-y-full'
           }`}
+          style={{ transitionDuration: '600ms', transitionTimingFunction: 'ease-in-out' }}
         >
           {SEARCH_TERMS[nextIndex]}
         </span>
