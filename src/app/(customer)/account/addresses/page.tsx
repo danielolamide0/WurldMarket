@@ -45,6 +45,7 @@ export default function SavedAddressesPage() {
   const [fullAddress, setFullAddress] = useState('')
   const [city, setCity] = useState('')
   const [postcode, setPostcode] = useState('')
+  const [coordinates, setCoordinates] = useState<{ lat: number; lng: number } | undefined>(undefined)
   const [addressSelected, setAddressSelected] = useState(false)
 
   const addresses = user ? getAddressesByUser(user.id) : []
@@ -54,15 +55,17 @@ export default function SavedAddressesPage() {
     setFullAddress('')
     setCity('')
     setPostcode('')
+    setCoordinates(undefined)
     setIsAdding(false)
     setEditingId(null)
     setAddressSelected(false)
   }
 
-  const handleAddressSelect = (address: { line1: string; city: string; postcode: string }) => {
+  const handleAddressSelect = (address: { line1: string; city: string; postcode: string; coordinates?: { lat: number; lng: number } }) => {
     setFullAddress(address.line1)
     setCity(address.city)
     setPostcode(address.postcode)
+    setCoordinates(address.coordinates)
     setAddressSelected(true)
   }
 
@@ -78,7 +81,7 @@ export default function SavedAddressesPage() {
       updateAddress(editingId, { label, fullAddress, city, postcode })
       addToast('Address updated successfully', 'success')
     } else {
-      addAddress(user.id, label, fullAddress, city, postcode)
+      addAddress(user.id, label, fullAddress, city, postcode, false, coordinates)
       addToast('Address added successfully', 'success')
     }
 

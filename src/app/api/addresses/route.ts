@@ -35,7 +35,7 @@ export async function POST(request: NextRequest) {
     await dbConnect()
 
     const body = await request.json()
-    const { userId, label, fullAddress, city, postcode, isPrimary } = body
+    const { userId, label, fullAddress, city, postcode, isPrimary, coordinates } = body
 
     if (!userId || !fullAddress || !city || !postcode) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
@@ -56,6 +56,7 @@ export async function POST(request: NextRequest) {
       fullAddress,
       city,
       postcode,
+      coordinates: coordinates || undefined,
       isPrimary: shouldBePrimary,
     })
 
@@ -135,6 +136,7 @@ function formatAddress(address: InstanceType<typeof SavedAddress>) {
     fullAddress: address.fullAddress,
     city: address.city,
     postcode: address.postcode,
+    coordinates: address.coordinates,
     isPrimary: address.isPrimary,
     createdAt: address.createdAt.toISOString(),
   }

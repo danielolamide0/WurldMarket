@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, useMemo } from 'react'
 import Link from 'next/link'
 import { MapPin, ArrowRight, Clock, ChevronRight, Utensils, ShoppingBag, Sparkles, Heart } from 'lucide-react'
 import { useProductStore } from '@/stores/productStore'
@@ -8,10 +8,12 @@ import { useOrderStore } from '@/stores/orderStore'
 import { useAuthStore } from '@/stores/authStore'
 import { useCustomerStore } from '@/stores/customerStore'
 import { useVendorStore } from '@/stores/vendorStore'
+import { useAddressStore } from '@/stores/addressStore'
 import { ProductCard } from '@/components/products/ProductCard'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
+import { calculateDistance } from '@/lib/utils'
 
 // Quick category icons for top row
 const QUICK_CATEGORIES = [
@@ -41,12 +43,23 @@ export default function HomePage() {
   const { favourites, getRegulars, userId, setUserId, fetchCustomerData, purchaseHistory } = useCustomerStore()
   const stores = useVendorStore((state) => state.stores)
   const fetchStores = useVendorStore((state) => state.fetchStores)
+  const { getPrimaryAddress, fetchAddresses } = useAddressStore()
+
+  // Get user's primary address for proximity sorting
+  const primaryAddress = user ? getPrimaryAddress(user.id) : undefined
 
   // Fetch data on mount
   useEffect(() => {
     fetchProducts({})
     fetchStores()
   }, [fetchProducts, fetchStores])
+
+  // Fetch addresses when user logs in
+  useEffect(() => {
+    if (isAuthenticated && user?.id) {
+      fetchAddresses(user.id)
+    }
+  }, [isAuthenticated, user?.id, fetchAddresses])
 
   // Sync customerStore when user changes
   useEffect(() => {
@@ -71,6 +84,21 @@ export default function HomePage() {
   const regularProducts = products.filter(p =>
     purchaseHistory.some(ph => ph.productId === p.id)
   ).slice(0, 4)
+
+  // Sort stores by proximity to user's primary address
+  const sortedStores = useMemo(() => {
+    if (!primaryAddress?.coordinates) {
+      return stores
+    }
+
+    const { lat: userLat, lng: userLng } = primaryAddress.coordinates
+
+    return [...stores].sort((a, b) => {
+      const distA = calculateDistance(userLat, userLng, a.coordinates.lat, a.coordinates.lng)
+      const distB = calculateDistance(userLat, userLng, b.coordinates.lat, b.coordinates.lng)
+      return distA - distB
+    })
+  }, [stores, primaryAddress?.coordinates])
 
   return (
     <div className="min-h-screen bg-white">
@@ -197,7 +225,7 @@ export default function HomePage() {
             </Link>
           </div>
           <div className="flex gap-4 overflow-x-auto scrollbar-hide pb-2">
-            {stores.slice(0, 6).map((store) => (
+            {sortedStores.slice(0, 6).map((store) => (
               <Link
                 key={store.id}
                 href={`/stores/${store.id}`}

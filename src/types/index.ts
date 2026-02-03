@@ -171,6 +171,10 @@ export interface SavedAddress {
   fullAddress: string
   city: string
   postcode: string
+  coordinates?: {
+    lat: number
+    lng: number
+  }
   isPrimary: boolean
   createdAt: string
 }

@@ -10,6 +10,10 @@ interface Address {
   line2?: string
   city: string
   postcode: string
+  coordinates?: {
+    lat: number
+    lng: number
+  }
 }
 
 interface PostcodeLookupProps {
@@ -24,6 +28,8 @@ interface IdealPostcodesAddress {
   post_town: string
   postcode: string
   country: string
+  latitude: number
+  longitude: number
 }
 
 interface IdealPostcodesResponse {
@@ -77,6 +83,10 @@ async function lookupPostcode(postcode: string): Promise<Address[]> {
         line2: addr.line_2 || undefined,
         city: addr.post_town,
         postcode: formattedPostcode,
+        coordinates: addr.latitude && addr.longitude ? {
+          lat: addr.latitude,
+          lng: addr.longitude,
+        } : undefined,
       }
     })
   } catch (error) {

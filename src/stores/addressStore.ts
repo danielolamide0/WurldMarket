@@ -12,7 +12,8 @@ interface AddressState {
     fullAddress: string,
     city: string,
     postcode: string,
-    isPrimary?: boolean
+    isPrimary?: boolean,
+    coordinates?: { lat: number; lng: number }
   ) => Promise<SavedAddress | null>
   updateAddress: (
     addressId: string,
@@ -45,12 +46,12 @@ export const useAddressStore = create<AddressState>()(
         }
       },
 
-      addAddress: async (userId, label, fullAddress, city, postcode, isPrimary = false) => {
+      addAddress: async (userId, label, fullAddress, city, postcode, isPrimary = false, coordinates) => {
         try {
           const response = await fetch('/api/addresses', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ userId, label, fullAddress, city, postcode, isPrimary }),
+            body: JSON.stringify({ userId, label, fullAddress, city, postcode, isPrimary, coordinates }),
           })
 
           const data = await response.json()

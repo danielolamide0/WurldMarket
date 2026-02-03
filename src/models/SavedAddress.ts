@@ -7,6 +7,10 @@ export interface ISavedAddress extends Document {
   fullAddress: string
   city: string
   postcode: string
+  coordinates?: {
+    lat: number
+    lng: number
+  }
   isPrimary: boolean
   createdAt: Date
   updatedAt: Date
@@ -39,6 +43,10 @@ const SavedAddressSchema = new Schema<ISavedAddress>(
       required: true,
       trim: true,
       uppercase: true,
+    },
+    coordinates: {
+      lat: { type: Number },
+      lng: { type: Number },
     },
     isPrimary: {
       type: Boolean,
