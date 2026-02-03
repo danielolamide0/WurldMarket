@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { ShoppingCart, User, Search, LogOut, X, MapPin, Package } from 'lucide-react'
+import { ShoppingCart, User, Search, LogOut, X, MapPin, Package, Menu, ChevronDown } from 'lucide-react'
 import { useAuthStore } from '@/stores/authStore'
 import { useCartStore } from '@/stores/cartStore'
 import { useProductStore } from '@/stores/productStore'
@@ -35,6 +35,7 @@ export function Header() {
 
   const [searchQuery, setSearchQuery] = useState('')
   const [isSearchOpen, setIsSearchOpen] = useState(false)
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [searchResults, setSearchResults] = useState<{
     products: Product[]
     stores: StoreLocation[]
@@ -229,159 +230,252 @@ export function Header() {
   )
 
   return (
-    <header className="sticky top-0 z-40 bg-white border-b border-gray-100 shadow-sm">
-      <div className="max-w-7xl mx-auto px-4">
-        {/* Main Header Row */}
-        <div className="flex items-center justify-between h-16">
-          {/* Logo */}
-          <Link href="/" className="flex items-center flex-shrink-0">
-            <img
-              src="/logo.png"
-              alt="WurldBasket"
-              className="h-10 w-auto"
-            />
-          </Link>
-
-          {/* Search - Desktop */}
-          <div className="hidden md:flex flex-1 max-w-md mx-8" ref={desktopSearchRef}>
-            <div className="relative w-full">
-              <form onSubmit={handleSearchSubmit}>
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-primary" />
-                <input
-                  type="text"
-                  placeholder="Looking for items?"
-                  value={searchQuery}
-                  onChange={(e) => {
-                    setSearchQuery(e.target.value)
-                    setIsSearchOpen(true)
-                  }}
-                  onFocus={() => setIsSearchOpen(true)}
-                  className="w-full pl-10 pr-10 py-2.5 rounded-full border-2 border-primary bg-white focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary placeholder-gray-400"
+    <>
+      <header className="sticky top-0 z-40 bg-white border-b border-gray-100 shadow-sm">
+        <div className="max-w-7xl mx-auto px-4">
+          {/* Main Header Row */}
+          <div className="flex items-center justify-between h-20">
+            {/* Left: Hamburger + Logo */}
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => setIsMobileMenuOpen(true)}
+                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+              >
+                <Menu className="h-6 w-6 text-gray-700" />
+              </button>
+              <Link href="/" className="flex items-center flex-shrink-0">
+                <img
+                  src="/logo.png"
+                  alt="WurldBasket"
+                  className="h-14 w-auto"
                 />
-                {searchQuery && (
+              </Link>
+            </div>
+
+            {/* Center: Search - Desktop */}
+            <div className="hidden md:flex flex-1 max-w-xl mx-6" ref={desktopSearchRef}>
+              <div className="relative w-full flex">
+                <form onSubmit={handleSearchSubmit} className="flex-1 flex">
+                  <div className="relative flex-1">
+                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+                    <input
+                      type="text"
+                      placeholder="Looking for items?"
+                      value={searchQuery}
+                      onChange={(e) => {
+                        setSearchQuery(e.target.value)
+                        setIsSearchOpen(true)
+                      }}
+                      onFocus={() => setIsSearchOpen(true)}
+                      className="w-full pl-11 pr-4 py-3 rounded-l-full border-2 border-r-0 border-primary bg-white focus:outline-none placeholder-gray-400"
+                    />
+                  </div>
+                  {/* Location Selector */}
                   <button
                     type="button"
-                    onClick={() => {
-                      setSearchQuery('')
-                      setSearchResults({ products: [], stores: [] })
-                    }}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 p-1 hover:bg-gray-100 rounded-full"
+                    className="flex items-center gap-2 px-4 py-3 bg-primary text-white rounded-r-full border-2 border-primary hover:bg-primary-dark transition-colors"
                   >
-                    <X className="h-4 w-4 text-gray-400" />
+                    <MapPin className="h-4 w-4" />
+                    <span className="text-sm font-medium hidden lg:inline">SO15 2</span>
+                    <ChevronDown className="h-4 w-4" />
                   </button>
+                </form>
+
+                {/* Desktop Popular Searches Dropdown */}
+                {showPopularSearches && (
+                  <PopularSearchesDropdown />
                 )}
-              </form>
 
-              {/* Desktop Popular Searches Dropdown */}
-              {showPopularSearches && (
-                <PopularSearchesDropdown />
-              )}
+                {/* Desktop Search Results Dropdown */}
+                {isSearchOpen && searchQuery.length >= 2 && (
+                  <SearchResultsDropdown />
+                )}
+              </div>
+            </div>
 
-              {/* Desktop Search Results Dropdown */}
-              {isSearchOpen && searchQuery.length >= 2 && (
-                <SearchResultsDropdown />
-              )}
+            {/* Right: Cart */}
+            <div className="flex items-center gap-2">
+              <button
+                onClick={openCart}
+                className="relative p-2 rounded-xl hover:bg-gray-100 transition-colors"
+              >
+                <ShoppingCart className="h-6 w-6 text-gray-700" />
+                {totalItems > 0 && (
+                  <span className="absolute -top-1 -right-1 w-5 h-5 bg-primary text-white text-xs font-bold rounded-full flex items-center justify-center">
+                    {totalItems}
+                  </span>
+                )}
+              </button>
             </div>
           </div>
 
-          {/* Actions */}
-          <div className="flex items-center gap-2">
-            {/* Cart Button */}
-            <button
-              onClick={openCart}
-              className="relative p-2 rounded-xl hover:bg-gray-100 transition-colors"
-            >
-              <ShoppingCart className="h-6 w-6 text-gray-700" />
-              {totalItems > 0 && (
-                <span className="absolute -top-1 -right-1 w-5 h-5 bg-primary text-white text-xs font-bold rounded-full flex items-center justify-center">
-                  {totalItems}
-                </span>
-              )}
-            </button>
-
-            {/* User Menu */}
-            {isAuthenticated ? (
-              <div className="hidden sm:flex items-center gap-2">
-                {user?.role === 'customer' && (
-                  <Link href="/account">
-                    <Button variant="outline" size="sm">
-                      <User className="h-4 w-4 mr-2" />
-                      Account
-                    </Button>
-                  </Link>
-                )}
-                {user?.role === 'vendor' && (
-                  <Link href="/dashboard">
-                    <Button variant="secondary" size="sm">Dashboard</Button>
-                  </Link>
-                )}
-                <span className="text-sm text-gray-600">Hi, {user?.name.split(' ')[0]}</span>
-                <button
-                  onClick={handleLogout}
-                  className="p-2 rounded-xl hover:bg-gray-100 transition-colors"
-                  title="Logout"
-                >
-                  <LogOut className="h-5 w-5 text-gray-600" />
-                </button>
-              </div>
-            ) : (
-              <Link href="/login" className="hidden sm:block">
-                <Button variant="primary" size="sm">
-                  <User className="h-4 w-4 mr-2" />
-                  Sign In
-                </Button>
-              </Link>
-            )}
-          </div>
-        </div>
-
-        {/* Mobile Search Bar - Always visible on mobile */}
-        <div className="md:hidden pb-3">
-          <div className="relative" ref={mobileSearchRef}>
-            <form onSubmit={handleSearchSubmit}>
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-primary" />
-              <input
-                type="text"
-                placeholder="Looking for items?"
-                value={searchQuery}
-                onChange={(e) => {
-                  setSearchQuery(e.target.value)
-                  setIsSearchOpen(true)
-                }}
-                onFocus={() => setIsSearchOpen(true)}
-                className="w-full pl-10 pr-10 py-2.5 rounded-full border-2 border-primary bg-white focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary placeholder-gray-400"
-              />
-              {searchQuery && (
+          {/* Mobile Search Bar */}
+          <div className="md:hidden pb-3">
+            <div className="relative flex" ref={mobileSearchRef}>
+              <form onSubmit={handleSearchSubmit} className="flex-1 flex">
+                <div className="relative flex-1">
+                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+                  <input
+                    type="text"
+                    placeholder="Looking for items?"
+                    value={searchQuery}
+                    onChange={(e) => {
+                      setSearchQuery(e.target.value)
+                      setIsSearchOpen(true)
+                    }}
+                    onFocus={() => setIsSearchOpen(true)}
+                    className="w-full pl-11 pr-4 py-3 rounded-l-full border-2 border-r-0 border-primary bg-white focus:outline-none placeholder-gray-400"
+                  />
+                </div>
+                {/* Location Selector */}
                 <button
                   type="button"
-                  onClick={() => {
-                    setSearchQuery('')
-                    setSearchResults({ products: [], stores: [] })
-                    setIsSearchOpen(false)
-                  }}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 p-1 hover:bg-gray-200 rounded-full"
+                  className="flex items-center gap-1 px-3 py-3 bg-primary text-white rounded-r-full border-2 border-primary"
                 >
-                  <X className="h-4 w-4 text-gray-400" />
+                  <MapPin className="h-4 w-4" />
+                  <span className="text-xs font-medium">SO15 2</span>
+                  <ChevronDown className="h-3 w-3" />
                 </button>
+              </form>
+
+              {/* Mobile Popular Searches Dropdown */}
+              {showPopularSearches && (
+                <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden z-50">
+                  <PopularSearchesDropdown isMobile />
+                </div>
               )}
-            </form>
 
-            {/* Mobile Popular Searches Dropdown */}
-            {showPopularSearches && (
-              <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden z-50">
-                <PopularSearchesDropdown isMobile />
+              {/* Mobile Search Results Dropdown */}
+              {isSearchOpen && searchQuery.length >= 2 && (
+                <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden z-50 max-h-80 overflow-y-auto">
+                  <SearchResultsDropdown isMobile />
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </header>
+
+      {/* Mobile Menu Drawer */}
+      {isMobileMenuOpen && (
+        <>
+          <div
+            className="fixed inset-0 bg-black/50 z-50"
+            onClick={() => setIsMobileMenuOpen(false)}
+          />
+          <div className="fixed top-0 left-0 bottom-0 w-72 bg-white z-50 shadow-xl overflow-y-auto">
+            {/* Menu Header */}
+            <div className="p-4 border-b border-gray-100">
+              <div className="flex items-center justify-between mb-4">
+                <img src="/logo.png" alt="WurldBasket" className="h-10 w-auto" />
+                <button
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="p-2 hover:bg-gray-100 rounded-lg"
+                >
+                  <X className="h-5 w-5" />
+                </button>
               </div>
-            )}
+              {isAuthenticated ? (
+                <p className="text-lg font-semibold text-gray-900">Hi {user?.name.split(' ')[0]}</p>
+              ) : (
+                <Link href="/login" onClick={() => setIsMobileMenuOpen(false)}>
+                  <Button className="w-full">Sign In</Button>
+                </Link>
+              )}
+            </div>
 
-            {/* Mobile Search Results Dropdown */}
-            {isSearchOpen && searchQuery.length >= 2 && (
-              <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden z-50 max-h-80 overflow-y-auto">
-                <SearchResultsDropdown isMobile />
+            {/* Menu Items */}
+            <nav className="p-4">
+              <ul className="space-y-1">
+                {isAuthenticated && (
+                  <>
+                    <li>
+                      <Link
+                        href="/checkout"
+                        onClick={() => setIsMobileMenuOpen(false)}
+                        className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-100 text-gray-700"
+                      >
+                        <ShoppingCart className="h-5 w-5" />
+                        Checkout
+                      </Link>
+                    </li>
+                    <li>
+                      <Link
+                        href="/orders"
+                        onClick={() => setIsMobileMenuOpen(false)}
+                        className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-100 text-gray-700"
+                      >
+                        <Package className="h-5 w-5" />
+                        Your Orders
+                      </Link>
+                    </li>
+                    <li>
+                      <Link
+                        href="/account"
+                        onClick={() => setIsMobileMenuOpen(false)}
+                        className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-100 text-gray-700"
+                      >
+                        <User className="h-5 w-5" />
+                        Your Account
+                      </Link>
+                    </li>
+                    <li>
+                      <Link
+                        href="/regulars"
+                        onClick={() => setIsMobileMenuOpen(false)}
+                        className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-100 text-gray-700"
+                      >
+                        <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                        </svg>
+                        Your Regulars
+                      </Link>
+                    </li>
+                  </>
+                )}
+                <li className="border-t border-gray-100 pt-2 mt-2">
+                  <Link
+                    href="/stores"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-100 text-gray-700"
+                  >
+                    <MapPin className="h-5 w-5" />
+                    Groceries
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="/regulars"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-100 text-gray-700"
+                  >
+                    <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                    </svg>
+                    Regulars & Favourites
+                  </Link>
+                </li>
+              </ul>
+            </nav>
+
+            {/* Sign Out */}
+            {isAuthenticated && (
+              <div className="p-4 border-t border-gray-100">
+                <button
+                  onClick={() => {
+                    handleLogout()
+                    setIsMobileMenuOpen(false)
+                  }}
+                  className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-red-50 text-red-600 w-full"
+                >
+                  <LogOut className="h-5 w-5" />
+                  Sign out
+                </button>
               </div>
             )}
           </div>
-        </div>
-      </div>
-    </header>
+        </>
+      )}
+    </>
   )
 }

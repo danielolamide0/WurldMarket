@@ -98,16 +98,16 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-forest-dark via-forest to-forest-light flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-primary-dark via-primary to-primary-light flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         {/* Logo */}
         <div className="text-center mb-8">
           <img
             src="/logo.png"
             alt="WurldBasket"
-            className="h-20 w-auto mx-auto mb-4"
+            className="h-24 w-auto mx-auto mb-4"
           />
-          <p className="text-forest-light mt-2">Global Food Marketplace</p>
+          <p className="text-white/70 mt-2">Global Food Marketplace</p>
         </div>
 
         <Card variant="elevated" className="overflow-hidden">
