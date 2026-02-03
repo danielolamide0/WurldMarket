@@ -26,6 +26,52 @@ const POPULAR_SEARCHES = [
   'Palm Oil',
 ]
 
+// Animated placeholder search terms
+const SEARCH_TERMS = ['shops?', 'groceries?', 'Butcher?', 'frozen?', 'spices?']
+
+// Animated Placeholder Component
+function AnimatedPlaceholder() {
+  const [currentIndex, setCurrentIndex] = useState(0)
+  const [isAnimating, setIsAnimating] = useState(false)
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setIsAnimating(true)
+      
+      setTimeout(() => {
+        setCurrentIndex((prev) => (prev + 1) % SEARCH_TERMS.length)
+        setIsAnimating(false)
+      }, 400) // Animation duration
+    }, 1000) // Change every second
+
+    return () => clearInterval(interval)
+  }, [])
+
+  const nextIndex = (currentIndex + 1) % SEARCH_TERMS.length
+
+  return (
+    <span className="inline-flex items-center">
+      <span>Looking for </span>
+      <span className="relative inline-block h-[1.5em] w-[140px] ml-1 overflow-hidden">
+        <span
+          className={`absolute left-0 w-full transition-all duration-500 ease-in-out ${
+            isAnimating ? '-translate-y-full opacity-0' : 'translate-y-0 opacity-100'
+          }`}
+        >
+          {SEARCH_TERMS[currentIndex]}
+        </span>
+        <span
+          className={`absolute left-0 w-full transition-all duration-500 ease-in-out ${
+            isAnimating ? 'translate-y-0 opacity-100' : 'translate-y-full opacity-0'
+          }`}
+        >
+          {SEARCH_TERMS[nextIndex]}
+        </span>
+      </span>
+    </span>
+  )
+}
+
 export function Header() {
   const router = useRouter()
   const { user, isAuthenticated, logout } = useAuthStore()
@@ -315,17 +361,21 @@ export function Header() {
             <div className="relative w-full flex max-w-2xl mx-auto">
               <form onSubmit={handleSearchSubmit} className="flex-1 flex">
                 <div className="relative flex-1">
-                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 z-10" />
+                  {!searchQuery && (
+                    <div className="absolute left-11 top-1/2 -translate-y-1/2 pointer-events-none z-10 text-gray-400">
+                      <AnimatedPlaceholder />
+                    </div>
+                  )}
                   <input
                     type="text"
-                    placeholder="Looking for items?"
                     value={searchQuery}
                     onChange={(e) => {
                       setSearchQuery(e.target.value)
                       setIsSearchOpen(true)
                     }}
                     onFocus={() => setIsSearchOpen(true)}
-                    className={`w-full pl-11 pr-4 py-3 border-2 border-primary bg-white focus:outline-none placeholder-gray-400 ${
+                    className={`w-full pl-11 pr-4 py-3 border-2 border-primary bg-white focus:outline-none ${
                       isAuthenticated ? 'rounded-l-full border-r-0' : 'rounded-full'
                     }`}
                   />
@@ -403,17 +453,21 @@ export function Header() {
             <div className="relative flex" ref={mobileSearchRef}>
               <form onSubmit={handleSearchSubmit} className="flex-1 flex">
                 <div className="relative flex-1">
-                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 z-10" />
+                  {!searchQuery && (
+                    <div className="absolute left-11 top-1/2 -translate-y-1/2 pointer-events-none z-10 text-gray-400">
+                      <AnimatedPlaceholder />
+                    </div>
+                  )}
                   <input
                     type="text"
-                    placeholder="Looking for items?"
                     value={searchQuery}
                     onChange={(e) => {
                       setSearchQuery(e.target.value)
                       setIsSearchOpen(true)
                     }}
                     onFocus={() => setIsSearchOpen(true)}
-                    className={`w-full pl-11 pr-4 py-3 border-2 border-primary bg-white focus:outline-none placeholder-gray-400 ${
+                    className={`w-full pl-11 pr-4 py-3 border-2 border-primary bg-white focus:outline-none ${
                       isAuthenticated ? 'rounded-l-full border-r-0' : 'rounded-full'
                     }`}
                   />
