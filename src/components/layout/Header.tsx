@@ -43,7 +43,7 @@ function AnimatedPlaceholder() {
       setTimeout(() => {
         setCurrentIndex((prev) => (prev + 1) % SEARCH_TERMS.length)
         setIsAnimating(false)
-      }, 600) // Animation duration (600ms for smooth scroll)
+      }, 600) // Animation duration
     }, 2000) // Each word stays for 2 seconds before scrolling
 
     return () => clearInterval(interval)
@@ -55,23 +55,18 @@ function AnimatedPlaceholder() {
     <span className="inline-flex items-center">
       <span>Looking for </span>
       <span className="relative inline-block h-[1.5em] w-[140px] ml-1 overflow-hidden">
-        {/* Current word - scrolls up and out */}
+        {/* Container that scrolls up - words stacked vertically */}
         <span
-          className={`absolute left-0 w-full transition-transform ease-in-out ${
-            isAnimating ? '-translate-y-full' : 'translate-y-0'
-          }`}
-          style={{ transitionDuration: '600ms', transitionTimingFunction: 'ease-in-out' }}
+          className="absolute left-0 w-full"
+          style={{
+            transform: isAnimating ? `translateY(-1.5em)` : 'translateY(0)',
+            transition: 'transform 600ms ease-in-out',
+          }}
         >
-          {SEARCH_TERMS[currentIndex]}
-        </span>
-        {/* Next word - scrolls up from below */}
-        <span
-          className={`absolute left-0 w-full transition-transform ease-in-out ${
-            isAnimating ? 'translate-y-0' : 'translate-y-full'
-          }`}
-          style={{ transitionDuration: '600ms', transitionTimingFunction: 'ease-in-out' }}
-        >
-          {SEARCH_TERMS[nextIndex]}
+          {/* Current word */}
+          <span className="block h-[1.5em] leading-[1.5em]">{SEARCH_TERMS[currentIndex]}</span>
+          {/* Next word positioned directly below */}
+          <span className="block h-[1.5em] leading-[1.5em]">{SEARCH_TERMS[nextIndex]}</span>
         </span>
       </span>
     </span>
