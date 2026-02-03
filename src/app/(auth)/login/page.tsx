@@ -104,12 +104,12 @@ export default function LoginPage() {
         <div className="text-center mb-8">
           <div className="flex items-center justify-center gap-3 mb-4">
             <img
-              src="/logo.png"
+              src="/WurldBAsketLogo.png"
               alt="WurldBasket"
               className="h-16 w-auto"
             />
             <img
-              src="/logo-text.png"
+              src="/WurldBasketText.png"
               alt="WurldBasket"
               className="h-10 w-auto brightness-0 invert"
             />

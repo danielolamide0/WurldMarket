@@ -245,7 +245,7 @@ export function Header() {
               </button>
               <Link href="/" className="flex items-center flex-shrink-0">
                 <img
-                  src="/logo.png"
+                  src="/WurldBAsketLogo.png"
                   alt="WurldBasket"
                   className="h-12 w-auto"
                 />
@@ -255,7 +255,7 @@ export function Header() {
             {/* Center: Logo Text */}
             <Link href="/" className="absolute left-1/2 -translate-x-1/2">
               <img
-                src="/logo-text.png"
+                src="/WurldBasketText.png"
                 alt="WurldBasket"
                 className="h-8 w-auto"
               />
@@ -377,8 +377,8 @@ export function Header() {
             <div className="p-4 border-b border-gray-100">
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-2">
-                  <img src="/logo.png" alt="WurldBasket" className="h-10 w-auto" />
-                  <img src="/logo-text.png" alt="WurldBasket" className="h-6 w-auto" />
+                  <img src="/WurldBAsketLogo.png" alt="WurldBasket" className="h-10 w-auto" />
+                  <img src="/WurldBasketText.png" alt="WurldBasket" className="h-6 w-auto" />
                 </div>
                 <button
                   onClick={() => setIsMobileMenuOpen(false)}

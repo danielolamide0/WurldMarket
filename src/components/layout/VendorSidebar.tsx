@@ -40,12 +40,12 @@ export function VendorSidebar() {
       <div className="p-4 border-b border-gray-100">
         <Link href="/dashboard" className="flex items-center gap-2">
           <img
-            src="/logo.png"
+            src="/WurldBAsketLogo.png"
             alt="WurldBasket"
             className="h-10 w-auto"
           />
           <img
-            src="/logo-text.png"
+            src="/WurldBasketText.png"
             alt="WurldBasket"
             className="h-6 w-auto"
           />
@@ -113,12 +113,12 @@ export function VendorSidebar() {
         <div className="flex items-center justify-between">
           <Link href="/dashboard" className="flex items-center gap-2">
             <img
-              src="/logo.png"
+              src="/WurldBAsketLogo.png"
               alt="WurldBasket"
               className="h-8 w-auto"
             />
             <img
-              src="/logo-text.png"
+              src="/WurldBasketText.png"
               alt="WurldBasket"
               className="h-5 w-auto"
             />

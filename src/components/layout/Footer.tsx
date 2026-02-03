@@ -10,12 +10,12 @@ export function Footer() {
           <div>
             <div className="flex items-center gap-2 mb-4">
               <img
-                src="/logo.png"
+                src="/WurldBAsketLogo.png"
                 alt="WurldBasket"
                 className="h-10 w-auto brightness-0 invert"
               />
               <img
-                src="/logo-text.png"
+                src="/WurldBasketText.png"
                 alt="WurldBasket"
                 className="h-6 w-auto brightness-0 invert"
               />

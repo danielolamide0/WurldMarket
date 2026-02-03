@@ -51,12 +51,12 @@ export function SplashScreen({ onComplete }: SplashScreenProps) {
       <div className="relative z-10 flex flex-col items-center">
         <div className="bg-white/95 backdrop-blur-sm rounded-3xl p-8 shadow-2xl flex items-center gap-4">
           <img
-            src="/logo.png"
+            src="/WurldBAsketLogo.png"
             alt="WurldBasket"
             className="h-20 w-auto"
           />
           <img
-            src="/logo-text.png"
+            src="/WurldBasketText.png"
             alt="WurldBasket"
             className="h-12 w-auto"
           />
