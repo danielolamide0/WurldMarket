@@ -102,137 +102,96 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen bg-white">
-      {/* Quick Categories Row */}
+      {/* Quick Categories Row - Compact */}
       <section className="border-b border-gray-100">
-        <div className="max-w-7xl mx-auto px-4 py-4">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-bold text-gray-900">Categories</h2>
-            <Link href="/stores" className="text-primary text-sm font-medium flex items-center gap-1">
-              Show all <ChevronRight className="h-4 w-4" />
-            </Link>
-          </div>
-          <div className="flex gap-4 overflow-x-auto scrollbar-hide pb-2">
+        <div className="max-w-7xl mx-auto px-4 py-3">
+          <div className="flex gap-3 overflow-x-auto scrollbar-hide">
             {QUICK_CATEGORIES.map((cat) => (
               <Link
                 key={cat.id}
                 href={cat.href}
-                className="flex flex-col items-center gap-2 min-w-[70px]"
+                className="flex flex-col items-center gap-1 min-w-[60px]"
               >
-                <div className="w-14 h-14 bg-gray-100 rounded-2xl flex items-center justify-center text-2xl hover:bg-gray-200 transition-colors">
+                <div className="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center text-xl hover:bg-gray-200 transition-colors">
                   {cat.icon}
                 </div>
-                <span className="text-xs text-gray-600 whitespace-nowrap">{cat.name}</span>
+                <span className="text-[10px] text-gray-600 whitespace-nowrap text-center leading-tight">{cat.name}</span>
               </Link>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Find Your Flavour */}
-      <section className="py-6">
+      {/* Find Your Flavour - Compact */}
+      <section className="py-3">
         <div className="max-w-7xl mx-auto px-4">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-bold text-gray-900">Find your flavour</h2>
-            <Link href="/stores" className="text-primary text-sm font-medium flex items-center gap-1">
-              Show all <ChevronRight className="h-4 w-4" />
+          <div className="flex items-center justify-between mb-2">
+            <h2 className="text-base font-bold text-gray-900">Find your flavour</h2>
+            <Link href="/stores" className="text-primary text-sm font-medium">
+              Show all
             </Link>
           </div>
-          <div className="flex gap-4 overflow-x-auto scrollbar-hide pb-2">
+          <div className="flex gap-3 overflow-x-auto scrollbar-hide">
             {CUISINES.map((cuisine) => (
               <Link
                 key={cuisine.id}
                 href={cuisine.href}
-                className="flex flex-col items-center gap-2 min-w-[80px]"
+                className="flex flex-col items-center gap-1 min-w-[60px]"
               >
-                <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-gray-100 hover:border-primary transition-colors">
+                <div className="w-14 h-14 rounded-full overflow-hidden border-2 border-gray-100 hover:border-primary transition-colors">
                   <img
                     src={cuisine.image}
                     alt={cuisine.name}
                     className="w-full h-full object-cover"
                   />
                 </div>
-                <span className="text-sm text-gray-700 font-medium">{cuisine.name}</span>
+                <span className="text-xs text-gray-700 font-medium">{cuisine.name}</span>
               </Link>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Personalized Section for Logged-in Users */}
+      {/* Hello Card - Compact, always show for logged-in users */}
       {isAuthenticated && user?.role === 'customer' && (
-        <section className="py-6 bg-gray-50">
+        <section className="py-3 bg-gray-50">
           <div className="max-w-7xl mx-auto px-4">
-            {/* Greeting Card */}
-            <Card className="p-6 mb-6">
-              <h2 className="text-xl font-bold text-gray-900 mb-1">
+            <Card className="p-4">
+              <h2 className="text-lg font-bold text-gray-900">
                 Hello {user.name.split(' ')[0]}
               </h2>
-              <p className="text-gray-500 mb-4">Ready to start shopping?</p>
-              <div className="flex gap-3">
+              <p className="text-gray-500 text-sm mb-3">Ready to start shopping?</p>
+              <div className="flex gap-2">
                 <Link href="/checkout" className="flex-1">
-                  <Button className="w-full">Book a slot</Button>
+                  <Button className="w-full py-2 text-sm">Book a slot</Button>
                 </Link>
                 <Link href="/orders" className="flex-1">
-                  <Button variant="outline" className="w-full">My orders</Button>
+                  <Button variant="outline" className="w-full py-2 text-sm">My orders</Button>
                 </Link>
               </div>
             </Card>
-
-            {/* Your Regulars */}
-            {regularsCount > 0 && (
-              <Card className="p-6">
-                <div className="flex items-center justify-between mb-4">
-                  <div>
-                    <h3 className="font-bold text-gray-900">Your Regulars</h3>
-                    <p className="text-sm text-gray-500">
-                      {regularsCount} items {favouritesCount > 0 && `(${favouritesCount} on offer)`}
-                    </p>
-                  </div>
-                </div>
-                {regularProducts.length > 0 && (
-                  <div className="grid grid-cols-2 gap-3 mb-4">
-                    {regularProducts.map((product) => (
-                      <Link key={product.id} href={`/products/${product.id}`}>
-                        <div className="bg-gray-100 rounded-xl p-2">
-                          <img
-                            src={product.image}
-                            alt={product.name}
-                            className="w-full h-20 object-cover rounded-lg"
-                          />
-                        </div>
-                      </Link>
-                    ))}
-                  </div>
-                )}
-                <Link href="/regulars">
-                  <Button className="w-full bg-primary hover:bg-primary-dark">
-                    Shop regulars
-                  </Button>
-                </Link>
-              </Card>
-            )}
           </div>
         </section>
       )}
 
-      {/* Shops in Your Area */}
-      <section className="py-6">
+      {/* Shops in Your Area - Compact */}
+      <section className="py-3">
         <div className="max-w-7xl mx-auto px-4">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-bold text-gray-900">Shops in your area</h2>
-            <Link href="/stores" className="text-primary text-sm font-medium flex items-center gap-1">
-              Show all <ChevronRight className="h-4 w-4" />
+          <div className="flex items-center justify-between mb-2">
+            <h2 className="text-base font-bold text-gray-900">Shops in your area</h2>
+            <Link href="/stores" className="text-primary text-sm font-medium">
+              Show all
             </Link>
           </div>
-          <div className="flex gap-4 overflow-x-auto scrollbar-hide pb-2">
+          <div className="flex gap-3 overflow-x-auto scrollbar-hide pb-1">
             {sortedStores.slice(0, 6).map((store) => (
               <Link
                 key={store.id}
                 href={`/stores/${store.id}`}
-                className="flex-shrink-0 w-28"
+                className="flex-shrink-0 w-20"
               >
-                <div className="bg-white border border-gray-200 rounded-2xl p-3 hover:shadow-md transition-shadow">
-                  <div className="w-full h-16 bg-gray-100 rounded-xl mb-2 overflow-hidden flex items-center justify-center">
+                <div className="flex flex-col items-center">
+                  <div className="w-16 h-16 bg-white border border-gray-200 rounded-xl mb-1 overflow-hidden flex items-center justify-center">
                     {store.image ? (
                       <img
                         src={store.image}
@@ -240,20 +199,63 @@ export default function HomePage() {
                         className="w-full h-full object-cover"
                       />
                     ) : (
-                      <ShoppingBag className="h-8 w-8 text-gray-400" />
+                      <ShoppingBag className="h-6 w-6 text-gray-400" />
                     )}
                   </div>
-                  <p className="text-sm font-medium text-gray-900 truncate">{store.name}</p>
-                  <p className="text-xs text-gray-500 flex items-center gap-1">
-                    <Clock className="h-3 w-3" />
-                    10-20 mins
-                  </p>
+                  <p className="text-xs font-medium text-gray-900 truncate w-full text-center">{store.name}</p>
+                  <p className="text-[10px] text-gray-500">10-20 mins</p>
                 </div>
               </Link>
             ))}
           </div>
         </div>
       </section>
+
+      {/* Order from X places - Info line */}
+      <div className="px-4 py-2 border-t border-gray-100">
+        <p className="text-sm text-gray-600 flex items-center gap-1">
+          Order from {sortedStores.length > 0 ? sortedStores.length : '400'}+ places
+          <span className="w-4 h-4 rounded-full border border-gray-400 text-gray-400 text-xs flex items-center justify-center">i</span>
+        </p>
+      </div>
+
+      {/* Your Regulars - Only show if user has regulars, below the fold */}
+      {isAuthenticated && user?.role === 'customer' && regularsCount > 0 && (
+        <section className="py-4 bg-gray-50">
+          <div className="max-w-7xl mx-auto px-4">
+            <Card className="p-4">
+              <div className="flex items-center justify-between mb-3">
+                <div>
+                  <h3 className="font-bold text-gray-900">Your Regulars</h3>
+                  <p className="text-xs text-gray-500">
+                    {regularsCount} items {favouritesCount > 0 && `(${favouritesCount} on offer)`}
+                  </p>
+                </div>
+              </div>
+              {regularProducts.length > 0 && (
+                <div className="grid grid-cols-4 gap-2 mb-3">
+                  {regularProducts.map((product) => (
+                    <Link key={product.id} href={`/products/${product.id}`}>
+                      <div className="bg-gray-100 rounded-lg overflow-hidden">
+                        <img
+                          src={product.image}
+                          alt={product.name}
+                          className="w-full h-14 object-cover"
+                        />
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              )}
+              <Link href="/regulars">
+                <Button className="w-full py-2 text-sm">
+                  Shop regulars
+                </Button>
+              </Link>
+            </Card>
+          </div>
+        </section>
+      )}
 
       {/* Popular Products */}
       <section className="py-6">
