@@ -249,19 +249,64 @@ export default function HomePage() {
         </section>
       )}
 
-      {/* Popular Products */}
-      <section className="py-6">
+      {/* Popular offers ending soon - Horizontally scrollable */}
+      <section className="py-4">
         <div className="max-w-7xl mx-auto px-4">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-bold text-gray-900">Popular Products</h2>
-            <Link href="/stores" className="text-primary text-sm font-medium flex items-center gap-1">
-              Show all <ChevronRight className="h-4 w-4" />
-            </Link>
-          </div>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {featuredProducts.map((product) => (
-              <ProductCard key={product.id} product={product} />
-            ))}
+          <h2 className="text-lg font-bold text-primary mb-1">Popular offers ending soon</h2>
+          <p className="text-sm text-gray-500 mb-3">Don't miss the chance to shop our trusted sellers</p>
+          <div className="flex gap-3 overflow-x-auto scrollbar-hide pb-2">
+            {featuredProducts.slice(0, 6).map((product) => {
+              const store = sortedStores.find(s => s.id === product.storeId)
+              const originalPrice = (product.price * 1.25).toFixed(2)
+              const offerEndDate = new Date()
+              offerEndDate.setDate(offerEndDate.getDate() + 7)
+
+              return (
+                <div
+                  key={product.id}
+                  className="flex-shrink-0 w-44 bg-white border border-gray-200 rounded-xl overflow-hidden"
+                >
+                  {/* Store badge */}
+                  <div className="px-2 py-1 bg-gray-100 text-xs text-gray-600">
+                    {store?.name ? `${store.name}-` : 'Marketplace-'}
+                  </div>
+
+                  {/* Product image */}
+                  <div className="h-28 bg-white flex items-center justify-center p-2">
+                    <img
+                      src={product.image}
+                      alt={product.name}
+                      className="max-h-full max-w-full object-contain"
+                    />
+                  </div>
+
+                  {/* Product info */}
+                  <div className="p-2">
+                    <p className="text-xs font-medium text-gray-900 line-clamp-2 h-8">{product.name}</p>
+                    <p className="text-[10px] text-gray-500 mb-2">Sold by {store?.name || 'Marketplace seller'}</p>
+
+                    {/* Offer banner */}
+                    <div className="bg-yellow-400 text-xs font-semibold text-gray-900 px-2 py-1 rounded mb-1">
+                      Was £{originalPrice} Now £{product.price.toFixed(2)}
+                    </div>
+                    <p className="text-[10px] text-gray-500 mb-2">
+                      Offer valid until {offerEndDate.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' })}
+                    </p>
+
+                    {/* Price and Add button */}
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-sm font-bold text-gray-900">£{product.price.toFixed(2)}</p>
+                        <p className="text-[10px] text-gray-500">£{product.price.toFixed(2)}/each</p>
+                      </div>
+                      <Link href={`/products/${product.id}`}>
+                        <Button size="sm" className="text-xs px-3 py-1">Add</Button>
+                      </Link>
+                    </div>
+                  </div>
+                </div>
+              )
+            })}
           </div>
         </div>
       </section>

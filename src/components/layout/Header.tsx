@@ -52,9 +52,9 @@ function AnimatedPlaceholder() {
   const nextIndex = (currentIndex + 1) % SEARCH_TERMS.length
 
   return (
-    <span className="inline-flex items-center">
-      <span>Looking for </span>
-      <span className="relative inline-block h-[1.5em] w-[140px] ml-1 overflow-hidden">
+    <span className="inline-flex items-center whitespace-nowrap">
+      <span className="whitespace-nowrap">Looking for </span>
+      <span className="relative inline-block h-[1.5em] min-w-[100px] max-w-[140px] ml-1 overflow-hidden">
         {/* Container that scrolls up - words stacked vertically */}
         <span
           className="absolute left-0 w-full"
@@ -64,9 +64,9 @@ function AnimatedPlaceholder() {
           }}
         >
           {/* Current word */}
-          <span className="block h-[1.5em] leading-[1.5em]">{SEARCH_TERMS[currentIndex]}</span>
+          <span className="block h-[1.5em] leading-[1.5em] whitespace-nowrap">{SEARCH_TERMS[currentIndex]}</span>
           {/* Next word positioned directly below */}
-          <span className="block h-[1.5em] leading-[1.5em]">{SEARCH_TERMS[nextIndex]}</span>
+          <span className="block h-[1.5em] leading-[1.5em] whitespace-nowrap">{SEARCH_TERMS[nextIndex]}</span>
         </span>
       </span>
     </span>
@@ -364,7 +364,7 @@ export function Header() {
                 <div className="relative flex-1">
                   <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 z-10" />
                   {!searchQuery && (
-                    <div className="absolute left-11 top-1/2 -translate-y-1/2 pointer-events-none z-10 text-gray-400">
+                    <div className="absolute left-11 top-1/2 -translate-y-1/2 pointer-events-none z-10 text-gray-400 overflow-hidden max-w-[calc(100%-3rem)]">
                       <AnimatedPlaceholder />
                     </div>
                   )}
@@ -456,7 +456,7 @@ export function Header() {
                 <div className="relative flex-1">
                   <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 z-10" />
                   {!searchQuery && (
-                    <div className="absolute left-11 top-1/2 -translate-y-1/2 pointer-events-none z-10 text-gray-400">
+                    <div className="absolute left-11 top-1/2 -translate-y-1/2 pointer-events-none z-10 text-gray-400 overflow-hidden max-w-[calc(100%-3rem)]">
                       <AnimatedPlaceholder />
                     </div>
                   )}
