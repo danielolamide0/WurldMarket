@@ -172,7 +172,16 @@ export default function HomePage() {
       {/* Shops in Your Area - Compact */}
       <section className="py-3">
         <div className="max-w-7xl mx-auto px-4">
-          <h2 className="text-base font-bold text-gray-900 mb-2">Shops in your area</h2>
+          <div className="flex items-center justify-between mb-2">
+            <h2 className="text-base font-bold text-gray-900">Shops in your area</h2>
+            <Link
+              href="/stores"
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-primary text-white rounded-full hover:bg-primary-dark transition-colors"
+            >
+              <MapPin className="h-4 w-4" />
+              <span className="text-sm font-medium">STORE FINDER</span>
+            </Link>
+          </div>
           <div className="flex gap-3 overflow-x-auto scrollbar-hide pb-1">
             {sortedStores.slice(0, 6).map((store) => (
               <Link

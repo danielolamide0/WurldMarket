@@ -122,21 +122,30 @@ export function Footer() {
       <div className="border-t border-gray-200 py-4 bg-white">
         <div className="max-w-7xl mx-auto px-4">
           <h4 className="text-sm font-semibold text-gray-900 mb-3">Payment Methods</h4>
-          <div className="flex flex-wrap items-center gap-3">
-            <div className="bg-white px-3 py-2 rounded border border-gray-200 text-xs font-semibold text-blue-600">AMEX</div>
-            <div className="bg-white px-3 py-2 rounded border border-gray-200 text-xs font-semibold">
-              <span style={{ color: '#EB001B' }}>Master</span>
-              <span style={{ color: '#F79E1B' }}>card</span>
+          <div className="flex flex-wrap items-center gap-4">
+            {/* Visa */}
+            <div className="h-10 w-16 flex items-center justify-center bg-white border border-gray-200 rounded">
+              <svg viewBox="0 0 100 32" className="h-6 w-full">
+                <rect width="100" height="32" fill="#1434CB" rx="2"/>
+                <text x="50" y="22" fontSize="14" fill="white" fontWeight="bold" textAnchor="middle" fontFamily="Arial, sans-serif">VISA</text>
+              </svg>
             </div>
-            <div className="bg-white px-3 py-2 rounded border border-gray-200 text-xs font-semibold">
-              <span style={{ color: '#EB001B' }}>Master</span>
-              <span style={{ color: '#F79E1B' }}>card</span>
+            
+            {/* Mastercard */}
+            <div className="h-10 w-16 flex items-center justify-center bg-white border border-gray-200 rounded">
+              <svg viewBox="0 0 100 32" className="h-6 w-full">
+                <circle cx="30" cy="16" r="12" fill="#EB001B"/>
+                <circle cx="70" cy="16" r="12" fill="#F79E1B"/>
+              </svg>
             </div>
-            <div className="bg-white px-3 py-2 rounded border border-gray-200 text-xs font-semibold text-blue-600">Maestro</div>
-            <div className="bg-white px-3 py-2 rounded border border-gray-200 text-xs font-semibold text-blue-600">VISA</div>
-            <div className="bg-white px-3 py-2 rounded border border-gray-200 text-xs font-semibold text-blue-600">Verified by VISA</div>
-            <div className="bg-white px-3 py-2 rounded border border-gray-200 text-xs font-semibold text-gray-700">MasterCard. SecureCode.</div>
-            <div className="bg-white px-3 py-2 rounded border border-gray-200 text-xs font-semibold text-gray-700">American Express SafeKey</div>
+            
+            {/* American Express */}
+            <div className="h-10 w-16 flex items-center justify-center bg-white border border-gray-200 rounded">
+              <svg viewBox="0 0 100 32" className="h-6 w-full">
+                <rect width="100" height="32" fill="#006FCF" rx="2"/>
+                <text x="50" y="20" fontSize="9" fill="white" fontWeight="bold" textAnchor="middle" fontFamily="Arial, sans-serif">AMEX</text>
+              </svg>
+            </div>
           </div>
         </div>
       </div>
