@@ -44,7 +44,6 @@ export function MobileNav() {
               </Link>
             )
           })}
-          </div>
         </div>
       </div>
     </nav>
