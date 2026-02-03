@@ -109,7 +109,7 @@ export default function StoresPage() {
           <p className="text-sm text-gray-500 mb-4">{locationError}</p>
         )}
         {userLocation && !isLocating && (
-          <p className="text-sm text-forest mb-4">
+          <p className="text-sm text-primary mb-4">
             Showing stores sorted by distance from your location
           </p>
         )}

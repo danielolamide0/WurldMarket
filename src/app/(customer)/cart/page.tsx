@@ -129,7 +129,7 @@ export default function CartPage() {
             <div className="flex justify-between text-gray-600">
               <span>Delivery Fee</span>
               {deliveryFee === 0 ? (
-                <span className="text-forest font-medium">FREE</span>
+                <span className="text-primary font-medium">FREE</span>
               ) : (
                 <span>{formatPrice(deliveryFee)}</span>
               )}

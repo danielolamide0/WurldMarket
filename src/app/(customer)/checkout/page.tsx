@@ -186,7 +186,7 @@ export default function CheckoutPage() {
     return (
       <div className="min-h-screen flex items-center justify-center p-4">
         <div className="max-w-md w-full text-center">
-          <div className="w-20 h-20 bg-forest rounded-full flex items-center justify-center mx-auto mb-6 animate-bounce">
+          <div className="w-20 h-20 bg-primary rounded-full flex items-center justify-center mx-auto mb-6 animate-bounce">
             <CheckCircle className="h-10 w-10 text-white" />
           </div>
           <h1 className="text-2xl font-bold text-gray-900 mb-2">Order Placed!</h1>
@@ -551,7 +551,7 @@ export default function CheckoutPage() {
             <div className="flex justify-between text-gray-600">
               <span>Delivery</span>
               {deliveryFee === 0 ? (
-                <span className="text-forest font-medium">FREE</span>
+                <span className="text-primary font-medium">FREE</span>
               ) : (
                 <span>{formatPrice(deliveryFee)}</span>
               )}

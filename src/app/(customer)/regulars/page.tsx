@@ -151,8 +151,8 @@ function RegularsContent() {
                   onClick={() => setActiveTab(tab.id)}
                   className={`flex-shrink-0 flex flex-col items-center justify-center px-6 py-4 rounded-2xl border-2 transition-all min-w-[120px] ${
                     isActive
-                      ? 'bg-forest text-white border-forest'
-                      : 'bg-white text-gray-700 border-gray-200 hover:border-forest hover:text-forest'
+                      ? 'bg-primary text-white border-primary'
+                      : 'bg-white text-gray-700 border-gray-200 hover:border-primary hover:text-primary'
                   }`}
                 >
                   <Icon className={`h-6 w-6 mb-1 ${isActive ? 'text-white' : ''}`} />
@@ -182,7 +182,7 @@ function RegularsContent() {
             <p className="text-gray-700 font-medium">
               {activeProducts.length} item{activeProducts.length !== 1 ? 's' : ''}
             </p>
-            <Button onClick={handleAddAllToCart} className="bg-forest/80 hover:bg-forest">
+            <Button onClick={handleAddAllToCart} className="bg-primary hover:bg-primary-dark">
               <Plus className="h-4 w-4 mr-2" />
               Add all to cart
             </Button>

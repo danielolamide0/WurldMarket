@@ -72,7 +72,7 @@ export default function AccountPage() {
   return (
     <div className="min-h-screen">
       {/* Profile Header */}
-      <div className="bg-gradient-to-br from-forest-dark to-forest text-white">
+      <div className="bg-gradient-to-br from-primary-dark to-primary text-white">
         <div className="max-w-3xl mx-auto px-4 py-8">
           <div className="flex items-center gap-4">
             <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center">
@@ -94,7 +94,7 @@ export default function AccountPage() {
 
           {user?.role === 'vendor' && (
             <Link href="/dashboard" className="block mt-4">
-              <Button variant="outline" className="border-white text-white hover:bg-white hover:text-forest">
+              <Button variant="outline" className="border-white text-white hover:bg-white hover:text-primary">
                 <Store className="h-4 w-4 mr-2" />
                 Go to Vendor Dashboard
               </Button>

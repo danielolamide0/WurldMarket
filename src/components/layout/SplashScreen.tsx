@@ -47,9 +47,9 @@ export function SplashScreen({ onComplete }: SplashScreenProps) {
       {/* Dark Overlay */}
       <div className="absolute inset-0 bg-black/40" />
 
-      {/* Logo Container with white background */}
+      {/* Logo Container with transparent background */}
       <div className="relative z-10 flex flex-col items-center">
-        <div className="bg-white/95 backdrop-blur-sm rounded-3xl p-8 shadow-2xl flex items-center gap-4">
+        <div className="bg-transparent rounded-3xl p-8 flex items-center gap-4">
           <img
             src="/WurldBAsketLogo.png"
             alt="WurldBasket"

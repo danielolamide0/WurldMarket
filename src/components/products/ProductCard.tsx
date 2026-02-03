@@ -104,7 +104,7 @@ export function ProductCard({ product }: ProductCardProps) {
               disabled={isOutOfStock}
               className={`p-2.5 rounded-xl transition-all ${
                 isInCart
-                  ? 'bg-forest text-white'
+                  ? 'bg-primary-light text-white'
                   : isOutOfStock
                   ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
                   : 'bg-primary text-white hover:bg-primary-dark'
@@ -119,7 +119,7 @@ export function ProductCard({ product }: ProductCardProps) {
           </div>
 
           {isInCart && (
-            <p className="text-sm text-forest mt-2 font-medium">
+            <p className="text-sm text-primary mt-2 font-medium">
               {quantityInCart} in cart
             </p>
           )}
