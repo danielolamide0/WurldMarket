@@ -63,8 +63,6 @@ export default function ProductDetailPage() {
       quantity,
       stock: product.stock,
     })
-
-    addToast(`Added ${quantity} x ${product.name} to cart`, 'success')
     setQuantity(1)
   }
 

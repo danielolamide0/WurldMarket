@@ -40,8 +40,6 @@ export function ProductCard({ product }: ProductCardProps) {
       quantity: 1,
       stock: product.stock,
     })
-
-    addToast(`${product.name} added to cart`, 'success')
   }
 
   const handleToggleFavourite = (e: React.MouseEvent) => {

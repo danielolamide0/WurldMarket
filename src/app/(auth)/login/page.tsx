@@ -71,7 +71,6 @@ export default function LoginPage() {
     })
 
     if (result.success) {
-      addToast('Account created successfully!', 'success')
       if (signupRole === 'vendor') {
         router.push('/dashboard')
       } else {
