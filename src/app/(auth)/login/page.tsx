@@ -10,7 +10,7 @@ import { useToast } from '@/components/ui/toast'
 import { User, Lock, Store, Mail, Building2, Phone, ShoppingBag, ArrowLeft } from 'lucide-react'
 
 type ViewMode = 'login' | 'signup' | 'forgot-password'
-type SignupStep = 'email' | 'verify' | 'profile'
+type SignupStep = 'form' | 'verify'
 type ForgotPasswordStep = 'email' | 'verify' | 'reset'
 type SignupRole = 'customer' | 'vendor'
 
@@ -30,7 +30,7 @@ export default function LoginPage() {
 
   // View state
   const [viewMode, setViewMode] = useState<ViewMode>('login')
-  const [signupStep, setSignupStep] = useState<SignupStep>('email')
+  const [signupStep, setSignupStep] = useState<SignupStep>('form')
   const [forgotPasswordStep, setForgotPasswordStep] = useState<ForgotPasswordStep>('email')
 
   // Form fields
@@ -62,7 +62,7 @@ export default function LoginPage() {
     setSignupRole('customer')
     setVerificationCode(['', '', '', '', '', ''])
     setEmailVerified(false)
-    setSignupStep('email')
+    setSignupStep('form')
     setForgotPasswordStep('email')
     clearError()
   }
@@ -118,8 +118,8 @@ export default function LoginPage() {
     }
   }
 
-  // Signup Step 1: Send verification code
-  const handleSendSignupCode = async (e: React.FormEvent) => {
+  // Signup Step 1: Fill form and send verification code
+  const handleSignupSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     clearError()
 
@@ -127,36 +127,6 @@ export default function LoginPage() {
       addToast('Please enter your email', 'error')
       return
     }
-
-    const result = await sendVerificationCode(email.trim(), 'signup')
-    if (result.success) {
-      setSignupStep('verify')
-      addToast('Verification code sent to your email', 'success')
-    }
-  }
-
-  // Signup Step 2: Verify code
-  const handleVerifySignupCode = async (e: React.FormEvent) => {
-    e.preventDefault()
-    clearError()
-
-    const code = getFullCode()
-    if (code.length !== 6) {
-      addToast('Please enter the 6-digit code', 'error')
-      return
-    }
-
-    const result = await verifyCode(email.trim(), code, 'signup')
-    if (result.success) {
-      setEmailVerified(true)
-      setSignupStep('profile')
-    }
-  }
-
-  // Signup Step 3: Complete profile
-  const handleCompleteSignup = async (e: React.FormEvent) => {
-    e.preventDefault()
-    clearError()
 
     if (password !== confirmPassword) {
       addToast('Passwords do not match', 'error')
@@ -173,9 +143,29 @@ export default function LoginPage() {
       return
     }
 
+    // Send verification code to email
+    const result = await sendVerificationCode(email.trim(), 'signup')
+    if (result.success) {
+      setSignupStep('verify')
+      addToast('Verification code sent to your email', 'success')
+    }
+  }
+
+  // Signup Step 2: Verify code and complete signup
+  const handleVerifyAndSignup = async (e: React.FormEvent) => {
+    e.preventDefault()
+    clearError()
+
+    const code = getFullCode()
+    if (code.length !== 6) {
+      addToast('Please enter the 6-digit code', 'error')
+      return
+    }
+
+    // Complete signup with the verification code
     const result = await signup({
       email: email.trim(),
-      verificationCode: getFullCode(),
+      verificationCode: code,
       password,
       name,
       phone: signupRole === 'customer' ? (phone || undefined) : undefined,
@@ -301,7 +291,7 @@ export default function LoginPage() {
 
         <Card variant="elevated" className="overflow-hidden">
           {/* View Mode Tabs - only show when not in sub-steps */}
-          {(viewMode === 'login' || (viewMode === 'signup' && signupStep === 'email') || viewMode === 'forgot-password') && (
+          {(viewMode === 'login' || (viewMode === 'signup' && signupStep === 'form') || viewMode === 'forgot-password') && (
             <div className="flex border-b border-gray-100">
               <button
                 type="button"
@@ -388,127 +378,9 @@ export default function LoginPage() {
             {/* SIGNUP VIEW */}
             {viewMode === 'signup' && (
               <>
-                {/* Step 1: Enter Email */}
-                {signupStep === 'email' && (
-                  <form onSubmit={handleSendSignupCode} className="space-y-4">
-                    <div className="text-center mb-4">
-                      <h2 className="text-xl font-semibold text-gray-900 mb-2">Create Account</h2>
-                      <p className="text-gray-600 text-sm">
-                        Enter your email to get started
-                      </p>
-                    </div>
-
-                    <Input
-                      label="Email Address"
-                      type="email"
-                      placeholder="you@example.com"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      icon={<Mail className="h-5 w-5" />}
-                      required
-                    />
-
-                    {error && (
-                      <p className="text-sm text-red-600 bg-red-50 p-3 rounded-xl">{error}</p>
-                    )}
-
-                    <Button
-                      type="submit"
-                      className="w-full"
-                      size="lg"
-                      isLoading={isLoading}
-                    >
-                      Send Verification Code
-                    </Button>
-
-                    <div className="text-center">
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setViewMode('login')
-                          resetForm()
-                        }}
-                        className="text-sm text-gray-600 hover:text-gray-900"
-                      >
-                        Already have an account? <span className="text-primary font-medium">Sign In</span>
-                      </button>
-                    </div>
-                  </form>
-                )}
-
-                {/* Step 2: Verify Code */}
-                {signupStep === 'verify' && (
-                  <form onSubmit={handleVerifySignupCode} className="space-y-6">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setSignupStep('email')
-                        setVerificationCode(['', '', '', '', '', ''])
-                        clearError()
-                      }}
-                      className="flex items-center gap-2 text-gray-600 hover:text-gray-900"
-                    >
-                      <ArrowLeft className="h-4 w-4" />
-                      Back
-                    </button>
-
-                    <div className="text-center">
-                      <h2 className="text-xl font-semibold text-gray-900 mb-2">Verify Your Email</h2>
-                      <p className="text-gray-600 text-sm">
-                        We sent a 6-digit code to<br />
-                        <span className="font-medium text-gray-900">{email}</span>
-                      </p>
-                    </div>
-
-                    {renderCodeInputs()}
-
-                    {error && (
-                      <p className="text-sm text-red-600 bg-red-50 p-3 rounded-xl text-center">{error}</p>
-                    )}
-
-                    <Button
-                      type="submit"
-                      className="w-full"
-                      size="lg"
-                      isLoading={isLoading}
-                      disabled={getFullCode().length !== 6}
-                    >
-                      Verify Code
-                    </Button>
-
-                    <div className="text-center">
-                      <button
-                        type="button"
-                        onClick={() => handleResendCode('signup')}
-                        className="text-sm text-primary hover:underline"
-                        disabled={isLoading}
-                      >
-                        Didn&apos;t receive the code? Resend
-                      </button>
-                    </div>
-                  </form>
-                )}
-
-                {/* Step 3: Complete Profile */}
-                {signupStep === 'profile' && (
-                  <form onSubmit={handleCompleteSignup} className="space-y-4">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setSignupStep('verify')
-                        clearError()
-                      }}
-                      className="flex items-center gap-2 text-gray-600 hover:text-gray-900"
-                    >
-                      <ArrowLeft className="h-4 w-4" />
-                      Back
-                    </button>
-
-                    <div className="text-center mb-2">
-                      <h2 className="text-xl font-semibold text-gray-900 mb-1">Complete Your Profile</h2>
-                      <p className="text-gray-600 text-sm">Just a few more details</p>
-                    </div>
-
+                {/* Step 1: Full Signup Form */}
+                {signupStep === 'form' && (
+                  <form onSubmit={handleSignupSubmit} className="space-y-4">
                     {/* Role Selection */}
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -568,6 +440,16 @@ export default function LoginPage() {
                       required
                     />
 
+                    <Input
+                      label={signupRole === 'vendor' ? 'Business Email' : 'Email'}
+                      type="email"
+                      placeholder="Enter your email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      icon={<Mail className="h-5 w-5" />}
+                      required
+                    />
+
                     {signupRole === 'customer' && (
                       <Input
                         label="Phone Number (Optional)"
@@ -611,6 +493,72 @@ export default function LoginPage() {
                     >
                       {signupRole === 'vendor' ? 'Create Vendor Account' : 'Create Account'}
                     </Button>
+
+                    <div className="text-center">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setViewMode('login')
+                          resetForm()
+                        }}
+                        className="text-sm text-gray-600 hover:text-gray-900"
+                      >
+                        Already have an account? <span className="text-primary font-medium">Sign In</span>
+                      </button>
+                    </div>
+                  </form>
+                )}
+
+                {/* Step 2: Verify Email Code */}
+                {signupStep === 'verify' && (
+                  <form onSubmit={handleVerifyAndSignup} className="space-y-6">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSignupStep('form')
+                        setVerificationCode(['', '', '', '', '', ''])
+                        clearError()
+                      }}
+                      className="flex items-center gap-2 text-gray-600 hover:text-gray-900"
+                    >
+                      <ArrowLeft className="h-4 w-4" />
+                      Back
+                    </button>
+
+                    <div className="text-center">
+                      <h2 className="text-xl font-semibold text-gray-900 mb-2">Verify Your Email</h2>
+                      <p className="text-gray-600 text-sm">
+                        We sent a 6-digit code to<br />
+                        <span className="font-medium text-gray-900">{email}</span>
+                      </p>
+                    </div>
+
+                    {renderCodeInputs()}
+
+                    {error && (
+                      <p className="text-sm text-red-600 bg-red-50 p-3 rounded-xl text-center">{error}</p>
+                    )}
+
+                    <Button
+                      type="submit"
+                      className="w-full"
+                      size="lg"
+                      isLoading={isLoading}
+                      disabled={getFullCode().length !== 6}
+                    >
+                      Verify & Create Account
+                    </Button>
+
+                    <div className="text-center">
+                      <button
+                        type="button"
+                        onClick={() => handleResendCode('signup')}
+                        className="text-sm text-primary hover:underline"
+                        disabled={isLoading}
+                      >
+                        Didn&apos;t receive the code? Resend
+                      </button>
+                    </div>
                   </form>
                 )}
               </>
