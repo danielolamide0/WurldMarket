@@ -80,10 +80,8 @@ export default function SavedAddressesPage() {
 
     if (editingId) {
       updateAddress(editingId, { label, fullAddress, city, postcode, coordinates })
-      addToast('Address updated successfully', 'success')
     } else {
       addAddress(user.id, label, fullAddress, city, postcode, false, coordinates)
-      addToast('Address added successfully', 'success')
     }
 
     resetForm()
@@ -102,13 +100,11 @@ export default function SavedAddressesPage() {
 
   const handleDelete = (addressId: string) => {
     deleteAddress(addressId)
-    addToast('Address deleted', 'success')
   }
 
   const handleSetPrimary = (addressId: string) => {
     if (!user) return
     setPrimaryAddress(user.id, addressId)
-    addToast('Primary address updated', 'success')
   }
 
   const getLabelIcon = (labelValue: string) => {
