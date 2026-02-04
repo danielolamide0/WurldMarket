@@ -179,11 +179,18 @@ export default function CheckoutPage() {
     setIsProcessing(false)
   }
 
+  // Scroll to top when order is complete
+  useEffect(() => {
+    if (orderComplete) {
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+    }
+  }, [orderComplete])
+
   // Order Complete Screen
   if (orderComplete) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-4">
-        <div className="max-w-md w-full text-center">
+      <div className="min-h-screen p-4 pt-8">
+        <div className="max-w-md mx-auto text-center">
           <div className="w-20 h-20 bg-primary rounded-full flex items-center justify-center mx-auto mb-6 animate-bounce">
             <CheckCircle className="h-10 w-10 text-white" />
           </div>
