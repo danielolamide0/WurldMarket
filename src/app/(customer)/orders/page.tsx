@@ -70,9 +70,9 @@ export default function CustomerOrdersPage() {
                   <div className="p-4">
                     <div className="flex items-start justify-between gap-4">
                       <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-3 mb-2">
-                          <span className="font-semibold text-gray-900">{order.id}</span>
-                          <Badge className={ORDER_STATUS_COLORS[order.status]} size="sm">
+                        <div className="flex items-center gap-2 mb-2 flex-wrap">
+                          <span className="font-semibold text-gray-900 truncate">{order.id}</span>
+                          <Badge className={ORDER_STATUS_COLORS[order.status]} size="sm" style={{ flexShrink: 0 }}>
                             {ORDER_STATUS_LABELS[order.status]}
                           </Badge>
                         </div>
@@ -81,8 +81,8 @@ export default function CustomerOrdersPage() {
                           {order.items.length} item{order.items.length !== 1 ? 's' : ''} • {formatDate(order.createdAt)}
                         </p>
                       </div>
-                      <div className="text-right flex-shrink-0">
-                        <p className="text-lg font-bold text-primary">{formatPrice(order.total)}</p>
+                      <div className="text-right flex-shrink-0 ml-4">
+                        <p className="text-lg font-bold text-primary whitespace-nowrap">{formatPrice(order.total)}</p>
                         <ChevronRight className="h-5 w-5 text-gray-400 mt-2 ml-auto" />
                       </div>
                     </div>
