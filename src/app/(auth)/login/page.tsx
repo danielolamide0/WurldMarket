@@ -147,7 +147,6 @@ export default function LoginPage() {
     const result = await sendVerificationCode(email.trim(), 'signup')
     if (result.success) {
       setSignupStep('verify')
-      addToast('Verification code sent to your email', 'success')
     }
   }
 
