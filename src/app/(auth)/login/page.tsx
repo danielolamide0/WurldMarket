@@ -194,7 +194,6 @@ export default function LoginPage() {
     const result = await sendVerificationCode(email.trim(), 'password-reset')
     if (result.success) {
       setForgotPasswordStep('verify')
-      addToast('If an account exists with this email, a code has been sent', 'success')
     }
   }
 
@@ -232,7 +231,6 @@ export default function LoginPage() {
 
     const result = await resetPassword(email.trim(), getFullCode(), password)
     if (result.success) {
-      addToast('Password reset successfully. Please sign in.', 'success')
       resetForm()
       setViewMode('login')
     }
@@ -242,10 +240,7 @@ export default function LoginPage() {
   const handleResendCode = async (type: 'signup' | 'password-reset') => {
     clearError()
     setVerificationCode(['', '', '', '', '', ''])
-    const result = await sendVerificationCode(email.trim(), type)
-    if (result.success) {
-      addToast('New verification code sent', 'success')
-    }
+    await sendVerificationCode(email.trim(), type)
   }
 
   // Render verification code inputs

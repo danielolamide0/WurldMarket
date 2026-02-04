@@ -11,7 +11,6 @@ import { useAuthStore } from '@/stores/authStore'
 import { ProductCard } from '@/components/products/ProductCard'
 import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { useToast } from '@/components/ui/toast'
 
 type TabType = 'regulars' | 'favourites' | 'previously-purchased'
 
@@ -24,7 +23,6 @@ function RegularsContent() {
   const products = useProductStore((state) => state.products)
   const { favourites, getPreviouslyPurchased, getRegulars, fetchCustomerData, userId, setUserId } = useCustomerStore()
   const { addItem } = useCartStore()
-  const { addToast } = useToast()
 
   // Sync customerStore when user changes
   useEffect(() => {
@@ -114,9 +112,6 @@ function RegularsContent() {
         addedCount++
       }
     })
-    if (addedCount > 0) {
-      addToast(`${addedCount} items added to cart`, 'success')
-    }
   }
 
   if (!isAuthenticated) {

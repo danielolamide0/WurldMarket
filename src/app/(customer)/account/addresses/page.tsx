@@ -19,7 +19,6 @@ import { useAddressStore } from '@/stores/addressStore'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
-import { useToast } from '@/components/ui/toast'
 import { PostcodeLookup } from '@/components/address/PostcodeLookup'
 import { SavedAddress } from '@/types'
 
@@ -38,7 +37,6 @@ export default function SavedAddressesPage() {
     deleteAddress,
     setPrimaryAddress,
   } = useAddressStore()
-  const { addToast } = useToast()
 
   const [isAdding, setIsAdding] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
@@ -72,7 +70,6 @@ export default function SavedAddressesPage() {
 
   const handleSave = () => {
     if (!fullAddress.trim() || !city.trim() || !postcode.trim()) {
-      addToast('Please fill in all address fields', 'error')
       return
     }
 

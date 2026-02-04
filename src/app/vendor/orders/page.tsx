@@ -8,7 +8,6 @@ import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
-import { useToast } from '@/components/ui/toast'
 import { formatPrice, formatDateTime } from '@/lib/utils'
 import { ORDER_STATUS_LABELS, ORDER_STATUS_COLORS } from '@/lib/constants'
 import { OrderStatus } from '@/types'
@@ -17,7 +16,6 @@ const statusOptions: OrderStatus[] = ['pending', 'confirmed', 'preparing', 'read
 
 export default function VendorOrdersPage() {
   const { user } = useAuthStore()
-  const { addToast } = useToast()
   const orders = useOrderStore((state) =>
     user?.vendorId ? state.getOrdersByVendor(user.vendorId) : []
   )
@@ -38,7 +36,6 @@ export default function VendorOrdersPage() {
 
   const handleStatusChange = (orderId: string, newStatus: OrderStatus) => {
     updateOrderStatus(orderId, newStatus)
-    addToast(`Order status updated to ${ORDER_STATUS_LABELS[newStatus]}`, 'success')
   }
 
   const getNextStatus = (currentStatus: OrderStatus): OrderStatus | null => {

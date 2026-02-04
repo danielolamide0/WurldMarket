@@ -11,7 +11,6 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Select } from '@/components/ui/select'
-import { useToast } from '@/components/ui/toast'
 import { CATEGORIES } from '@/lib/constants'
 import { ProductCategory } from '@/types'
 
@@ -19,7 +18,6 @@ export default function AddProductPage() {
   const router = useRouter()
   const { user } = useAuthStore()
   const addProduct = useProductStore((state) => state.addProduct)
-  const { addToast } = useToast()
 
   const vendorStores = useVendorStore((state) => state.getStoresByVendor(user?.vendorId || ''))
   const fetchStores = useVendorStore((state) => state.fetchStores)
@@ -54,7 +52,6 @@ export default function AddProductPage() {
     e.preventDefault()
 
     if (!formData.name || !formData.price || !formData.unit || !formData.stock || !formData.storeId) {
-      addToast('Please fill in all required fields', 'error')
       return
     }
 
@@ -74,10 +71,8 @@ export default function AddProductPage() {
     })
 
     if (newProduct) {
-      addToast('Product added successfully!', 'success')
       router.push('/inventory')
     } else {
-      addToast('Failed to add product', 'error')
       setIsSubmitting(false)
     }
   }

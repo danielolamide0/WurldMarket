@@ -11,7 +11,6 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Select } from '@/components/ui/select'
-import { useToast } from '@/components/ui/toast'
 import { CATEGORIES } from '@/lib/constants'
 import { ProductCategory } from '@/types'
 
@@ -22,7 +21,6 @@ export default function EditProductPage() {
   const { user } = useAuthStore()
   const { getProductById, updateProduct, fetchProducts } = useProductStore()
   const { getStoresByVendor, fetchStores } = useVendorStore()
-  const { addToast } = useToast()
 
   const product = getProductById(productId)
   const vendorStores = getStoresByVendor(user?.vendorId || '')
@@ -81,7 +79,6 @@ export default function EditProductPage() {
     e.preventDefault()
 
     if (!formData.name || !formData.price || !formData.unit || !formData.stock) {
-      addToast('Please fill in all required fields', 'error')
       return
     }
 
@@ -102,7 +99,6 @@ export default function EditProductPage() {
       isActive: formData.isActive,
     })
 
-    addToast('Product updated successfully!', 'success')
     router.push('/inventory')
   }
 

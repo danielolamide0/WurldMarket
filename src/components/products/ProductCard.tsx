@@ -8,7 +8,6 @@ import { useCustomerStore } from '@/stores/customerStore'
 import { formatPrice } from '@/lib/utils'
 import { CATEGORY_MAP } from '@/lib/constants'
 import { Badge } from '@/components/ui/badge'
-import { useToast } from '@/components/ui/toast'
 
 interface ProductCardProps {
   product: Product
@@ -17,7 +16,6 @@ interface ProductCardProps {
 export function ProductCard({ product }: ProductCardProps) {
   const { addItem, updateQuantity, removeItem, getItemQuantity } = useCartStore()
   const { isFavourite, toggleFavourite } = useCustomerStore()
-  const { addToast } = useToast()
   const quantityInCart = getItemQuantity(product.id)
   const isInCart = quantityInCart > 0
   const isOutOfStock = product.stock === 0
@@ -68,10 +66,6 @@ export function ProductCard({ product }: ProductCardProps) {
     e.preventDefault()
     e.stopPropagation()
     toggleFavourite(product.id)
-    addToast(
-      isFav ? `${product.name} removed from favourites` : `${product.name} added to favourites`,
-      'success'
-    )
   }
 
   return (

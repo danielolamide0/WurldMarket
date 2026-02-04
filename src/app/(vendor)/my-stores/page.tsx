@@ -23,14 +23,12 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
-import { useToast } from '@/components/ui/toast'
 import { PostcodeLookup } from '@/components/address/PostcodeLookup'
 import { Vendor, StoreLocation } from '@/types'
 
 export default function VendorStoresPage() {
   const { user } = useAuthStore()
   const { getVendorById, updateVendor, getStoresByVendor, createStore, deleteStore, fetchVendors, fetchStores } = useVendorStore()
-  const { addToast } = useToast()
 
   const [vendor, setVendor] = useState<Vendor | undefined>(undefined)
   const [vendorStores, setVendorStores] = useState<StoreLocation[]>([])
@@ -114,13 +112,11 @@ export default function VendorStoresPage() {
 
     setVendor((prev) => prev ? { ...prev, description, contactPhone, contactEmail } : prev)
     setIsEditingDetails(false)
-    addToast('Business details updated', 'success')
   }
 
   const handleAddStore = async () => {
     if (!user?.vendorId) return
     if (!newStoreName || !newStoreAddress || !newStoreCity || !newStorePostcode) {
-      addToast('Please fill in all store details', 'error')
       return
     }
 
@@ -143,7 +139,6 @@ export default function VendorStoresPage() {
     })
 
     if (!newStore) {
-      addToast('Failed to add store', 'error')
       return
     }
 
@@ -154,13 +149,11 @@ export default function VendorStoresPage() {
     setNewStoreCity('')
     setNewStorePostcode('')
     setStoreAddressSelected(false)
-    addToast('Store location added', 'success')
   }
 
   const handleDeleteStore = (storeId: string) => {
     deleteStore(storeId)
     setVendorStores((prev) => prev.filter((s) => s.id !== storeId))
-    addToast('Store location removed', 'success')
   }
 
   return (

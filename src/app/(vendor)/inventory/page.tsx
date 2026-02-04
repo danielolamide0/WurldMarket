@@ -11,13 +11,11 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
 import { Modal } from '@/components/ui/modal'
-import { useToast } from '@/components/ui/toast'
 import { formatPrice } from '@/lib/utils'
 import { CATEGORY_MAP } from '@/lib/constants'
 
 export default function InventoryPage() {
   const { user } = useAuthStore()
-  const { addToast } = useToast()
   const products = useProductStore((state) =>
     user?.vendorId ? state.getProductsByVendor(user.vendorId) : []
   )
@@ -51,7 +49,6 @@ export default function InventoryPage() {
   const handleDelete = () => {
     if (deleteConfirm) {
       deleteProduct(deleteConfirm)
-      addToast('Product deleted successfully', 'success')
       setDeleteConfirm(null)
     }
   }
@@ -59,7 +56,6 @@ export default function InventoryPage() {
   const handleUpdateStock = () => {
     if (editStock) {
       updateProduct(editStock.id, { stock: editStock.stock })
-      addToast('Stock updated successfully', 'success')
       setEditStock(null)
     }
   }

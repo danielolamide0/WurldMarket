@@ -14,7 +14,6 @@ import { useVendorStore } from '@/stores/vendorStore'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
-import { useToast } from '@/components/ui/toast'
 import { formatPrice } from '@/lib/utils'
 import { DELIVERY_FEE, FREE_DELIVERY_THRESHOLD } from '@/lib/constants'
 import { PostcodeLookup } from '@/components/address/PostcodeLookup'
@@ -29,7 +28,6 @@ export default function CheckoutPage() {
   const { fetchCustomerData } = useCustomerStore()
   const { getAddressesByUser, getPrimaryAddress } = useAddressStore()
   const { stores, fetchStores } = useVendorStore()
-  const { addToast } = useToast()
 
   // Fetch stores on mount
   useEffect(() => {
@@ -128,12 +126,10 @@ export default function CheckoutPage() {
 
   const handleSubmitOrder = async () => {
     if (!customerName || !customerPhone) {
-      addToast('Please fill in all required fields', 'error')
       return
     }
 
     if (orderType === 'delivery' && !address) {
-      addToast('Please enter your delivery address', 'error')
       return
     }
 
@@ -154,7 +150,6 @@ export default function CheckoutPage() {
     )
 
     if (!order) {
-      addToast('Failed to create order. Please try again.', 'error')
       setIsProcessing(false)
       return
     }

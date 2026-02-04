@@ -8,12 +8,10 @@ import { useAuthStore } from '@/stores/authStore'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
-import { useToast } from '@/components/ui/toast'
 
 export default function SettingsPage() {
   const router = useRouter()
   const { user, isAuthenticated, updateUser, deleteAccount, logout } = useAuthStore()
-  const { addToast } = useToast()
 
   const [isEditingEmail, setIsEditingEmail] = useState(false)
   const [isEditingPhone, setIsEditingPhone] = useState(false)
@@ -43,26 +41,19 @@ export default function SettingsPage() {
 
   const handleSaveEmail = async () => {
     if (!emailValue.trim()) {
-      addToast('Email is required', 'error')
       return
     }
 
     const success = await updateUser({ email: emailValue.trim() })
     if (success) {
-      addToast('Email updated successfully', 'success')
       setIsEditingEmail(false)
-    } else {
-      addToast('Failed to update email', 'error')
     }
   }
 
   const handleSavePhone = async () => {
     const success = await updateUser({ phone: phoneValue.trim() || undefined })
     if (success) {
-      addToast('Phone number updated successfully', 'success')
       setIsEditingPhone(false)
-    } else {
-      addToast('Failed to update phone number', 'error')
     }
   }
 
@@ -79,11 +70,8 @@ export default function SettingsPage() {
   const handleDeleteAccount = async () => {
     const success = await deleteAccount(user.id)
     if (success) {
-      addToast('Account deleted successfully', 'success')
       logout()
       router.push('/')
-    } else {
-      addToast('Failed to delete account', 'error')
     }
     setShowDeleteConfirm(false)
   }
