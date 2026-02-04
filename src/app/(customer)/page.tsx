@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useMemo } from 'react'
+import { useEffect, useMemo, useRef } from 'react'
 import Link from 'next/link'
 import { MapPin, ArrowRight, Clock, ChevronRight, Utensils, ShoppingBag, Sparkles, Heart, Wheat, Flame, Snowflake, Leaf, Cookie, Coffee, Carrot, Salad, Apple, Beef, Fish, Droplet, Droplets, ChefHat, Package, Egg, Home, WheatOff, Circle } from 'lucide-react'
 import { CATEGORIES } from '@/lib/constants'
@@ -10,6 +10,7 @@ import { useAuthStore } from '@/stores/authStore'
 import { useCustomerStore } from '@/stores/customerStore'
 import { useVendorStore } from '@/stores/vendorStore'
 import { useAddressStore } from '@/stores/addressStore'
+import { useCartStore } from '@/stores/cartStore'
 import { ProductCard } from '@/components/products/ProductCard'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
@@ -61,9 +62,84 @@ export default function HomePage() {
   const stores = useVendorStore((state) => state.stores)
   const fetchStores = useVendorStore((state) => state.fetchStores)
   const { getPrimaryAddress, fetchAddresses, addresses } = useAddressStore()
+  const { setUserId: setCartUserId, userId: cartUserId } = useCartStore()
 
   // Get user's primary address for proximity sorting (reactive to address store changes)
   const primaryAddress = user ? getPrimaryAddress(user.id) : undefined
+
+  // Refs for scrollable sections
+  const categoriesRef = useRef<HTMLDivElement>(null)
+  const cuisinesRef = useRef<HTMLDivElement>(null)
+  const storesRef = useRef<HTMLDivElement>(null)
+
+  // Restore scroll positions on mount
+  useEffect(() => {
+    if (categoriesRef.current) {
+      const savedScroll = sessionStorage.getItem('homepage-categories-scroll')
+      if (savedScroll) {
+        categoriesRef.current.scrollLeft = parseInt(savedScroll, 10)
+      }
+    }
+    if (cuisinesRef.current) {
+      const savedScroll = sessionStorage.getItem('homepage-cuisines-scroll')
+      if (savedScroll) {
+        cuisinesRef.current.scrollLeft = parseInt(savedScroll, 10)
+      }
+    }
+    if (storesRef.current) {
+      const savedScroll = sessionStorage.getItem('homepage-stores-scroll')
+      if (savedScroll) {
+        storesRef.current.scrollLeft = parseInt(savedScroll, 10)
+      }
+    }
+  }, [])
+
+  // Save scroll positions when scrolling
+  useEffect(() => {
+    const categoriesEl = categoriesRef.current
+    const cuisinesEl = cuisinesRef.current
+    const storesEl = storesRef.current
+
+    const handleCategoriesScroll = () => {
+      if (categoriesEl) {
+        sessionStorage.setItem('homepage-categories-scroll', categoriesEl.scrollLeft.toString())
+      }
+    }
+
+    const handleCuisinesScroll = () => {
+      if (cuisinesEl) {
+        sessionStorage.setItem('homepage-cuisines-scroll', cuisinesEl.scrollLeft.toString())
+      }
+    }
+
+    const handleStoresScroll = () => {
+      if (storesEl) {
+        sessionStorage.setItem('homepage-stores-scroll', storesEl.scrollLeft.toString())
+      }
+    }
+
+    if (categoriesEl) {
+      categoriesEl.addEventListener('scroll', handleCategoriesScroll)
+    }
+    if (cuisinesEl) {
+      cuisinesEl.addEventListener('scroll', handleCuisinesScroll)
+    }
+    if (storesEl) {
+      storesEl.addEventListener('scroll', handleStoresScroll)
+    }
+
+    return () => {
+      if (categoriesEl) {
+        categoriesEl.removeEventListener('scroll', handleCategoriesScroll)
+      }
+      if (cuisinesEl) {
+        cuisinesEl.removeEventListener('scroll', handleCuisinesScroll)
+      }
+      if (storesEl) {
+        storesEl.removeEventListener('scroll', handleStoresScroll)
+      }
+    }
+  }, [])
 
   // Fetch data on mount
   useEffect(() => {
@@ -91,6 +167,17 @@ export default function HomePage() {
       setUserId(null)
     }
   }, [isAuthenticated, user?.id, user?.role, userId, setUserId, fetchCustomerData])
+
+  // Sync cartStore when user changes
+  useEffect(() => {
+    if (isAuthenticated && user?.id) {
+      if (cartUserId !== user.id) {
+        setCartUserId(user.id)
+      }
+    } else if (!isAuthenticated) {
+      setCartUserId(null)
+    }
+  }, [isAuthenticated, user?.id, cartUserId, setCartUserId])
 
   const customerOrders = user ? getOrdersByCustomer(user.id) : []
   const regulars = getRegulars()
@@ -172,7 +259,7 @@ export default function HomePage() {
       {/* Categories Row - Compact */}
       <section className="border-b border-gray-100">
         <div className="max-w-7xl mx-auto px-4 py-3">
-          <div className="flex gap-3 overflow-x-auto scrollbar-hide">
+          <div ref={categoriesRef} className="flex gap-3 overflow-x-auto scrollbar-hide">
             {CATEGORIES.map((cat) => {
               return (
                 <Link
@@ -199,7 +286,7 @@ export default function HomePage() {
       <section className="py-3">
         <div className="max-w-7xl mx-auto px-4">
           <h2 className="text-base font-bold text-gray-900 mb-2">Find your flavour</h2>
-          <div className="flex gap-3 overflow-x-auto scrollbar-hide md:justify-between">
+          <div ref={cuisinesRef} className="flex gap-3 overflow-x-auto scrollbar-hide md:justify-between">
             {CUISINES.map((cuisine) => (
               <Link
                 key={cuisine.id}
@@ -255,7 +342,7 @@ export default function HomePage() {
               <span className="text-sm font-medium">STORE FINDER</span>
             </Link>
           </div>
-          <div className="flex gap-3 overflow-x-auto scrollbar-hide pb-1 md:justify-between">
+          <div ref={storesRef} className="flex gap-3 overflow-x-auto scrollbar-hide pb-1 md:justify-between">
             {sortedStores.slice(0, 6).map((store) => (
               <Link
                 key={store.id}

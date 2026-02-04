@@ -76,7 +76,7 @@ function AnimatedPlaceholder() {
 export function Header() {
   const router = useRouter()
   const { user, isAuthenticated, logout } = useAuthStore()
-  const { items, openCart } = useCartStore()
+  const { items, openCart, setUserId: setCartUserId } = useCartStore()
   const products = useProductStore((state) => state.products)
   const stores = useVendorStore((state) => state.stores)
   const { getAddressesByUser, getPrimaryAddress, setPrimaryAddress, fetchAddresses } = useAddressStore()
@@ -105,6 +105,13 @@ export function Header() {
     }
   }, [isAuthenticated, user?.id, fetchAddresses])
 
+  // Sync cart when user logs in
+  useEffect(() => {
+    if (isAuthenticated && user?.id) {
+      setCartUserId(user.id)
+    }
+  }, [isAuthenticated, user?.id, setCartUserId])
+
   // Close address dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -125,6 +132,7 @@ export function Header() {
 
   const handleLogout = () => {
     logout()
+    setCartUserId(null)
     router.push('/')
   }
 
