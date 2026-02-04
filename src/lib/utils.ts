@@ -67,3 +67,20 @@ export function calculateDistance(
 function toRad(deg: number): number {
   return deg * (Math.PI / 180)
 }
+
+/**
+ * Calculate estimated delivery time in minutes based on distance
+ * Assumes average delivery speed of 25 mph in urban areas
+ * Adds 10 minutes base time for preparation
+ */
+export function calculateDeliveryTime(distanceInMiles: number): number {
+  // Average delivery speed: 25 mph in urban areas
+  const averageSpeedMph = 25
+  // Base preparation time: 10 minutes
+  const baseTimeMinutes = 10
+  // Travel time: distance / speed * 60 (convert hours to minutes)
+  const travelTimeMinutes = (distanceInMiles / averageSpeedMph) * 60
+  // Total time: base + travel, rounded to nearest 5 minutes
+  const totalMinutes = baseTimeMinutes + travelTimeMinutes
+  return Math.ceil(totalMinutes / 5) * 5 // Round up to nearest 5 minutes
+}

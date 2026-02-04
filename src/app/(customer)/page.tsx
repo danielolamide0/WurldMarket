@@ -15,7 +15,7 @@ import { ProductCard } from '@/components/products/ProductCard'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { calculateDistance } from '@/lib/utils'
+import { calculateDistance, calculateDeliveryTime } from '@/lib/utils'
 
 // Icon mapping for categories
 const iconMap: { [key: string]: React.ComponentType<{ className?: string }> } = {
@@ -192,12 +192,15 @@ export default function HomePage() {
     purchaseHistory.some(ph => ph.productId === p.id)
   ).slice(0, 4)
 
-  // Sort stores by proximity to user's primary address
-  const sortedStores = useMemo(() => {
-    // Get primary address directly from addresses array (reactive to changes)
-    const currentPrimaryAddress = user
+  // Get primary address for distance calculation (reactive to address changes)
+  const currentPrimaryAddress = useMemo(() => {
+    return user 
       ? addresses.find(addr => addr.userId === user.id && addr.isPrimary)
       : undefined
+  }, [user, addresses])
+
+  // Sort stores by proximity to user's primary address
+  const sortedStores = useMemo(() => {
 
     if (!currentPrimaryAddress?.coordinates || !stores.length) {
       return stores
@@ -227,7 +230,7 @@ export default function HomePage() {
 
     // Append stores without coordinates at the end
     return [...sorted, ...storesWithoutCoords]
-  }, [stores, addresses, user?.id, isAuthenticated])
+  }, [stores, currentPrimaryAddress, isAuthenticated])
 
   return (
     <div className="min-h-screen bg-white">
@@ -318,29 +321,45 @@ export default function HomePage() {
             </Link>
           </div>
           <div ref={storesRef} className="flex gap-3 overflow-x-auto scrollbar-hide pb-1 md:justify-between">
-            {sortedStores.map((store) => (
-              <Link
-                key={store.id}
-                href={`/stores/${store.id}`}
-                className="flex-shrink-0 w-20 md:flex-1 md:max-w-[140px]"
-              >
-                <div className="flex flex-col items-center">
-                  <div className="w-16 h-16 bg-white border border-gray-200 rounded-xl mb-1 overflow-hidden flex items-center justify-center">
-                    {store.image ? (
-                      <img
-                        src={store.image}
-                        alt={store.name}
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <ShoppingBag className="h-6 w-6 text-gray-400" />
+            {sortedStores.map((store) => {
+              // Calculate delivery time if user has primary address
+              let deliveryTime: number | null = null
+              if (isAuthenticated && currentPrimaryAddress?.coordinates && store.coordinates) {
+                const distance = calculateDistance(
+                  currentPrimaryAddress.coordinates.lat,
+                  currentPrimaryAddress.coordinates.lng,
+                  store.coordinates.lat,
+                  store.coordinates.lng
+                )
+                deliveryTime = calculateDeliveryTime(distance)
+              }
+
+              return (
+                <Link
+                  key={store.id}
+                  href={`/stores/${store.id}`}
+                  className="flex-shrink-0 w-20 md:flex-1 md:max-w-[140px]"
+                >
+                  <div className="flex flex-col items-center">
+                    <div className="w-16 h-16 bg-white border border-gray-200 rounded-xl mb-1 overflow-hidden flex items-center justify-center">
+                      {store.image ? (
+                        <img
+                          src={store.image}
+                          alt={store.name}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <ShoppingBag className="h-6 w-6 text-gray-400" />
+                      )}
+                    </div>
+                    <p className="text-xs font-medium text-gray-900 truncate w-full text-center">{store.name}</p>
+                    {deliveryTime !== null && (
+                      <p className="text-[10px] text-gray-500">{deliveryTime} mins</p>
                     )}
                   </div>
-                  <p className="text-xs font-medium text-gray-900 truncate w-full text-center">{store.name}</p>
-                  <p className="text-[10px] text-gray-500">10-20 mins</p>
-                </div>
-              </Link>
-            ))}
+                </Link>
+              )
+            })}
           </div>
         </div>
       </section>
