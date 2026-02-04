@@ -60,11 +60,16 @@ export default function LoginPage() {
       return
     }
 
+    if (!email.trim()) {
+      addToast('Email is required', 'error')
+      return
+    }
+
     const result = await signup({
       username,
       password,
       name,
-      email: email.trim() || undefined,
+      email: email.trim(),
       phone: signupRole === 'customer' ? (phone || undefined) : undefined,
       role: signupRole,
       companyName: signupRole === 'vendor' ? companyName : undefined,
@@ -294,6 +299,7 @@ export default function LoginPage() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   icon={<Mail className="h-5 w-5" />}
+                  required
                 />
 
                 {signupRole === 'customer' && (
