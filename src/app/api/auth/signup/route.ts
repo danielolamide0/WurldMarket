@@ -3,22 +3,56 @@ import dbConnect from '@/lib/mongodb'
 import User from '@/models/User'
 import Vendor from '@/models/Vendor'
 import CustomerData from '@/models/CustomerData'
+import VerificationCode from '@/models/VerificationCode'
 
 export async function POST(request: NextRequest) {
   try {
     await dbConnect()
 
     const body = await request.json()
-    const { username, password, name, email, phone, role = 'customer', companyName } = body
+    const {
+      email,
+      verificationCode,
+      password,
+      name,
+      phone,
+      role = 'customer',
+      companyName
+    } = body
 
-    if (!username || !password || !name) {
-      return NextResponse.json({ error: 'Username, password, and name are required' }, { status: 400 })
+    // Email-based signup (new users)
+    if (!email || !verificationCode || !password || !name) {
+      return NextResponse.json(
+        { error: 'Email, verification code, password, and name are required' },
+        { status: 400 }
+      )
     }
 
-    // Check if username exists
-    const existingUser = await User.findOne({ username: username.toLowerCase() })
+    const normalizedEmail = email.toLowerCase().trim()
+
+    // Verify the code
+    const validCode = await VerificationCode.findOne({
+      email: normalizedEmail,
+      code: verificationCode,
+      type: 'signup',
+      used: false,
+      expiresAt: { $gt: new Date() },
+    })
+
+    if (!validCode) {
+      return NextResponse.json(
+        { error: 'Invalid or expired verification code. Please request a new code.' },
+        { status: 400 }
+      )
+    }
+
+    // Check if email already exists
+    const existingUser = await User.findOne({ email: normalizedEmail })
     if (existingUser) {
-      return NextResponse.json({ error: 'Username already exists' }, { status: 409 })
+      return NextResponse.json(
+        { error: 'An account with this email already exists' },
+        { status: 409 }
+      )
     }
 
     let vendorId = undefined
@@ -26,37 +60,61 @@ export async function POST(request: NextRequest) {
     // For vendor signup
     if (role === 'vendor') {
       if (!companyName) {
-        return NextResponse.json({ error: 'Company name is required for vendor signup' }, { status: 400 })
+        return NextResponse.json(
+          { error: 'Company name is required for vendor signup' },
+          { status: 400 }
+        )
       }
 
       const slug = companyName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')
 
       const existingVendor = await Vendor.findOne({ slug })
       if (existingVendor) {
-        return NextResponse.json({ error: 'A vendor with this company name already exists' }, { status: 409 })
+        return NextResponse.json(
+          { error: 'A vendor with this company name already exists' },
+          { status: 409 }
+        )
       }
 
       const vendor = await Vendor.create({
         name: companyName,
         slug,
         description: '',
-        contactEmail: email || '',
+        contactEmail: normalizedEmail,
         contactPhone: phone || '',
         isLive: false,
       })
       vendorId = vendor._id
     }
 
-    // Create user
+    // Create user with email-based auth
+    // Generate a unique username from email (for backward compatibility)
+    const emailPrefix = normalizedEmail.split('@')[0]
+    let username = emailPrefix.toLowerCase().replace(/[^a-z0-9]/g, '')
+
+    // Ensure username is unique
+    let counter = 0
+    let finalUsername = username
+    while (await User.findOne({ username: finalUsername })) {
+      counter++
+      finalUsername = `${username}${counter}`
+    }
+
     const user = await User.create({
-      username: username.toLowerCase(),
+      username: finalUsername,
       password,
       role,
       name,
-      email,
+      email: normalizedEmail,
       phone,
       vendorId,
+      authMethod: 'email',
+      isEmailVerified: true,
     })
+
+    // Mark verification code as used
+    validCode.used = true
+    await validCode.save()
 
     // Create CustomerData for customers
     if (role === 'customer') {
@@ -77,6 +135,8 @@ export async function POST(request: NextRequest) {
         email: user.email,
         phone: user.phone,
         vendorId: vendorId?.toString(),
+        authMethod: user.authMethod,
+        isEmailVerified: user.isEmailVerified,
         createdAt: user.createdAt.toISOString(),
       },
       vendorId: vendorId?.toString(),

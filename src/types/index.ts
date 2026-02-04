@@ -10,6 +10,8 @@ export interface User {
   email?: string
   phone?: string // Customer phone number
   vendorId?: string // Links vendor user to their vendor profile
+  authMethod?: 'username' | 'email' // How the user authenticates
+  isEmailVerified?: boolean // Whether email has been verified
   createdAt: string
 }
 

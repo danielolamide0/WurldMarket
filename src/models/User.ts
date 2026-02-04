@@ -9,6 +9,8 @@ export interface IUser extends Document {
   email?: string
   phone?: string
   vendorId?: mongoose.Types.ObjectId
+  authMethod: 'username' | 'email'
+  isEmailVerified: boolean
   createdAt: Date
   updatedAt: Date
 }
@@ -48,6 +50,15 @@ const UserSchema = new Schema<IUser>(
     vendorId: {
       type: Schema.Types.ObjectId,
       ref: 'Vendor',
+    },
+    authMethod: {
+      type: String,
+      enum: ['username', 'email'],
+      default: 'username',
+    },
+    isEmailVerified: {
+      type: Boolean,
+      default: false,
     },
   },
   { timestamps: true }

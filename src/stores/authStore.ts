@@ -3,10 +3,10 @@ import { persist } from 'zustand/middleware'
 import { User } from '@/types'
 
 interface SignupOptions {
-  username: string
+  email: string
+  verificationCode: string
   password: string
   name: string
-  email: string
   phone?: string
   role?: 'customer' | 'vendor'
   companyName?: string
@@ -17,10 +17,19 @@ interface AuthState {
   isAuthenticated: boolean
   isLoading: boolean
   error: string | null
-  login: (username: string, password: string) => Promise<boolean>
+  // Login with email or username
+  login: (identifier: string, password: string) => Promise<boolean>
+  // Email verification flow
+  sendVerificationCode: (email: string, type: 'signup' | 'password-reset') => Promise<{ success: boolean; error?: string }>
+  verifyCode: (email: string, code: string, type: 'signup' | 'password-reset') => Promise<{ success: boolean; error?: string }>
+  // Signup with email verification
   signup: (options: SignupOptions) => Promise<{ success: boolean; error?: string; vendorId?: string }>
+  // Password reset
+  resetPassword: (email: string, code: string, newPassword: string) => Promise<{ success: boolean; error?: string }>
+  // Legacy support
   checkUsernameExists: (username: string) => Promise<boolean>
-  resetPassword: (username: string) => Promise<{ success: boolean; error?: string }>
+  checkEmailExists: (email: string) => Promise<boolean>
+  // User management
   updateUser: (updates: Partial<User>) => Promise<boolean>
   deleteAccount: (userId: string) => Promise<boolean>
   logout: () => void
@@ -35,14 +44,14 @@ export const useAuthStore = create<AuthState>()(
       isLoading: false,
       error: null,
 
-      login: async (username: string, password: string) => {
+      login: async (identifier: string, password: string) => {
         set({ isLoading: true, error: null })
 
         try {
           const response = await fetch('/api/auth/login', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ username, password }),
+            body: JSON.stringify({ identifier, password }),
           })
 
           const data = await response.json()
@@ -52,7 +61,7 @@ export const useAuthStore = create<AuthState>()(
               user: null,
               isAuthenticated: false,
               isLoading: false,
-              error: data.error || 'Invalid username or password',
+              error: data.error || 'Invalid credentials',
             })
             return false
           }
@@ -75,8 +84,58 @@ export const useAuthStore = create<AuthState>()(
         }
       },
 
+      sendVerificationCode: async (email: string, type: 'signup' | 'password-reset') => {
+        set({ isLoading: true, error: null })
+
+        try {
+          const response = await fetch('/api/auth/send-code', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, type }),
+          })
+
+          const data = await response.json()
+
+          if (!response.ok) {
+            set({ isLoading: false, error: data.error })
+            return { success: false, error: data.error }
+          }
+
+          set({ isLoading: false, error: null })
+          return { success: true }
+        } catch (error) {
+          set({ isLoading: false, error: 'Failed to send verification code' })
+          return { success: false, error: 'Failed to send verification code' }
+        }
+      },
+
+      verifyCode: async (email: string, code: string, type: 'signup' | 'password-reset') => {
+        set({ isLoading: true, error: null })
+
+        try {
+          const response = await fetch('/api/auth/verify-code', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, code, type }),
+          })
+
+          const data = await response.json()
+
+          if (!response.ok) {
+            set({ isLoading: false, error: data.error })
+            return { success: false, error: data.error }
+          }
+
+          set({ isLoading: false, error: null })
+          return { success: true }
+        } catch (error) {
+          set({ isLoading: false, error: 'Failed to verify code' })
+          return { success: false, error: 'Failed to verify code' }
+        }
+      },
+
       signup: async (options: SignupOptions) => {
-        const { username, password, name, email, phone, role = 'customer', companyName } = options
+        const { email, verificationCode, password, name, phone, role = 'customer', companyName } = options
         set({ isLoading: true, error: null })
 
         try {
@@ -84,10 +143,10 @@ export const useAuthStore = create<AuthState>()(
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-              username,
+              email,
+              verificationCode,
               password,
               name,
-              email,
               phone,
               role,
               companyName,
@@ -104,12 +163,12 @@ export const useAuthStore = create<AuthState>()(
             return { success: false, error: data.error }
           }
 
-        set({
+          set({
             user: data.user,
-          isAuthenticated: true,
-          isLoading: false,
-          error: null,
-        })
+            isAuthenticated: true,
+            isLoading: false,
+            error: null,
+          })
 
           return { success: true, vendorId: data.vendorId }
         } catch (error) {
@@ -121,43 +180,48 @@ export const useAuthStore = create<AuthState>()(
         }
       },
 
+      resetPassword: async (email: string, code: string, newPassword: string) => {
+        set({ isLoading: true, error: null })
+
+        try {
+          const response = await fetch('/api/auth/reset-password', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, code, newPassword }),
+          })
+
+          const data = await response.json()
+
+          if (!response.ok) {
+            set({ isLoading: false, error: data.error })
+            return { success: false, error: data.error }
+          }
+
+          set({ isLoading: false, error: null })
+          return { success: true }
+        } catch (error) {
+          set({ isLoading: false, error: 'Failed to reset password' })
+          return { success: false, error: 'Failed to reset password' }
+        }
+      },
+
       checkUsernameExists: async (username: string) => {
         try {
           const response = await fetch(`/api/auth/check-username?username=${encodeURIComponent(username)}`)
           const data = await response.json()
           return data.exists
         } catch {
-        return false
+          return false
         }
       },
 
-      resetPassword: async (username: string) => {
-        set({ isLoading: true, error: null })
-
-        // For now, just check if username exists
-        // In production, this would send an email with reset link
+      checkEmailExists: async (email: string) => {
         try {
-          const exists = await get().checkUsernameExists(username)
-
-          if (!exists) {
-          set({
-            isLoading: false,
-            error: 'Username not found',
-          })
-          return { success: false, error: 'Username not found' }
-        }
-
-        set({
-          isLoading: false,
-          error: null,
-        })
-        return { success: true }
+          const response = await fetch(`/api/auth/check-email?email=${encodeURIComponent(email)}`)
+          const data = await response.json()
+          return data.exists
         } catch {
-          set({
-            isLoading: false,
-            error: 'Failed to reset password',
-          })
-          return { success: false, error: 'Failed to reset password' }
+          return false
         }
       },
 

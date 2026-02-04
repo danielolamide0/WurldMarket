@@ -7,21 +7,44 @@ export async function POST(request: NextRequest) {
     await dbConnect()
 
     const body = await request.json()
-    const { username, password } = body
+    const { identifier, password } = body
 
-    if (!username || !password) {
-      return NextResponse.json({ error: 'Username and password are required' }, { status: 400 })
+    // Support both 'identifier' (new) and 'username' (legacy) field names
+    const loginIdentifier = identifier || body.username
+
+    if (!loginIdentifier || !password) {
+      return NextResponse.json(
+        { error: 'Email/username and password are required' },
+        { status: 400 }
+      )
     }
 
-    const user = await User.findOne({ username: username.toLowerCase() })
+    const normalizedIdentifier = loginIdentifier.toLowerCase().trim()
+
+    // Check if identifier looks like an email
+    const isEmail = normalizedIdentifier.includes('@')
+
+    // Find user by email or username
+    let user
+    if (isEmail) {
+      user = await User.findOne({ email: normalizedIdentifier })
+    } else {
+      user = await User.findOne({ username: normalizedIdentifier })
+    }
 
     if (!user) {
-      return NextResponse.json({ error: 'Invalid username or password' }, { status: 401 })
+      return NextResponse.json(
+        { error: 'Invalid email/username or password' },
+        { status: 401 }
+      )
     }
 
     // In production, use bcrypt.compare
     if (user.password !== password) {
-      return NextResponse.json({ error: 'Incorrect password' }, { status: 401 })
+      return NextResponse.json(
+        { error: 'Incorrect password' },
+        { status: 401 }
+      )
     }
 
     return NextResponse.json({
@@ -33,6 +56,8 @@ export async function POST(request: NextRequest) {
         email: user.email,
         phone: user.phone,
         vendorId: user.vendorId?.toString(),
+        authMethod: user.authMethod || 'username',
+        isEmailVerified: user.isEmailVerified || false,
         createdAt: user.createdAt.toISOString(),
       },
     })
