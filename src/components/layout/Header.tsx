@@ -407,6 +407,7 @@ export function Header() {
                         {userAddresses.map((addr) => (
                           <button
                             key={addr.id}
+                            type="button"
                             onClick={() => handleAddressSelect(addr.id)}
                             className="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-50 text-left"
                           >
@@ -420,13 +421,16 @@ export function Header() {
                             )}
                           </button>
                         ))}
-                        <Link
-                          href="/account/addresses"
-                          onClick={() => setIsAddressDropdownOpen(false)}
-                          className="block px-4 py-3 text-sm text-primary font-medium hover:bg-gray-50 border-t border-gray-100"
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setIsAddressDropdownOpen(false)
+                            router.push('/account/addresses')
+                          }}
+                          className="block w-full text-left px-4 py-3 text-sm text-primary font-medium hover:bg-gray-50 border-t border-gray-100"
                         >
                           Manage addresses
-                        </Link>
+                        </button>
                       </div>
                     )}
                   </div>
@@ -508,6 +512,7 @@ export function Header() {
                   {userAddresses.map((addr) => (
                     <button
                       key={addr.id}
+                      type="button"
                       onClick={() => handleAddressSelect(addr.id)}
                       className="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-50 text-left"
                     >
@@ -521,13 +526,16 @@ export function Header() {
                       )}
                     </button>
                   ))}
-                  <Link
-                    href="/account/addresses"
-                    onClick={() => setIsAddressDropdownOpen(false)}
-                    className="block px-4 py-3 text-sm text-primary font-medium hover:bg-gray-50 border-t border-gray-100"
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsAddressDropdownOpen(false)
+                      router.push('/account/addresses')
+                    }}
+                    className="block w-full text-left px-4 py-3 text-sm text-primary font-medium hover:bg-gray-50 border-t border-gray-100"
                   >
                     Manage addresses
-                  </Link>
+                  </button>
                 </div>
               )}
 

@@ -12,6 +12,7 @@ import {
   Home,
   Briefcase,
   MapPinned,
+  AlertTriangle,
 } from 'lucide-react'
 import { useAuthStore } from '@/stores/authStore'
 import { useAddressStore } from '@/stores/addressStore'
@@ -78,7 +79,7 @@ export default function SavedAddressesPage() {
     if (!user) return
 
     if (editingId) {
-      updateAddress(editingId, { label, fullAddress, city, postcode })
+      updateAddress(editingId, { label, fullAddress, city, postcode, coordinates })
       addToast('Address updated successfully', 'success')
     } else {
       addAddress(user.id, label, fullAddress, city, postcode, false, coordinates)
@@ -94,6 +95,7 @@ export default function SavedAddressesPage() {
     setFullAddress(address.fullAddress)
     setCity(address.city)
     setPostcode(address.postcode)
+    setCoordinates(address.coordinates)
     setAddressSelected(true)
     setIsAdding(true)
   }
@@ -180,16 +182,26 @@ export default function SavedAddressesPage() {
               </div>
             </div>
 
-            {/* Postcode Lookup - only for new addresses */}
-            {!editingId && !addressSelected && (
-              <PostcodeLookup
-                onAddressSelect={handleAddressSelect}
-                onManualEntry={() => setAddressSelected(true)}
-              />
+            {/* Postcode Lookup - for new addresses OR editing addresses without coordinates */}
+            {((!editingId && !addressSelected) || (editingId && !coordinates && !addressSelected)) && (
+              <>
+                {editingId && !coordinates && (
+                  <div className="mb-4 p-3 bg-amber-50 border border-amber-200 rounded-xl">
+                    <div className="flex items-center gap-2 text-amber-700 text-sm">
+                      <AlertTriangle className="h-4 w-4" />
+                      <span>This address needs coordinates for store proximity sorting. Look up the postcode to add them.</span>
+                    </div>
+                  </div>
+                )}
+                <PostcodeLookup
+                  onAddressSelect={handleAddressSelect}
+                  onManualEntry={() => setAddressSelected(true)}
+                />
+              </>
             )}
 
             {/* Manual fields - shown after postcode lookup or when editing */}
-            {(addressSelected || editingId) && (
+            {(addressSelected || (editingId && coordinates)) && (
               <div className="space-y-4 mt-4 p-4 bg-gray-50 rounded-xl">
                 {!editingId && (
                   <div className="flex justify-end -mt-2 mb-2">
@@ -200,10 +212,25 @@ export default function SavedAddressesPage() {
                         setFullAddress('')
                         setCity('')
                         setPostcode('')
+                        setCoordinates(undefined)
                       }}
                       className="text-sm text-primary hover:underline"
                     >
                       Change Postcode
+                    </button>
+                  </div>
+                )}
+                {editingId && (
+                  <div className="flex justify-end -mt-2 mb-2">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setAddressSelected(false)
+                        setCoordinates(undefined)
+                      }}
+                      className="text-sm text-primary hover:underline"
+                    >
+                      Look up new postcode
                     </button>
                   </div>
                 )}
@@ -293,11 +320,22 @@ export default function SavedAddressesPage() {
                               Primary
                             </span>
                           )}
+                          {!address.coordinates && (
+                            <span className="text-xs bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full font-medium flex items-center gap-1">
+                              <AlertTriangle className="h-3 w-3" />
+                              Needs update
+                            </span>
+                          )}
                         </div>
                         <p className="text-gray-600 text-sm">{address.fullAddress}</p>
                         <p className="text-gray-500 text-sm">
                           {address.city}, {address.postcode}
                         </p>
+                        {!address.coordinates && (
+                          <p className="text-xs text-amber-600 mt-1">
+                            Edit this address to enable store proximity sorting
+                          </p>
+                        )}
                       </div>
                     </div>
 

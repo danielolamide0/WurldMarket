@@ -192,63 +192,35 @@ export default function HomePage() {
   // Sort stores by proximity to user's primary address
   const sortedStores = useMemo(() => {
     // Get primary address directly from addresses array (reactive to changes)
-    const currentPrimaryAddress = user 
+    const currentPrimaryAddress = user
       ? addresses.find(addr => addr.userId === user.id && addr.isPrimary)
       : undefined
-    
-    // Debug logging to check what's happening
-    if (user && isAuthenticated && stores.length > 0) {
-      console.log('🔍 Sorting Debug:')
-      console.log('Primary Address:', currentPrimaryAddress)
-      console.log('Primary Address has coordinates:', !!currentPrimaryAddress?.coordinates)
-      if (currentPrimaryAddress?.coordinates) {
-        console.log('Primary Address coords:', currentPrimaryAddress.coordinates)
-      }
-      console.log('Stores:', stores.map(s => ({ 
-        name: s.name, 
-        hasCoords: !!s.coordinates,
-        coords: s.coordinates 
-      })))
-    }
-    
+
     if (!currentPrimaryAddress?.coordinates || !stores.length) {
-      if (user && isAuthenticated) {
-        console.log('⚠️ Cannot sort: No primary address coordinates or no stores')
-      }
       return stores
     }
 
     const { lat: userLat, lng: userLng } = currentPrimaryAddress.coordinates
 
     // Filter stores that have coordinates before sorting
-    const storesWithCoords = stores.filter(store => 
-      store.coordinates && 
-      typeof store.coordinates.lat === 'number' && 
+    const storesWithCoords = stores.filter(store =>
+      store.coordinates &&
+      typeof store.coordinates.lat === 'number' &&
       typeof store.coordinates.lng === 'number'
     )
 
-    const storesWithoutCoords = stores.filter(store => 
-      !store.coordinates || 
-      typeof store.coordinates.lat !== 'number' || 
+    const storesWithoutCoords = stores.filter(store =>
+      !store.coordinates ||
+      typeof store.coordinates.lat !== 'number' ||
       typeof store.coordinates.lng !== 'number'
     )
 
-    // Sort stores with coordinates by distance
+    // Sort stores with coordinates by distance (closest first)
     const sorted = [...storesWithCoords].sort((a, b) => {
       const distA = calculateDistance(userLat, userLng, a.coordinates.lat, a.coordinates.lng)
       const distB = calculateDistance(userLat, userLng, b.coordinates.lat, b.coordinates.lng)
-      if (user && isAuthenticated) {
-        console.log(`📏 ${a.name}: ${distA.toFixed(2)} miles, ${b.name}: ${distB.toFixed(2)} miles`)
-      }
       return distA - distB
     })
-
-    if (user && isAuthenticated && sorted.length > 0) {
-      console.log('✅ Sorted order:', sorted.map(s => ({
-        name: s.name,
-        distance: calculateDistance(userLat, userLng, s.coordinates.lat, s.coordinates.lng).toFixed(2) + ' miles'
-      })))
-    }
 
     // Append stores without coordinates at the end
     return [...sorted, ...storesWithoutCoords]
