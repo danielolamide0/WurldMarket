@@ -34,9 +34,8 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Mark code as used
-    verificationCode.used = true
-    await verificationCode.save()
+    // Don't mark as used here - the final action (signup or reset-password) will mark it
+    // This endpoint just validates the code is correct
 
     return NextResponse.json({
       success: true,

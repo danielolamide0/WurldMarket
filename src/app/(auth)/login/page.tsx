@@ -339,8 +339,8 @@ export default function LoginPage() {
             {viewMode === 'login' && (
               <form onSubmit={handleLogin} className="space-y-4">
                 <Input
-                  label="Email or Username"
-                  placeholder="Enter your email or username"
+                  label="Email"
+                  placeholder="Enter your email"
                   value={identifier}
                   onChange={(e) => setIdentifier(e.target.value)}
                   icon={<Mail className="h-5 w-5" />}
