@@ -6,7 +6,6 @@ import Link from 'next/link'
 import { ArrowLeft } from 'lucide-react'
 import { useProductStore } from '@/stores/productStore'
 import { ProductCard } from '@/components/products/ProductCard'
-import { CategoryNav } from '@/components/products/CategoryNav'
 import { CATEGORIES, CATEGORY_MAP } from '@/lib/constants'
 import { ProductCategory } from '@/types'
 
@@ -53,11 +52,6 @@ export default function CategoryPage() {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 py-6">
-        {/* Category Navigation */}
-        <div className="mb-6">
-          <CategoryNav />
-        </div>
-
         {/* Products Grid */}
         {products.length === 0 ? (
           <div className="bg-white rounded-2xl p-12 text-center">
