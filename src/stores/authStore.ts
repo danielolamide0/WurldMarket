@@ -264,12 +264,16 @@ export const useAuthStore = create<AuthState>()(
         set({ isLoading: true, error: null })
 
         try {
-          // Remove from localStorage
-          const storedUsers = localStorage.getItem('wurldbasket-users')
-          if (storedUsers) {
-            let registeredUsers: User[] = JSON.parse(storedUsers)
-            registeredUsers = registeredUsers.filter((u) => u.id !== userId)
-            localStorage.setItem('wurldbasket-users', JSON.stringify(registeredUsers))
+          const response = await fetch('/api/auth/delete-account', {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ userId }),
+          })
+
+          if (!response.ok) {
+            const data = await response.json()
+            set({ isLoading: false, error: data.error || 'Failed to delete account' })
+            return false
           }
 
           // Clear auth state
