@@ -40,17 +40,16 @@ export default function AccountPage() {
 
   if (!isAuthenticated) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-4">
-        <div className="max-w-sm w-full text-center">
+      <div className="min-h-screen p-4 pt-8">
+        <div className="max-w-sm w-full text-center mx-auto">
           <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
             <User className="h-10 w-10 text-gray-400" />
           </div>
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">Sign In to Continue</h1>
           <p className="text-gray-500 mb-8">
             Sign in to view your orders, manage your account, and more.
           </p>
           <Link href="/login">
-            <Button size="lg" className="w-full">Sign In</Button>
+            <Button size="lg" className="w-full">Sign in / Sign up</Button>
           </Link>
         </div>
       </div>
