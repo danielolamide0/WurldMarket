@@ -194,8 +194,8 @@ function RegularsContent() {
                 <p className="text-gray-500 mb-6">
                   Items you purchase frequently will appear here. Start shopping to build your regulars list!
                 </p>
-                <Link href="/stores">
-                  <Button>Browse Products</Button>
+                <Link href="/">
+                  <Button>Start Shopping</Button>
                 </Link>
               </>
             ) : activeTab === 'favourites' ? (
@@ -205,8 +205,8 @@ function RegularsContent() {
                 <p className="text-gray-500 mb-6">
                   Tap the heart icon on any product to save it to your favourites.
                 </p>
-                <Link href="/stores">
-                  <Button>Browse Products</Button>
+                <Link href="/">
+                  <Button>Start Shopping</Button>
                 </Link>
               </>
             ) : (
@@ -216,7 +216,7 @@ function RegularsContent() {
                 <p className="text-gray-500 mb-6">
                   Products you have ordered will appear here for easy reordering.
                 </p>
-                <Link href="/stores">
+                <Link href="/">
                   <Button>Start Shopping</Button>
                 </Link>
               </>
