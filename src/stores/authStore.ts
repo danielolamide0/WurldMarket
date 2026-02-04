@@ -6,7 +6,7 @@ interface SignupOptions {
   username: string
   password: string
   name: string
-  email?: string
+  email: string
   phone?: string
   role?: 'customer' | 'vendor'
   companyName?: string

@@ -64,7 +64,7 @@ export default function LoginPage() {
       username,
       password,
       name,
-      email: email || undefined,
+      email: email.trim() || undefined,
       phone: signupRole === 'customer' ? (phone || undefined) : undefined,
       role: signupRole,
       companyName: signupRole === 'vendor' ? companyName : undefined,
@@ -288,13 +288,12 @@ export default function LoginPage() {
                 />
 
                 <Input
-                  label={signupRole === 'vendor' ? 'Business Email' : 'Email (Optional)'}
+                  label={signupRole === 'vendor' ? 'Business Email' : 'Email'}
                   type="email"
                   placeholder="Enter your email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   icon={<Mail className="h-5 w-5" />}
-                  required={signupRole === 'vendor'}
                 />
 
                 {signupRole === 'customer' && (
