@@ -69,18 +69,49 @@ function toRad(deg: number): number {
 }
 
 /**
- * Calculate estimated delivery time in minutes based on distance
- * Assumes average delivery speed of 25 mph in urban areas
- * Adds 10 minutes base time for preparation
+ * Calculate estimated delivery time range based on distance
+ * Returns a formatted string like "10-20 mins" or "1-1.5hrs"
  */
-export function calculateDeliveryTime(distanceInMiles: number): number {
-  // Average delivery speed: 25 mph in urban areas
-  const averageSpeedMph = 25
-  // Base preparation time: 10 minutes
-  const baseTimeMinutes = 10
-  // Travel time: distance / speed * 60 (convert hours to minutes)
-  const travelTimeMinutes = (distanceInMiles / averageSpeedMph) * 60
-  // Total time: base + travel, rounded to nearest 5 minutes
-  const totalMinutes = baseTimeMinutes + travelTimeMinutes
-  return Math.ceil(totalMinutes / 5) * 5 // Round up to nearest 5 minutes
+export function calculateDeliveryTime(distanceInMiles: number): string {
+  // Average delivery speed: 20-30 mph in urban areas (range for variability)
+  const minSpeedMph = 20
+  const maxSpeedMph = 30
+  // Base preparation time: 8-12 minutes (variable)
+  const minPrepMinutes = 8
+  const maxPrepMinutes = 12
+  
+  // Calculate travel time ranges
+  const minTravelMinutes = (distanceInMiles / maxSpeedMph) * 60 // Faster speed = less time
+  const maxTravelMinutes = (distanceInMiles / minSpeedMph) * 60 // Slower speed = more time
+  
+  // Total time ranges
+  const minTotalMinutes = minPrepMinutes + minTravelMinutes
+  const maxTotalMinutes = maxPrepMinutes + maxTravelMinutes
+  
+  // Round to nearest 5 minutes for cleaner display
+  const minRounded = Math.max(5, Math.round(minTotalMinutes / 5) * 5)
+  const maxRounded = Math.round(maxTotalMinutes / 5) * 5
+  
+  // Format based on time range
+  if (maxRounded < 60) {
+    // Both under 60 minutes - show as "X-Y mins"
+    return `${minRounded}-${maxRounded} mins`
+  } else if (minRounded >= 60) {
+    // Both over 60 minutes - show as hours
+    const minHours = minRounded / 60
+    const maxHours = maxRounded / 60
+    // Round to nearest 0.5 hours
+    const minHoursRounded = Math.round(minHours * 2) / 2
+    const maxHoursRounded = Math.round(maxHours * 2) / 2
+    
+    if (minHoursRounded === maxHoursRounded) {
+      return `${minHoursRounded}hr${minHoursRounded !== 1 ? 's' : ''}`
+    }
+    return `${minHoursRounded}-${maxHoursRounded}hrs`
+  } else {
+    // Mixed - min is under 60, max is over 60
+    const maxHours = maxRounded / 60
+    const maxHoursRounded = Math.round(maxHours * 2) / 2
+    return `${minRounded} mins-${maxHoursRounded}hrs`
+  }
 }

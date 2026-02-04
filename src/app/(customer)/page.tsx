@@ -323,7 +323,7 @@ export default function HomePage() {
           <div ref={storesRef} className="flex gap-3 overflow-x-auto scrollbar-hide pb-1 md:justify-between">
             {sortedStores.map((store) => {
               // Calculate delivery time if user has primary address
-              let deliveryTime: number | null = null
+              let deliveryTime: string | null = null
               if (isAuthenticated && currentPrimaryAddress?.coordinates && store.coordinates) {
                 const distance = calculateDistance(
                   currentPrimaryAddress.coordinates.lat,
@@ -353,8 +353,8 @@ export default function HomePage() {
                       )}
                     </div>
                     <p className="text-xs font-medium text-gray-900 truncate w-full text-center">{store.name}</p>
-                    {deliveryTime !== null && (
-                      <p className="text-[10px] text-gray-500">{deliveryTime} mins</p>
+                    {deliveryTime && (
+                      <p className="text-[10px] text-gray-500">{deliveryTime}</p>
                     )}
                   </div>
                 </Link>
