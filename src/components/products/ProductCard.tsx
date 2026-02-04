@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { Plus, Check, Heart } from 'lucide-react'
+import { Plus, Minus, Heart } from 'lucide-react'
 import { Product } from '@/types'
 import { useCartStore } from '@/stores/cartStore'
 import { useCustomerStore } from '@/stores/customerStore'
@@ -15,7 +15,7 @@ interface ProductCardProps {
 }
 
 export function ProductCard({ product }: ProductCardProps) {
-  const { addItem, getItemQuantity } = useCartStore()
+  const { addItem, updateQuantity, removeItem, getItemQuantity } = useCartStore()
   const { isFavourite, toggleFavourite } = useCustomerStore()
   const { addToast } = useToast()
   const quantityInCart = getItemQuantity(product.id)
@@ -40,6 +40,28 @@ export function ProductCard({ product }: ProductCardProps) {
       quantity: 1,
       stock: product.stock,
     })
+  }
+
+  const handleIncreaseQuantity = (e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    if (quantityInCart < product.stock) {
+      if (quantityInCart === 0) {
+        handleAddToCart(e)
+      } else {
+        updateQuantity(product.id, quantityInCart + 1)
+      }
+    }
+  }
+
+  const handleDecreaseQuantity = (e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    if (quantityInCart > 1) {
+      updateQuantity(product.id, quantityInCart - 1)
+    } else if (quantityInCart === 1) {
+      removeItem(product.id)
+    }
   }
 
   const handleToggleFavourite = (e: React.MouseEvent) => {
@@ -97,30 +119,37 @@ export function ProductCard({ product }: ProductCardProps) {
           <div className="flex items-center justify-between">
             <span className="text-lg font-bold text-primary">{formatPrice(product.price)}</span>
 
-            <button
-              onClick={handleAddToCart}
-              disabled={isOutOfStock}
-              className={`p-2.5 rounded-xl transition-all ${
-                isInCart
-                  ? 'bg-primary-light text-white'
-                  : isOutOfStock
-                  ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                  : 'bg-primary text-white hover:bg-primary-dark'
-              }`}
-            >
-              {isInCart ? (
-                <Check className="h-5 w-5" />
-              ) : (
+            {isInCart ? (
+              <div className="flex items-center gap-2 bg-primary-light rounded-xl p-1">
+                <button
+                  onClick={handleDecreaseQuantity}
+                  className="p-1.5 rounded-lg hover:bg-primary transition-colors text-white"
+                >
+                  <Minus className="h-4 w-4" />
+                </button>
+                <span className="w-6 text-center font-semibold text-white">{quantityInCart}</span>
+                <button
+                  onClick={handleIncreaseQuantity}
+                  disabled={quantityInCart >= product.stock}
+                  className="p-1.5 rounded-lg hover:bg-primary transition-colors text-white disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <Plus className="h-4 w-4" />
+                </button>
+              </div>
+            ) : (
+              <button
+                onClick={handleAddToCart}
+                disabled={isOutOfStock}
+                className={`p-2.5 rounded-xl transition-all ${
+                  isOutOfStock
+                    ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                    : 'bg-primary text-white hover:bg-primary-dark'
+                }`}
+              >
                 <Plus className="h-5 w-5" />
-              )}
-            </button>
+              </button>
+            )}
           </div>
-
-          {isInCart && (
-            <p className="text-sm text-primary mt-2 font-medium">
-              {quantityInCart} in cart
-            </p>
-          )}
         </div>
       </div>
     </Link>

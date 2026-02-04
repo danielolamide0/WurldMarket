@@ -42,20 +42,17 @@ const iconMap: { [key: string]: React.ComponentType<{ className?: string }> } = 
   Bean: Circle,
 }
 
-// Find your flavour - Cuisine types
+// Find your flavour - Cuisine types (matching actual stores)
 const CUISINES = [
-  { id: 'nigerian', name: 'Nigerian', image: 'https://images.unsplash.com/photo-1604329760661-e71dc83f8f26?w=200', href: '/search?q=nigerian' },
-  { id: 'indian', name: 'Indian', image: 'https://images.unsplash.com/photo-1585937421612-70a008356fbe?w=200', href: '/search?q=indian' },
-  { id: 'pakistani', name: 'Pakistani', image: 'https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=200', href: '/search?q=pakistani' },
   { id: 'chinese', name: 'Chinese', image: 'https://images.unsplash.com/photo-1563245372-f21724e3856d?w=200', href: '/search?q=chinese' },
-  { id: 'iranian', name: 'Iranian', image: 'https://images.unsplash.com/photo-1567188040759-fb8a883dc6d8?w=200', href: '/search?q=iranian' },
-  { id: 'afghan', name: 'Afghan', image: 'https://images.unsplash.com/photo-1601050690597-df0568f70950?w=200', href: '/search?q=afghan' },
-  { id: 'somali', name: 'Somali', image: 'https://images.unsplash.com/photo-1574484284002-952d92456975?w=200', href: '/search?q=somali' },
-  { id: 'sudanese', name: 'Sudanese', image: 'https://images.unsplash.com/photo-1565299585323-38d6b0865b47?w=200', href: '/search?q=sudanese' },
-  { id: 'eritrean', name: 'Eritrean', image: 'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=200', href: '/search?q=eritrean' },
-  { id: 'ghanaian', name: 'Ghanaian', image: 'https://images.unsplash.com/photo-1604329760661-e71dc83f8f26?w=200', href: '/search?q=ghanaian' },
-  { id: 'caribbean', name: 'Caribbean', image: 'https://images.unsplash.com/photo-1534422298391-e4f8c172dddb?w=200', href: '/search?q=caribbean' },
   { id: 'african', name: 'African', image: 'https://images.unsplash.com/photo-1604329760661-e71dc83f8f26?w=200', href: '/search?q=african' },
+  { id: 'nigerian', name: 'Nigerian', image: 'https://images.unsplash.com/photo-1604329760661-e71dc83f8f26?w=200', href: '/search?q=nigerian' },
+  { id: 'ghanaian', name: 'Ghanaian', image: 'https://images.unsplash.com/photo-1604329760661-e71dc83f8f26?w=200', href: '/search?q=ghanaian' },
+  { id: 'pakistani', name: 'Pakistani', image: 'https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=200', href: '/search?q=pakistani' },
+  { id: 'indian', name: 'Indian', image: 'https://images.unsplash.com/photo-1585937421612-70a008356fbe?w=200', href: '/search?q=indian' },
+  { id: 'afghan', name: 'Afghan', image: 'https://images.unsplash.com/photo-1601050690597-df0568f70950?w=200', href: '/search?q=afghan' },
+  { id: 'iranian', name: 'Iranian', image: 'https://images.unsplash.com/photo-1567188040759-fb8a883dc6d8?w=200', href: '/search?q=iranian' },
+  { id: 'caribbean', name: 'Caribbean', image: 'https://images.unsplash.com/photo-1534422298391-e4f8c172dddb?w=200', href: '/search?q=caribbean' },
 ]
 
 export default function HomePage() {
