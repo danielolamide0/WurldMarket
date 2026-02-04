@@ -172,7 +172,7 @@ export default function HomePage() {
       {/* Categories Row - Compact */}
       <section className="border-b border-gray-100">
         <div className="max-w-7xl mx-auto px-4 py-3">
-          <div className="flex gap-3 overflow-x-auto scrollbar-hide" style={{ maxWidth: 'calc(4 * 80px + 3 * 12px + 40px)' }}>
+          <div className="flex gap-3 overflow-x-auto scrollbar-hide">
             {CATEGORIES.map((cat) => {
               return (
                 <Link
