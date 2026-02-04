@@ -321,7 +321,7 @@ export default function HomePage() {
             </Link>
           </div>
           <div ref={storesRef} className="flex gap-3 overflow-x-auto scrollbar-hide pb-1 md:justify-between">
-            {sortedStores.slice(0, 6).map((store) => (
+            {sortedStores.map((store) => (
               <Link
                 key={store.id}
                 href={`/stores/${store.id}`}

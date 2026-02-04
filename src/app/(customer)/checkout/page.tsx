@@ -177,8 +177,6 @@ export default function CheckoutPage() {
     setOrderId(order.id)
     setOrderComplete(true)
     setIsProcessing(false)
-
-    addToast('Order placed successfully!', 'success')
   }
 
   // Order Complete Screen
