@@ -71,6 +71,17 @@ export default function LoginPage() {
   const handleCodeChange = (index: number, value: string) => {
     if (!/^\d*$/.test(value)) return // Only allow digits
 
+    // Detect iOS autofill - if value is 6 digits, it's likely autofill
+    if (value.length === 6 && /^\d{6}$/.test(value)) {
+      const newCode = value.split('')
+      setVerificationCode(newCode)
+      // Focus the last field
+      setTimeout(() => {
+        codeInputRefs.current[5]?.focus()
+      }, 0)
+      return
+    }
+
     const newCode = [...verificationCode]
     newCode[index] = value.slice(-1) // Only keep last character
     setVerificationCode(newCode)
@@ -258,9 +269,18 @@ export default function LoginPage() {
           ref={(el) => { codeInputRefs.current[index] = el }}
           type="text"
           inputMode="numeric"
-          maxLength={1}
+          maxLength={index === 0 ? 6 : 1}
           value={digit}
+          autoComplete={index === 0 ? 'one-time-code' : 'off'}
           onChange={(e) => handleCodeChange(index, e.target.value)}
+          onInput={(e) => {
+            // Handle iOS autofill which may trigger onInput
+            const target = e.target as HTMLInputElement
+            const value = target.value.replace(/\D/g, '')
+            if (value.length === 6 && index === 0) {
+              handleCodeChange(index, value)
+            }
+          }}
           onKeyDown={(e) => handleCodeKeyDown(index, e)}
           onPaste={(e) => handleCodePaste(e, index)}
           className="w-12 h-14 text-center text-2xl font-bold border-2 border-gray-200 rounded-xl focus:border-primary focus:outline-none transition-colors"
