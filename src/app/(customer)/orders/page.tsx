@@ -18,17 +18,19 @@ export default function CustomerOrdersPage() {
 
   if (!isAuthenticated) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4 pb-20">
-        <Card className="max-w-md w-full p-8 text-center">
-          <Package className="h-16 w-16 text-gray-300 mx-auto mb-4" />
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">Sign in to view orders</h1>
-          <p className="text-gray-500 mb-6">
-            View and track your orders by signing in to your account.
-          </p>
-          <Link href="/login">
-            <Button size="lg" className="w-full">Sign In</Button>
-          </Link>
-        </Card>
+      <div className="min-h-screen bg-gray-50 p-4 pt-8 pb-20">
+        <div className="max-w-md mx-auto">
+          <Card className="w-full p-8 text-center">
+            <Package className="h-16 w-16 text-gray-300 mx-auto mb-4" />
+            <h1 className="text-2xl font-bold text-gray-900 mb-2">Sign in to view orders</h1>
+            <p className="text-gray-500 mb-6">
+              View and track your orders by signing in to your account.
+            </p>
+            <Link href="/login">
+              <Button size="lg" className="w-full">Sign In</Button>
+            </Link>
+          </Card>
+        </div>
       </div>
     )
   }
