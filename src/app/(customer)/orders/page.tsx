@@ -1,5 +1,6 @@
 'use client'
 
+import { useEffect } from 'react'
 import Link from 'next/link'
 import { Package, ChevronRight, ArrowLeft } from 'lucide-react'
 import { useAuthStore } from '@/stores/authStore'
@@ -12,7 +13,14 @@ import { ORDER_STATUS_LABELS, ORDER_STATUS_COLORS } from '@/lib/constants'
 
 export default function CustomerOrdersPage() {
   const { user, isAuthenticated } = useAuthStore()
-  const { getOrdersByCustomer } = useOrderStore()
+  const { getOrdersByCustomer, fetchOrders } = useOrderStore()
+
+  // Fetch orders from MongoDB on mount
+  useEffect(() => {
+    if (isAuthenticated && user?.id) {
+      fetchOrders({ customerId: user.id })
+    }
+  }, [isAuthenticated, user?.id, fetchOrders])
 
   const orders = user ? getOrdersByCustomer(user.id) : []
 

@@ -44,7 +44,23 @@ export const useOrderStore = create<OrderState>()(
           const data = await response.json()
 
           if (response.ok) {
-            set({ orders: data.orders || [], isLoading: false })
+            const fetchedOrders = data.orders || []
+            // Merge fetched orders with existing orders (update existing, add new)
+            set((state) => {
+              const fetchedIds = new Set(fetchedOrders.map((o: Order) => o.id))
+              // Keep existing orders that weren't part of this fetch (different user's orders)
+              const existingOtherOrders = state.orders.filter((o) => !fetchedIds.has(o.id))
+              // Combine: fetched orders take priority (they're fresher)
+              return {
+                orders: [...fetchedOrders, ...existingOtherOrders.filter((o) => {
+                  // Also filter out orders that belong to the same customer/vendor being fetched
+                  if (params?.customerId && o.customerId === params.customerId) return false
+                  if (params?.vendorId && o.vendorId === params.vendorId) return false
+                  return true
+                })],
+                isLoading: false,
+              }
+            })
           } else {
             set({ isLoading: false })
           }

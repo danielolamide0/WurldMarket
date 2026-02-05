@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Search, Package, ChevronDown, ChevronUp, Phone, MapPin, Clock } from 'lucide-react'
 import { useAuthStore } from '@/stores/authStore'
 import { useOrderStore } from '@/stores/orderStore'
@@ -16,10 +16,18 @@ const statusOptions: OrderStatus[] = ['pending', 'confirmed', 'preparing', 'read
 
 export default function VendorOrdersPage() {
   const { user } = useAuthStore()
+  const fetchOrders = useOrderStore((state) => state.fetchOrders)
   const orders = useOrderStore((state) =>
     user?.vendorId ? state.getOrdersByVendor(user.vendorId) : []
   )
   const updateOrderStatus = useOrderStore((state) => state.updateOrderStatus)
+
+  // Fetch orders from MongoDB on mount
+  useEffect(() => {
+    if (user?.vendorId) {
+      fetchOrders({ vendorId: user.vendorId })
+    }
+  }, [user?.vendorId, fetchOrders])
 
   const [searchQuery, setSearchQuery] = useState('')
   const [statusFilter, setStatusFilter] = useState<string>('all')
