@@ -161,11 +161,6 @@ function RegularsContent() {
 
       {/* Content */}
       <div className="max-w-7xl mx-auto px-4 py-6">
-        {/* Section Header */}
-        <div className="mb-6">
-          <h1 className="text-2xl font-bold text-gray-900">Your {activeTabInfo?.label}</h1>
-        </div>
-
         {/* Item count and Add All button */}
         {activeProducts.length > 0 && (
           <div className="flex items-center justify-between mb-4">

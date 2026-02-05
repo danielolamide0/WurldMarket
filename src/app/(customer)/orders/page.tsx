@@ -45,8 +45,6 @@ export default function CustomerOrdersPage() {
             <ArrowLeft className="h-4 w-4" />
             Back to Home
           </Link>
-          <h1 className="text-2xl font-bold text-gray-900">Your Orders</h1>
-          <p className="text-gray-600">{orders.length} order{orders.length !== 1 ? 's' : ''}</p>
         </div>
       </div>
 
