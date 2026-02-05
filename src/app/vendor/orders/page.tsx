@@ -105,12 +105,12 @@ export default function VendorOrdersPage() {
                 >
                   <div className="flex items-start justify-between gap-4">
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-3 mb-2">
-                        <span className="font-mono font-bold text-gray-900">{order.id}</span>
-                        <Badge className={ORDER_STATUS_COLORS[order.status]}>
+                      <div className="flex items-center gap-2 mb-2 flex-wrap">
+                        <span className="font-mono font-bold text-gray-900 truncate">{order.id}</span>
+                        <Badge className={ORDER_STATUS_COLORS[order.status]} style={{ flexShrink: 0 }}>
                           {ORDER_STATUS_LABELS[order.status]}
                         </Badge>
-                        <Badge variant={order.orderType === 'delivery' ? 'info' : 'outline'} size="sm">
+                        <Badge variant={order.orderType === 'delivery' ? 'info' : 'outline'} size="sm" style={{ flexShrink: 0 }}>
                           {order.orderType === 'delivery' ? 'Delivery' : 'Pickup'}
                         </Badge>
                       </div>
@@ -123,8 +123,8 @@ export default function VendorOrdersPage() {
                         <span>{order.items.length} item{order.items.length !== 1 ? 's' : ''}</span>
                       </div>
                     </div>
-                    <div className="text-right">
-                      <p className="text-xl font-bold text-primary">{formatPrice(order.total)}</p>
+                    <div className="text-right flex-shrink-0 ml-4">
+                      <p className="text-xl font-bold text-primary whitespace-nowrap">{formatPrice(order.total)}</p>
                       {isExpanded ? (
                         <ChevronUp className="h-5 w-5 text-gray-400 mt-2 ml-auto" />
                       ) : (
