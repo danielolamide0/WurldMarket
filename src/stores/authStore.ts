@@ -20,7 +20,7 @@ interface AuthState {
   // Login with email or username
   login: (identifier: string, password: string) => Promise<boolean>
   // Email verification flow
-  sendVerificationCode: (email: string, type: 'signup' | 'password-reset') => Promise<{ success: boolean; error?: string }>
+  sendVerificationCode: (email: string, type: 'signup' | 'password-reset') => Promise<{ success: boolean; error?: string; timeRemaining?: number }>
   verifyCode: (email: string, code: string, type: 'signup' | 'password-reset') => Promise<{ success: boolean; error?: string }>
   // Signup with email verification
   signup: (options: SignupOptions) => Promise<{ success: boolean; error?: string; vendorId?: string }>
