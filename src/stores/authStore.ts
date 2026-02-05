@@ -98,7 +98,7 @@ export const useAuthStore = create<AuthState>()(
 
           if (!response.ok) {
             set({ isLoading: false, error: data.error })
-            return { success: false, error: data.error }
+            return { success: false, error: data.error, timeRemaining: data.timeRemaining }
           }
 
           set({ isLoading: false, error: null })

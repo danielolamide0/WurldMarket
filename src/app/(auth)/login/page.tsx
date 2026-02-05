@@ -50,6 +50,26 @@ export default function LoginPage() {
   // Email verified flag for signup
   const [emailVerified, setEmailVerified] = useState(false)
 
+  // Countdown timer for resend code
+  const [countdown, setCountdown] = useState<number | null>(null)
+
+  // Countdown effect
+  useEffect(() => {
+    if (countdown === null || countdown <= 0) {
+      if (countdown === 0) {
+        setCountdown(null)
+        clearError()
+      }
+      return
+    }
+
+    const timer = setTimeout(() => {
+      setCountdown(countdown - 1)
+    }, 1000)
+
+    return () => clearTimeout(timer)
+  }, [countdown, clearError])
+
   // Reset all form state
   const resetForm = () => {
     setIdentifier('')
@@ -64,6 +84,7 @@ export default function LoginPage() {
     setEmailVerified(false)
     setSignupStep('form')
     setForgotPasswordStep('email')
+    setCountdown(null)
     clearError()
   }
 
@@ -257,7 +278,24 @@ export default function LoginPage() {
   const handleResendCode = async (type: 'signup' | 'password-reset') => {
     clearError()
     setVerificationCode(['', '', '', '', '', ''])
-    await sendVerificationCode(email.trim(), type)
+    const result = await sendVerificationCode(email.trim(), type)
+    
+    // If rate limited, start countdown
+    if (!result.success && result.timeRemaining) {
+      setCountdown(result.timeRemaining)
+    } else if (result.success) {
+      setCountdown(null)
+    }
+  }
+
+  // Format countdown time
+  const formatCountdown = (seconds: number): string => {
+    const mins = Math.floor(seconds / 60)
+    const secs = seconds % 60
+    if (mins > 0) {
+      return `Wait ${mins} min${mins !== 1 ? 's' : ''} ${secs} sec${secs !== 1 ? 's' : ''} before requesting another code`
+    }
+    return `Wait ${secs} sec${secs !== 1 ? 's' : ''} before requesting another code`
   }
 
   // Render verification code inputs
@@ -555,9 +593,13 @@ export default function LoginPage() {
 
                     {renderCodeInputs()}
 
-                    {error && (
+                    {countdown !== null && countdown > 0 ? (
+                      <p className="text-sm text-gray-600 text-center">
+                        {formatCountdown(countdown)}
+                      </p>
+                    ) : error && !error.includes('wait') ? (
                       <p className="text-sm text-red-600 bg-red-50 p-3 rounded-xl text-center">{error}</p>
-                    )}
+                    ) : null}
 
                     <Button
                       type="submit"
@@ -574,7 +616,7 @@ export default function LoginPage() {
                         type="button"
                         onClick={() => handleResendCode('signup')}
                         className="text-sm text-primary hover:underline"
-                        disabled={isLoading}
+                        disabled={isLoading || (countdown !== null && countdown > 0)}
                       >
                         Didn&apos;t receive the code? Resend
                       </button>
@@ -660,9 +702,13 @@ export default function LoginPage() {
 
                     {renderCodeInputs()}
 
-                    {error && (
+                    {countdown !== null && countdown > 0 ? (
+                      <p className="text-sm text-gray-600 text-center">
+                        {formatCountdown(countdown)}
+                      </p>
+                    ) : error && !error.includes('wait') ? (
                       <p className="text-sm text-red-600 bg-red-50 p-3 rounded-xl text-center">{error}</p>
-                    )}
+                    ) : null}
 
                     <Button
                       type="submit"
@@ -679,7 +725,7 @@ export default function LoginPage() {
                         type="button"
                         onClick={() => handleResendCode('password-reset')}
                         className="text-sm text-primary hover:underline"
-                        disabled={isLoading}
+                        disabled={isLoading || (countdown !== null && countdown > 0)}
                       >
                         Didn&apos;t receive the code? Resend
                       </button>

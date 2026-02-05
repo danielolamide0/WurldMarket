@@ -60,15 +60,21 @@ export async function POST(request: NextRequest) {
     }
 
     // Rate limiting: Check for recent codes sent to this email
+    const rateLimitWindow = 60000 // 60 seconds
     const recentCode = await VerificationCode.findOne({
       email: normalizedEmail,
       type,
-      createdAt: { $gte: new Date(Date.now() - 60000) }, // Within last minute
+      createdAt: { $gte: new Date(Date.now() - rateLimitWindow) },
     })
 
     if (recentCode) {
+      const timeElapsed = Date.now() - recentCode.createdAt.getTime()
+      const timeRemaining = Math.ceil((rateLimitWindow - timeElapsed) / 1000) // Remaining seconds
       return NextResponse.json(
-        { error: 'Please wait before requesting another code' },
+        { 
+          error: 'Please wait before requesting another code',
+          timeRemaining 
+        },
         { status: 429 }
       )
     }
