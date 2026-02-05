@@ -336,7 +336,7 @@ export default function LoginPage() {
             <img
               src="/WurldBAsketLogo.png"
               alt="WurldBasket"
-              className="h-16 w-auto"
+              className="h-16 w-auto brightness-0 invert"
             />
             <img
               src="/WurldBasketText.png"
