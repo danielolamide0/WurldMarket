@@ -164,11 +164,6 @@ function RegularsContent() {
         {/* Section Header */}
         <div className="mb-6">
           <h1 className="text-2xl font-bold text-gray-900">Your {activeTabInfo?.label}</h1>
-          <p className="text-gray-500">
-            {activeTab === 'regulars' && 'Items you buy regularly'}
-            {activeTab === 'favourites' && 'Items you have saved'}
-            {activeTab === 'previously-purchased' && 'Your order history'}
-          </p>
         </div>
 
         {/* Item count and Add All button */}
@@ -191,9 +186,6 @@ function RegularsContent() {
               <>
                 <ShoppingBasket className="h-16 w-16 text-gray-300 mx-auto mb-4" />
                 <h3 className="text-lg font-semibold text-gray-900 mb-2">No regulars yet</h3>
-                <p className="text-gray-500 mb-6">
-                  Items you purchase frequently will appear here. Start shopping to build your regulars list!
-                </p>
                 <Link href="/">
                   <Button>Start Shopping</Button>
                 </Link>
@@ -202,9 +194,6 @@ function RegularsContent() {
               <>
                 <Heart className="h-16 w-16 text-gray-300 mx-auto mb-4" />
                 <h3 className="text-lg font-semibold text-gray-900 mb-2">No favourites yet</h3>
-                <p className="text-gray-500 mb-6">
-                  Tap the heart icon on any product to save it to your favourites.
-                </p>
                 <Link href="/">
                   <Button>Start Shopping</Button>
                 </Link>
@@ -213,9 +202,6 @@ function RegularsContent() {
               <>
                 <History className="h-16 w-16 text-gray-300 mx-auto mb-4" />
                 <h3 className="text-lg font-semibold text-gray-900 mb-2">No purchase history</h3>
-                <p className="text-gray-500 mb-6">
-                  Products you have ordered will appear here for easy reordering.
-                </p>
                 <Link href="/">
                   <Button>Start Shopping</Button>
                 </Link>
