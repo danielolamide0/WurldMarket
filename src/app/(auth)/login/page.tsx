@@ -87,17 +87,23 @@ export default function LoginPage() {
     }
   }
 
-  const handleCodePaste = (e: React.ClipboardEvent) => {
+  const handleCodePaste = (e: React.ClipboardEvent, startIndex: number = 0) => {
     e.preventDefault()
     const pastedData = e.clipboardData.getData('text').replace(/\D/g, '').slice(0, 6)
     const newCode = [...verificationCode]
-    for (let i = 0; i < pastedData.length; i++) {
-      newCode[i] = pastedData[i]
+    
+    // Fill the code starting from the current field
+    for (let i = 0; i < pastedData.length && (startIndex + i) < 6; i++) {
+      newCode[startIndex + i] = pastedData[i]
     }
+    
     setVerificationCode(newCode)
-    if (pastedData.length === 6) {
-      codeInputRefs.current[5]?.focus()
-    }
+    
+    // Focus the last filled field or the last field if 6 digits were pasted
+    const lastFilledIndex = Math.min(startIndex + pastedData.length - 1, 5)
+    setTimeout(() => {
+      codeInputRefs.current[lastFilledIndex]?.focus()
+    }, 0)
   }
 
   const getFullCode = () => verificationCode.join('')
@@ -256,7 +262,7 @@ export default function LoginPage() {
           value={digit}
           onChange={(e) => handleCodeChange(index, e.target.value)}
           onKeyDown={(e) => handleCodeKeyDown(index, e)}
-          onPaste={index === 0 ? handleCodePaste : undefined}
+          onPaste={(e) => handleCodePaste(e, index)}
           className="w-12 h-14 text-center text-2xl font-bold border-2 border-gray-200 rounded-xl focus:border-primary focus:outline-none transition-colors"
         />
       ))}
