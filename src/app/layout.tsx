@@ -33,11 +33,13 @@ export default function RootLayout({
         </Providers>
         <Script id="agentcx-config" strategy="beforeInteractive">
           {`window.AGENTCX_CONFIG = {
-            clientId: 'cx_aysop9j5nbvz'
+            installationId: 'cx_aysop9j5nbvz_shàde',
+            position: 'bottom-right',
+            iconFrame: 'default'
           };`}
         </Script>
         <Script
-          src="https://widget.agentcx.net/agentcx-widget.js?clientId=cx_aysop9j5nbvz"
+          src="https://widget.agentcx.net/agentcx-widget.js?installationId=cx_aysop9j5nbvz_shàde"
           strategy="afterInteractive"
         />
       </body>
