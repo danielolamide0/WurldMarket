@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { ArrowLeft } from 'lucide-react'
+import { ArrowLeft, Tag } from 'lucide-react'
 import { useAuthStore } from '@/stores/authStore'
 import { useProductStore } from '@/stores/productStore'
 import { useVendorStore } from '@/stores/vendorStore'
@@ -31,6 +31,9 @@ export default function AddProductPage() {
     stock: '',
     storeId: '',
     image: 'https://images.unsplash.com/photo-1586201375761-83865001e31c?w=400',
+    isOnOffer: false,
+    originalPrice: '',
+    offerEndDate: '',
   })
   const [isSubmitting, setIsSubmitting] = useState(false)
 
@@ -68,6 +71,9 @@ export default function AddProductPage() {
       stock: parseInt(formData.stock),
       image: formData.image,
       isActive: true,
+      isOnOffer: formData.isOnOffer,
+      originalPrice: formData.isOnOffer && formData.originalPrice ? parseFloat(formData.originalPrice) : undefined,
+      offerEndDate: formData.isOnOffer && formData.offerEndDate ? formData.offerEndDate : undefined,
     })
 
     if (newProduct) {
@@ -199,6 +205,49 @@ export default function AddProductPage() {
                 </div>
               </div>
             )}
+
+            {/* Offer Section */}
+            <div className="border-t border-gray-200 pt-6">
+              <div className="flex items-center gap-3 mb-4">
+                <Tag className="h-5 w-5 text-primary" />
+                <h3 className="font-semibold text-gray-900">Offers Ending Soon</h3>
+              </div>
+              <p className="text-sm text-gray-500 mb-4">
+                Add this product to the &quot;Offers ending soon&quot; section on the homepage to attract more customers.
+              </p>
+
+              <label className="flex items-center gap-3 cursor-pointer mb-4">
+                <input
+                  type="checkbox"
+                  checked={formData.isOnOffer}
+                  onChange={(e) => setFormData({ ...formData, isOnOffer: e.target.checked })}
+                  className="w-5 h-5 rounded border-gray-300 text-primary focus:ring-primary"
+                />
+                <span className="font-medium text-gray-700">Add to Offers Ending Soon</span>
+              </label>
+
+              {formData.isOnOffer && (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-4 bg-yellow-50 rounded-xl border border-yellow-200">
+                  <Input
+                    label="Original Price (before discount) *"
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    placeholder="0.00"
+                    value={formData.originalPrice}
+                    onChange={(e) => setFormData({ ...formData, originalPrice: e.target.value })}
+                    required={formData.isOnOffer}
+                  />
+                  <Input
+                    label="Offer End Date *"
+                    type="date"
+                    value={formData.offerEndDate}
+                    onChange={(e) => setFormData({ ...formData, offerEndDate: e.target.value })}
+                    required={formData.isOnOffer}
+                  />
+                </div>
+              )}
+            </div>
 
             <div className="flex gap-3 pt-4">
               <Button type="submit" isLoading={isSubmitting}>

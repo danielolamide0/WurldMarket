@@ -232,6 +232,36 @@ export default function HomePage() {
     return [...sorted, ...storesWithoutCoords]
   }, [stores, currentPrimaryAddress, isAuthenticated])
 
+  // Get products on offer, sorted by proximity to user's primary address
+  const offerProducts = useMemo(() => {
+    const now = new Date()
+
+    // Filter products that are on offer and offer hasn't expired
+    const onOfferProducts = products.filter(p =>
+      p.isOnOffer &&
+      p.isActive &&
+      (!p.offerEndDate || new Date(p.offerEndDate) > now)
+    )
+
+    // If user has primary address, sort by store proximity
+    if (currentPrimaryAddress?.coordinates && sortedStores.length > 0) {
+      // Create a map of storeId to distance
+      const storeDistanceMap = new Map<string, number>()
+      sortedStores.forEach((store, index) => {
+        storeDistanceMap.set(store.id, index) // Use index as proxy for distance (already sorted)
+      })
+
+      // Sort products by their store's proximity
+      return [...onOfferProducts].sort((a, b) => {
+        const distA = storeDistanceMap.get(a.storeId) ?? 999
+        const distB = storeDistanceMap.get(b.storeId) ?? 999
+        return distA - distB
+      }).slice(0, 10)
+    }
+
+    return onOfferProducts.slice(0, 10)
+  }, [products, currentPrimaryAddress, sortedStores])
+
   return (
     <div className="min-h-screen bg-white">
       {/* Categories Row - Compact */}
@@ -402,67 +432,68 @@ export default function HomePage() {
         </section>
       )}
 
-      {/* Popular offers ending soon - Horizontally scrollable */}
-      <section className="py-4">
-        <div className="max-w-7xl mx-auto px-4">
-          <h2 className="text-lg font-bold text-primary mb-1">Popular offers ending soon</h2>
-          <p className="text-sm text-gray-500 mb-3">Don&apos;t miss the chance to shop our trusted sellers</p>
-          <div className="flex gap-3 overflow-x-auto scrollbar-hide pb-2">
-            {featuredProducts.slice(0, 6).map((product) => {
-              const store = sortedStores.find(s => s.id === product.storeId)
-              const originalPrice = (product.price * 1.25).toFixed(2)
-              const offerEndDate = new Date()
-              offerEndDate.setDate(offerEndDate.getDate() + 7)
+      {/* Offers ending soon - Horizontally scrollable */}
+      {offerProducts.length > 0 && (
+        <section className="py-4">
+          <div className="max-w-7xl mx-auto px-4">
+            <h2 className="text-lg font-bold text-primary mb-1">Offers ending soon</h2>
+            <p className="text-sm text-gray-500 mb-3">Don&apos;t miss the chance to shop our trusted sellers</p>
+            <div className="flex gap-3 overflow-x-auto scrollbar-hide pb-2">
+              {offerProducts.map((product) => {
+                const store = sortedStores.find(s => s.id === product.storeId)
+                const originalPrice = product.originalPrice || (product.price * 1.25)
+                const offerEndDate = product.offerEndDate ? new Date(product.offerEndDate) : new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
 
-              return (
-                <div
-                  key={product.id}
-                  className="flex-shrink-0 w-44 bg-white border border-gray-200 rounded-xl overflow-hidden"
-                >
-                  {/* Store badge */}
-                  <div className="px-2 py-1 bg-gray-100 text-xs text-gray-600">
-                    {store?.name ? `${store.name}-` : 'Marketplace-'}
-                  </div>
-
-                  {/* Product image */}
-                  <div className="h-28 bg-white flex items-center justify-center p-2">
-                    <img
-                      src={product.image}
-                      alt={product.name}
-                      className="max-h-full max-w-full object-contain"
-                    />
-                  </div>
-
-                  {/* Product info */}
-                  <div className="p-2">
-                    <p className="text-xs font-medium text-gray-900 line-clamp-2 h-8">{product.name}</p>
-                    <p className="text-[10px] text-gray-500 mb-2">Sold by {store?.name || 'Marketplace seller'}</p>
-
-                    {/* Offer banner */}
-                    <div className="bg-yellow-400 text-xs font-semibold text-gray-900 px-2 py-1 rounded mb-1">
-                      Was £{originalPrice} Now £{product.price.toFixed(2)}
+                return (
+                  <div
+                    key={product.id}
+                    className="flex-shrink-0 w-44 bg-white border border-gray-200 rounded-xl overflow-hidden"
+                  >
+                    {/* Store badge */}
+                    <div className="px-2 py-1 bg-gray-100 text-xs text-gray-600">
+                      {store?.name ? `${store.name}-` : 'Marketplace-'}
                     </div>
-                    <p className="text-[10px] text-gray-500 mb-2">
-                      Offer valid until {offerEndDate.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' })}
-                    </p>
 
-                    {/* Price and Add button */}
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-sm font-bold text-gray-900">£{product.price.toFixed(2)}</p>
-                        <p className="text-[10px] text-gray-500">£{product.price.toFixed(2)}/each</p>
+                    {/* Product image */}
+                    <div className="h-28 bg-white flex items-center justify-center p-2">
+                      <img
+                        src={product.image}
+                        alt={product.name}
+                        className="max-h-full max-w-full object-contain"
+                      />
+                    </div>
+
+                    {/* Product info */}
+                    <div className="p-2">
+                      <p className="text-xs font-medium text-gray-900 line-clamp-2 h-8">{product.name}</p>
+                      <p className="text-[10px] text-gray-500 mb-2">Sold by {store?.name || 'Marketplace seller'}</p>
+
+                      {/* Offer banner */}
+                      <div className="bg-yellow-400 text-xs font-semibold text-gray-900 px-2 py-1 rounded mb-1">
+                        Was £{originalPrice.toFixed(2)} Now £{product.price.toFixed(2)}
                       </div>
-                      <Link href={`/products/${product.id}`}>
-                        <Button size="sm" className="text-xs px-3 py-1">Add</Button>
-                      </Link>
+                      <p className="text-[10px] text-gray-500 mb-2">
+                        Offer valid until {offerEndDate.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' })}
+                      </p>
+
+                      {/* Price and Add button */}
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-sm font-bold text-gray-900">£{product.price.toFixed(2)}</p>
+                          <p className="text-[10px] text-gray-500">£{product.price.toFixed(2)}/each</p>
+                        </div>
+                        <Link href={`/products/${product.id}`}>
+                          <Button size="sm" className="text-xs px-3 py-1">Add</Button>
+                        </Link>
+                      </div>
                     </div>
                   </div>
-                </div>
-              )
-            })}
+                )
+              })}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
     </div>
   )

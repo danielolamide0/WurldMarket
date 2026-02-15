@@ -89,6 +89,9 @@ export interface Product {
   image: string
   stock: number
   isActive: boolean
+  isOnOffer?: boolean
+  originalPrice?: number
+  offerEndDate?: string
   createdAt: string
   updatedAt: string
 }

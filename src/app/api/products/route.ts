@@ -31,6 +31,9 @@ export async function GET(request: NextRequest) {
           image: product.image,
           stock: product.stock,
           isActive: product.isActive,
+          isOnOffer: product.isOnOffer || false,
+          originalPrice: product.originalPrice,
+          offerEndDate: product.offerEndDate?.toISOString(),
           createdAt: product.createdAt.toISOString(),
           updatedAt: product.updatedAt.toISOString(),
         },
@@ -63,6 +66,9 @@ export async function GET(request: NextRequest) {
         image: p.image,
         stock: p.stock,
         isActive: p.isActive,
+        isOnOffer: p.isOnOffer || false,
+        originalPrice: p.originalPrice,
+        offerEndDate: p.offerEndDate?.toISOString(),
         createdAt: p.createdAt.toISOString(),
         updatedAt: p.updatedAt.toISOString(),
       })),
@@ -84,6 +90,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
     }
 
+    const { isOnOffer, originalPrice, offerEndDate } = body
+
     const product = await Product.create({
       vendorId,
       storeId,
@@ -94,6 +102,9 @@ export async function POST(request: NextRequest) {
       unit: unit || 'each',
       image,
       stock: stock || 0,
+      isOnOffer: isOnOffer || false,
+      originalPrice: isOnOffer ? originalPrice : undefined,
+      offerEndDate: isOnOffer && offerEndDate ? new Date(offerEndDate) : undefined,
     })
 
     return NextResponse.json({
@@ -109,6 +120,9 @@ export async function POST(request: NextRequest) {
         image: product.image,
         stock: product.stock,
         isActive: product.isActive,
+        isOnOffer: product.isOnOffer || false,
+        originalPrice: product.originalPrice,
+        offerEndDate: product.offerEndDate?.toISOString(),
         createdAt: product.createdAt.toISOString(),
         updatedAt: product.updatedAt.toISOString(),
       },
@@ -148,6 +162,9 @@ export async function PUT(request: NextRequest) {
         image: product.image,
         stock: product.stock,
         isActive: product.isActive,
+        isOnOffer: product.isOnOffer || false,
+        originalPrice: product.originalPrice,
+        offerEndDate: product.offerEndDate?.toISOString(),
         createdAt: product.createdAt.toISOString(),
         updatedAt: product.updatedAt.toISOString(),
       },
