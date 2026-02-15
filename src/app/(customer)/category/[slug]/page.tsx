@@ -5,6 +5,7 @@ import { useParams } from 'next/navigation'
 import Link from 'next/link'
 import { ArrowLeft } from 'lucide-react'
 import { useProductStore } from '@/stores/productStore'
+import { useVendorStore } from '@/stores/vendorStore'
 import { ProductCard } from '@/components/products/ProductCard'
 import { CATEGORIES, CATEGORY_MAP } from '@/lib/constants'
 import { ProductCategory } from '@/types'
@@ -15,11 +16,13 @@ export default function CategoryPage() {
   const category = CATEGORIES.find((c) => c.slug === slug)
   const products = useProductStore((state) => state.getProductsByCategory(slug as ProductCategory))
   const fetchProducts = useProductStore((state) => state.fetchProducts)
+  const fetchStores = useVendorStore((state) => state.fetchStores)
 
-  // Fetch products for this category when page loads
+  // Fetch products and stores for this category when page loads
   useEffect(() => {
     fetchProducts({ category: slug })
-  }, [slug, fetchProducts])
+    fetchStores()
+  }, [slug, fetchProducts, fetchStores])
 
   if (!category) {
     return (

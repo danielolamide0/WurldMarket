@@ -6,25 +6,21 @@ import {
   User,
   MapPin,
   CreditCard,
-  Bell,
   HelpCircle,
   LogOut,
   ChevronRight,
   Store,
-  ShoppingBasket,
-  Package,
   Settings,
+  Shield,
 } from 'lucide-react'
 import { useAuthStore } from '@/stores/authStore'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 
 const menuItems = [
-  { icon: ShoppingBasket, label: 'Regulars', href: '/regulars' },
-  { icon: Package, label: 'Your Orders', href: '/orders' },
   { icon: MapPin, label: 'Saved Addresses', href: '/account/addresses' },
   { icon: CreditCard, label: 'Payment Methods', href: '#' },
-  { icon: Bell, label: 'Notifications', href: '#' },
+  { icon: Shield, label: 'Permissions', href: '/account/permissions' },
   { icon: HelpCircle, label: 'Help & Support', href: '#' },
   { icon: Settings, label: 'Settings', href: '/account/settings' },
 ]

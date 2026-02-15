@@ -1,25 +1,34 @@
 'use client'
 
 import Link from 'next/link'
-import { Plus, Minus, Heart } from 'lucide-react'
+import { usePathname } from 'next/navigation'
+import { Plus, Minus, Heart, Store } from 'lucide-react'
 import { Product } from '@/types'
 import { useCartStore } from '@/stores/cartStore'
 import { useCustomerStore } from '@/stores/customerStore'
+import { useVendorStore } from '@/stores/vendorStore'
 import { formatPrice } from '@/lib/utils'
 import { CATEGORY_MAP } from '@/lib/constants'
 import { Badge } from '@/components/ui/badge'
 
 interface ProductCardProps {
   product: Product
+  showStoreName?: boolean
 }
 
-export function ProductCard({ product }: ProductCardProps) {
+export function ProductCard({ product, showStoreName }: ProductCardProps) {
+  const pathname = usePathname()
   const { addItem, updateQuantity, removeItem, getItemQuantity } = useCartStore()
   const { isFavourite, toggleFavourite } = useCustomerStore()
+  const { stores } = useVendorStore()
   const quantityInCart = getItemQuantity(product.id)
   const isInCart = quantityInCart > 0
   const isOutOfStock = product.stock === 0
   const isFav = isFavourite(product.id)
+  
+  // Show store name if not on a store page and showStoreName is not explicitly false
+  const shouldShowStoreName = showStoreName !== false && !pathname?.startsWith('/stores/')
+  const store = shouldShowStoreName ? stores.find((s) => s.id === product.storeId) : null
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault()
@@ -104,9 +113,17 @@ export function ProductCard({ product }: ProductCardProps) {
 
         {/* Content */}
         <div className="p-4">
-          <Badge variant="outline" size="sm" className="mb-2">
-            {CATEGORY_MAP[product.category]}
-          </Badge>
+          <div className="flex items-center justify-between mb-2">
+            <Badge variant="outline" size="sm">
+              {CATEGORY_MAP[product.category]}
+            </Badge>
+            {shouldShowStoreName && store && (
+              <div className="flex items-center gap-1 text-xs text-gray-500">
+                <Store className="h-3 w-3" />
+                <span className="truncate max-w-[100px]">{store.name}</span>
+              </div>
+            )}
+          </div>
           <h3 className="font-semibold text-gray-900 mb-1 truncate">{product.name}</h3>
           <p className="text-sm text-gray-500 mb-3">{product.unit}</p>
 

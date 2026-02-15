@@ -117,12 +117,39 @@ export default function CheckoutPage() {
   }
 
   const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0)
-  const deliveryFee = orderType === 'delivery' && subtotal < FREE_DELIVERY_THRESHOLD ? DELIVERY_FEE : 0
+  
+  // Calculate delivery fees per store
+  const uniqueStores = Array.from(new Set(items.map(item => item.storeId)))
+  const storeCount = uniqueStores.length
+  
+  // Calculate delivery fee: if multiple stores, charge per store
+  // If single store and subtotal >= FREE_DELIVERY_THRESHOLD, free delivery
+  let deliveryFee = 0
+  if (orderType === 'delivery') {
+    if (storeCount > 1) {
+      // Multiple stores: charge per store
+      deliveryFee = storeCount * DELIVERY_FEE
+    } else if (subtotal < FREE_DELIVERY_THRESHOLD) {
+      // Single store but below threshold
+      deliveryFee = DELIVERY_FEE
+    }
+    // Single store and above threshold: deliveryFee stays 0 (free)
+  }
+  
   const total = subtotal + deliveryFee
 
   // Get store info for pickup
   const firstItem = items[0]
   const pickupStore = firstItem ? stores.find((s) => s.id === firstItem.storeId) : null
+  
+  // Group items by store for display
+  const itemsByStore = items.reduce((acc, item) => {
+    if (!acc[item.storeId]) {
+      acc[item.storeId] = []
+    }
+    acc[item.storeId].push(item)
+    return acc
+  }, {} as Record<string, typeof items>)
 
   const handleSubmitOrder = async () => {
     if (!customerName || !customerPhone) {
@@ -178,7 +205,7 @@ export default function CheckoutPage() {
   useEffect(() => {
     if (orderComplete) {
       window.scrollTo({ top: 0, behavior: 'smooth' })
-    }
+  }
   }, [orderComplete])
 
   // Order Complete Screen
@@ -335,15 +362,15 @@ export default function CheckoutPage() {
             )}
             
             {(!isAuthenticated || !user?.phone) && (
-              <Input
-                label="Phone Number"
-                type="tel"
-                placeholder="07123 456789"
-                value={customerPhone}
-                onChange={(e) => setCustomerPhone(e.target.value)}
+            <Input
+              label="Phone Number"
+              type="tel"
+              placeholder="07123 456789"
+              value={customerPhone}
+              onChange={(e) => setCustomerPhone(e.target.value)}
                 icon={<Phone className="h-5 w-5" />}
-                required
-              />
+              required
+            />
             )}
           </div>
         </Card>
@@ -461,7 +488,7 @@ export default function CheckoutPage() {
                         Change Postcode
                       </button>
                     </div>
-                    <Input
+            <Input
                       label="Street Address"
                       placeholder="123 Main Street, Flat 4B"
                       value={newAddressLine}
@@ -471,8 +498,8 @@ export default function CheckoutPage() {
                           setAddress(`${e.target.value}, ${newCity} ${newPostcode}`)
                         }
                       }}
-                      icon={<MapPin className="h-5 w-5" />}
-                    />
+              icon={<MapPin className="h-5 w-5" />}
+            />
                     <div className="grid grid-cols-2 gap-4">
                       <Input
                         label="City"
@@ -533,8 +560,20 @@ export default function CheckoutPage() {
         {/* Order Summary */}
         <Card className="p-4">
           <h2 className="font-semibold text-gray-900 mb-4">Order Summary</h2>
-          <div className="space-y-2 mb-4">
-            {items.map((item) => (
+          <div className="space-y-4 mb-4">
+            {Object.entries(itemsByStore).map(([storeId, storeItems]) => {
+              const store = stores.find(s => s.id === storeId)
+              const storeSubtotal = storeItems.reduce((sum, item) => sum + item.price * item.quantity, 0)
+              return (
+                <div key={storeId} className="border-b border-gray-100 pb-4 last:border-b-0 last:pb-0">
+                  {store && (
+                    <div className="flex items-center gap-2 mb-2">
+                      <Store className="h-4 w-4 text-primary" />
+                      <span className="font-medium text-gray-900">{store.name}</span>
+                    </div>
+                  )}
+                  <div className="space-y-2 ml-6">
+                    {storeItems.map((item) => (
               <div key={item.productId} className="flex justify-between text-sm">
                 <span className="text-gray-600">
                   {item.quantity}x {item.name}
@@ -542,20 +581,41 @@ export default function CheckoutPage() {
                 <span>{formatPrice(item.price * item.quantity)}</span>
               </div>
             ))}
+                  </div>
+                </div>
+              )
+            })}
           </div>
           <div className="border-t border-gray-100 pt-3 space-y-2">
             <div className="flex justify-between text-gray-600">
               <span>Subtotal</span>
               <span>{formatPrice(subtotal)}</span>
             </div>
+            {orderType === 'delivery' && (
+              <div className="space-y-1">
+                {storeCount > 1 ? (
+                  <>
+                    <div className="flex justify-between text-gray-600 text-sm">
+                      <span>Delivery ({storeCount} stores)</span>
+                      <span>{formatPrice(storeCount * DELIVERY_FEE)}</span>
+                    </div>
+                    <p className="text-xs text-amber-600">
+                      Ordering from multiple stores adds delivery fees per store
+                    </p>
+                  </>
+                ) : deliveryFee === 0 ? (
             <div className="flex justify-between text-gray-600">
               <span>Delivery</span>
-              {deliveryFee === 0 ? (
-                <span className="text-primary font-medium">FREE</span>
+                    <span className="text-primary font-medium">FREE</span>
+                  </div>
               ) : (
+                  <div className="flex justify-between text-gray-600">
+                    <span>Delivery</span>
                 <span>{formatPrice(deliveryFee)}</span>
+                  </div>
               )}
             </div>
+            )}
             <div className="flex justify-between text-lg font-semibold pt-2 border-t border-gray-100">
               <span>Total</span>
               <span className="text-primary">{formatPrice(total)}</span>

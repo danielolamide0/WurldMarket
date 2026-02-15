@@ -38,6 +38,7 @@ body {
 }
 
 /* Custom scrollbar */
+/* Mobile: thin scrollbar */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
@@ -55,6 +56,43 @@ body {
 
 ::-webkit-scrollbar-thumb:hover {
   background: var(--color-primary-dark);
+}
+
+/* Desktop: wider, easier to use scrollbar */
+@media (min-width: 768px) {
+  ::-webkit-scrollbar {
+    width: 14px;
+    height: 14px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 7px;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: var(--color-primary);
+    border-radius: 7px;
+    border: 2px solid #f1f1f1;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--color-primary-dark);
+    border: 2px solid #e0e0e0;
+  }
+}
+
+/* Firefox scrollbar */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-primary) #f1f1f1;
+}
+
+@media (min-width: 768px) {
+  * {
+    scrollbar-width: auto;
+    scrollbar-color: var(--color-primary) #f1f1f1;
+  }
 }
 
 /* Leaflet map fixes */

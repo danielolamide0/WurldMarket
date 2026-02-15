@@ -2,15 +2,21 @@
 
 import { useEffect } from 'react'
 import Link from 'next/link'
-import { X, ShoppingBag, Plus, Minus, Trash2 } from 'lucide-react'
+import { X, ShoppingBag, Plus, Minus, Trash2, Store } from 'lucide-react'
 import { useCartStore } from '@/stores/cartStore'
+import { useVendorStore } from '@/stores/vendorStore'
 import { Button } from '@/components/ui/button'
 import { formatPrice } from '@/lib/utils'
 
 export function CartDrawer() {
   const { items, isOpen, closeCart, updateQuantity, removeItem } = useCartStore()
+  const { stores } = useVendorStore()
   const totalPrice = items.reduce((sum, item) => sum + item.price * item.quantity, 0)
   const totalItems = items.reduce((sum, item) => sum + item.quantity, 0)
+  
+  // Get unique stores in cart
+  const uniqueStores = Array.from(new Set(items.map(item => item.storeId)))
+  const storeCount = uniqueStores.length
 
   // Prevent body scroll when drawer is open
   useEffect(() => {
@@ -82,6 +88,15 @@ export function CartDrawer() {
                   <div className="flex-1 min-w-0">
                     <h3 className="font-medium text-gray-900 truncate">{item.name}</h3>
                     <p className="text-sm text-gray-500">{item.unit}</p>
+                    {(() => {
+                      const store = stores.find(s => s.id === item.storeId)
+                      return store ? (
+                        <div className="flex items-center gap-1 text-xs text-gray-500 mt-1">
+                          <Store className="h-3 w-3" />
+                          <span className="truncate">{store.name}</span>
+                        </div>
+                      ) : null
+                    })()}
                     <p className="text-primary font-semibold mt-1">
                       {formatPrice(item.price * item.quantity)}
                     </p>
@@ -126,6 +141,11 @@ export function CartDrawer() {
               <span className="font-medium">Subtotal</span>
               <span className="font-bold text-primary">{formatPrice(totalPrice)}</span>
             </div>
+            {storeCount > 1 && (
+              <p className="text-sm text-amber-600">
+                Items from {storeCount} different stores - delivery fees may apply per store
+              </p>
+            )}
             <p className="text-sm text-gray-500">Delivery fees calculated at checkout</p>
             <Link href="/checkout" onClick={closeCart}>
               <Button className="w-full" size="lg">

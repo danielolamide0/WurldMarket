@@ -8,6 +8,7 @@ import { useProductStore } from '@/stores/productStore'
 import { useCustomerStore } from '@/stores/customerStore'
 import { useCartStore } from '@/stores/cartStore'
 import { useAuthStore } from '@/stores/authStore'
+import { useVendorStore } from '@/stores/vendorStore'
 import { ProductCard } from '@/components/products/ProductCard'
 import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -23,6 +24,7 @@ function RegularsContent() {
   const products = useProductStore((state) => state.products)
   const { favourites, getPreviouslyPurchased, getRegulars, fetchCustomerData, userId, setUserId } = useCustomerStore()
   const { addItem } = useCartStore()
+  const fetchStores = useVendorStore((state) => state.fetchStores)
 
   // Sync customerStore when user changes
   useEffect(() => {
@@ -40,6 +42,11 @@ function RegularsContent() {
       setUserId(null)
     }
   }, [isAuthenticated, user?.id, userId, setUserId, fetchCustomerData])
+
+  // Fetch stores on mount
+  useEffect(() => {
+    fetchStores()
+  }, [fetchStores])
 
   // Update tab when URL changes
   useEffect(() => {
