@@ -392,11 +392,11 @@ export function Header() {
                 </div>
                 {/* Location Selector - Only show for authenticated users */}
                 {isAuthenticated && userAddresses.length > 0 ? (
-                  <div className="relative" ref={addressDropdownRef}>
+                  <div className="relative flex" ref={addressDropdownRef}>
                     <button
                       type="button"
                       onClick={() => setIsAddressDropdownOpen(!isAddressDropdownOpen)}
-                      className="flex items-center gap-2 px-4 py-3 bg-primary text-white rounded-r-full border-2 border-primary hover:bg-primary-dark transition-colors"
+                      className="flex items-center gap-2 px-4 bg-primary text-white rounded-r-full border-2 border-primary hover:bg-primary-dark transition-colors"
                     >
                       <MapPin className="h-4 w-4" />
                       <span className="text-sm font-medium">{primaryAddress?.postcode || userAddresses[0]?.postcode}</span>
@@ -442,7 +442,7 @@ export function Header() {
                 ) : isAuthenticated ? (
                   <Link
                     href="/account/addresses"
-                    className="flex items-center gap-2 px-4 py-3 bg-primary text-white rounded-r-full border-2 border-primary hover:bg-primary-dark transition-colors"
+                    className="flex items-center gap-2 px-4 bg-primary text-white rounded-r-full border-2 border-primary hover:bg-primary-dark transition-colors"
                   >
                     <MapPin className="h-4 w-4" />
                     <span className="text-sm font-medium">Add address</span>
@@ -491,7 +491,7 @@ export function Header() {
                   <button
                     type="button"
                     onClick={() => setIsAddressDropdownOpen(!isAddressDropdownOpen)}
-                    className="flex items-center gap-1 px-3 py-3 bg-primary text-white rounded-r-full border-2 border-primary"
+                    className="flex items-center gap-1 px-3 bg-primary text-white rounded-r-full border-2 border-primary"
                   >
                     <MapPin className="h-4 w-4" />
                     <span className="text-xs font-medium">{primaryAddress?.postcode || userAddresses[0]?.postcode}</span>
@@ -500,7 +500,7 @@ export function Header() {
                 ) : isAuthenticated ? (
                   <Link
                     href="/account/addresses"
-                    className="flex items-center gap-1 px-3 py-3 bg-primary text-white rounded-r-full border-2 border-primary"
+                    className="flex items-center gap-1 px-3 bg-primary text-white rounded-r-full border-2 border-primary"
                   >
                     <MapPin className="h-4 w-4" />
                     <span className="text-xs font-medium">Add</span>
