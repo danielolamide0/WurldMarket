@@ -40,6 +40,13 @@ export default function CategoryPage() {
   return (
     <div className="min-h-screen">
       <div className="max-w-7xl mx-auto px-4 py-6">
+        {/* Back Arrow */}
+        <Link
+          href="/"
+          className="inline-flex items-center gap-2 text-primary hover:text-primary-dark mb-4"
+        >
+          <ArrowLeft className="h-5 w-5" />
+        </Link>
         {/* Products Grid */}
         {products.length === 0 ? (
           <div className="bg-white rounded-2xl p-12 text-center">

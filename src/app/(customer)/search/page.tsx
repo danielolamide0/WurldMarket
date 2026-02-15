@@ -47,31 +47,14 @@ function SearchResults() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-white border-b border-gray-100">
-        <div className="max-w-7xl mx-auto px-4 py-6">
-          <Link
-            href="/"
-            className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-4"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            Back to Home
-          </Link>
-          <div className="flex items-center gap-3">
-            <Search className="h-6 w-6 text-primary" />
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900">
-                Search results for &ldquo;{query}&rdquo;
-              </h1>
-              <p className="text-gray-600">
-                {totalResults} {totalResults === 1 ? 'result' : 'results'} found
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div className="max-w-7xl mx-auto px-4 py-8">
+      <div className="max-w-7xl mx-auto px-4 py-6">
+        {/* Back Arrow */}
+        <Link
+          href="/"
+          className="inline-flex items-center gap-2 text-primary hover:text-primary-dark mb-4"
+        >
+          <ArrowLeft className="h-5 w-5" />
+        </Link>
         {totalResults === 0 ? (
           <Card className="p-12 text-center">
             <Search className="h-12 w-12 text-gray-300 mx-auto mb-4" />
