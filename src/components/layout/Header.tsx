@@ -354,14 +354,19 @@ export function Header() {
             <div className="flex items-center gap-2">
               <button
                 onClick={openCart}
-                className="relative p-2 rounded-xl hover:bg-gray-100 transition-colors"
+                className="flex items-center gap-1 px-3 py-2 rounded-xl bg-gray-100 hover:bg-gray-200 transition-colors"
               >
-                <ShoppingCart className="h-6 w-6 text-gray-700" />
-                {totalItems > 0 && (
-                  <span className="absolute -top-1 -right-1 w-5 h-5 bg-primary text-white text-xs font-bold rounded-full flex items-center justify-center">
-                    {totalItems}
-                  </span>
-                )}
+                <div className="relative">
+                  <ShoppingCart className="h-6 w-6 text-gray-700" />
+                  {totalItems > 0 && (
+                    <span className="absolute -top-2 -right-2 w-5 h-5 bg-primary text-white text-xs font-bold rounded-full flex items-center justify-center">
+                      {totalItems}
+                    </span>
+                  )}
+                </div>
+                <span className="font-semibold text-gray-900 ml-1">
+                  £{items.reduce((sum, item) => sum + item.price * item.quantity, 0).toFixed(2)}
+                </span>
               </button>
             </div>
           </div>
