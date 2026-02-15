@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { Home, Package, ShoppingBasket, User } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { useAuthStore } from '@/stores/authStore'
 
 const navItems = [
   { href: '/', icon: Home, label: 'Home' },
@@ -14,6 +15,12 @@ const navItems = [
 
 export function MobileNav() {
   const pathname = usePathname()
+  const { isAuthenticated } = useAuthStore()
+
+  // Don't show bottom nav if user is not logged in
+  if (!isAuthenticated) {
+    return null
+  }
 
   return (
     <nav className="fixed bottom-4 left-0 right-0 z-50 md:hidden px-4">
