@@ -1,6 +1,7 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, Suspense } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import {
   ArrowLeft,
@@ -28,7 +29,11 @@ const addressLabels = [
   { value: 'Other', icon: MapPinned },
 ]
 
-export default function SavedAddressesPage() {
+function SavedAddressesContent() {
+  const router = useRouter()
+  const searchParams = useSearchParams()
+  const fromPage = searchParams.get('from') // 'home', 'cart', 'checkout', or null
+
   const { user, isAuthenticated } = useAuthStore()
   const {
     getAddressesByUser,
@@ -82,6 +87,16 @@ export default function SavedAddressesPage() {
     }
 
     resetForm()
+
+    // Redirect based on where user came from
+    if (fromPage === 'home') {
+      router.push('/')
+    } else if (fromPage === 'cart') {
+      router.push('/cart')
+    } else if (fromPage === 'checkout') {
+      router.push('/checkout')
+    }
+    // If fromPage is null or 'account', stay on the page (current behavior)
   }
 
   const handleEdit = (address: SavedAddress) => {
@@ -132,11 +147,11 @@ export default function SavedAddressesPage() {
       <div className="bg-white border-b border-gray-100">
         <div className="max-w-3xl mx-auto px-4 py-6">
           <Link
-            href="/account"
+            href={fromPage === 'home' ? '/' : fromPage === 'cart' ? '/cart' : fromPage === 'checkout' ? '/checkout' : '/account'}
             className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-4"
           >
             <ArrowLeft className="h-4 w-4" />
-            Back to Account
+            {fromPage === 'home' ? 'Back to Home' : fromPage === 'cart' ? 'Back to Cart' : fromPage === 'checkout' ? 'Back to Checkout' : 'Back to Account'}
           </Link>
           <h1 className="text-2xl font-bold text-gray-900">Saved Addresses</h1>
           <p className="text-gray-600">Manage your delivery addresses</p>
@@ -365,5 +380,17 @@ export default function SavedAddressesPage() {
         )}
       </div>
     </div>
+  )
+}
+
+export default function SavedAddressesPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+      </div>
+    }>
+      <SavedAddressesContent />
+    </Suspense>
   )
 }

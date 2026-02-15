@@ -447,7 +447,7 @@ export function Header() {
                           type="button"
                           onClick={() => {
                             setIsAddressDropdownOpen(false)
-                            router.push('/account/addresses')
+                            router.push('/account/addresses?from=home')
                           }}
                           className="block w-full text-left px-4 py-3 text-sm text-primary font-medium hover:bg-gray-50 border-t border-gray-100"
                         >
@@ -458,7 +458,7 @@ export function Header() {
                   </div>
                 ) : isAuthenticated ? (
                   <Link
-                    href="/account/addresses"
+                    href="/account/addresses?from=home"
                     className="flex items-center gap-2 px-4 bg-primary text-white rounded-r-full border-2 border-primary hover:bg-primary-dark transition-colors"
                   >
                     <MapPin className="h-4 w-4" />
@@ -516,7 +516,7 @@ export function Header() {
                   </button>
                 ) : isAuthenticated ? (
                   <Link
-                    href="/account/addresses"
+                    href="/account/addresses?from=home"
                     className="flex items-center gap-1 px-3 bg-primary text-white rounded-r-full border-2 border-primary"
                   >
                     <MapPin className="h-4 w-4" />
@@ -552,7 +552,7 @@ export function Header() {
                     type="button"
                     onClick={() => {
                       setIsAddressDropdownOpen(false)
-                      router.push('/account/addresses')
+                      router.push('/account/addresses?from=home')
                     }}
                     className="block w-full text-left px-4 py-3 text-sm text-primary font-medium hover:bg-gray-50 border-t border-gray-100"
                   >

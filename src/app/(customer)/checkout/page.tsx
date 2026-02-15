@@ -355,7 +355,7 @@ export default function CheckoutPage() {
               <h2 className="font-semibold text-gray-900">Delivery Address</h2>
               {isAuthenticated && (
                 <Link
-                  href="/account/addresses"
+                  href="/account/addresses?from=checkout"
                   className="text-sm text-primary font-medium hover:underline"
                 >
                   Manage Addresses
