@@ -269,7 +269,7 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-4 py-3">
           <div ref={categoriesRef} className="flex gap-3 overflow-x-auto scrollbar-hide">
             {CATEGORIES.map((cat) => {
-              return (
+    return (
                 <Link
                   key={cat.id}
                   href={`/category/${cat.slug}`}
@@ -373,11 +373,11 @@ export default function HomePage() {
                   <div className="flex flex-col items-center">
                     <div className="w-16 h-16 bg-white border border-gray-200 rounded-xl mb-1 overflow-hidden flex items-center justify-center">
                       {store.image ? (
-                        <img
-                          src={store.image}
-                          alt={store.name}
-                          className="w-full h-full object-cover"
-                        />
+                      <img
+                        src={store.image}
+                        alt={store.name}
+                        className="w-full h-full object-cover"
+                      />
                       ) : (
                         <ShoppingBag className="h-6 w-6 text-gray-400" />
                       )}
@@ -386,7 +386,7 @@ export default function HomePage() {
                     {deliveryTime && (
                       <p className="text-[10px] text-gray-500">{deliveryTime}</p>
                     )}
-                  </div>
+                    </div>
                 </Link>
               )
             })}
@@ -397,7 +397,7 @@ export default function HomePage() {
       {/* Your Regulars - Only show if user has regulars, below the fold */}
       {isAuthenticated && user?.role === 'customer' && regularsCount > 0 && (
         <section className="py-4 bg-gray-50">
-          <div className="max-w-7xl mx-auto px-4">
+        <div className="max-w-7xl mx-auto px-4">
             <Card className="p-4">
               <div className="flex items-center justify-between mb-3">
                 <div>
@@ -426,7 +426,7 @@ export default function HomePage() {
                 <Button className="w-full py-2 text-sm">
                   Shop regulars
                 </Button>
-              </Link>
+            </Link>
             </Card>
           </div>
         </section>
@@ -452,7 +452,7 @@ export default function HomePage() {
                     {/* Store badge */}
                     <div className="px-2 py-1 bg-gray-100 text-xs text-gray-600">
                       {store?.name ? `${store.name}-` : 'Marketplace-'}
-                    </div>
+          </div>
 
                     {/* Product image */}
                     <div className="h-28 bg-white flex items-center justify-center p-2">
@@ -461,7 +461,7 @@ export default function HomePage() {
                         alt={product.name}
                         className="max-h-full max-w-full object-contain"
                       />
-                    </div>
+        </div>
 
                     {/* Product info */}
                     <div className="p-2">
@@ -484,15 +484,15 @@ export default function HomePage() {
                         </div>
                         <Link href={`/products/${product.id}`}>
                           <Button size="sm" className="text-xs px-3 py-1">Add</Button>
-                        </Link>
+          </Link>
                       </div>
                     </div>
                   </div>
                 )
               })}
             </div>
-          </div>
-        </section>
+        </div>
+      </section>
       )}
 
     </div>

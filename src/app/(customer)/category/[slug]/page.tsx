@@ -39,21 +39,6 @@ export default function CategoryPage() {
 
   return (
     <div className="min-h-screen">
-      {/* Header */}
-      <div className="bg-white border-b border-gray-100">
-        <div className="max-w-7xl mx-auto px-4 py-6">
-          <Link
-            href="/"
-            className="inline-flex items-center text-gray-600 hover:text-gray-900 mb-4"
-          >
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to Home
-          </Link>
-          <h1 className="text-2xl font-bold text-gray-900">{category.name}</h1>
-          <p className="text-gray-600">{category.description}</p>
-        </div>
-      </div>
-
       <div className="max-w-7xl mx-auto px-4 py-6">
         {/* Products Grid */}
         {products.length === 0 ? (
