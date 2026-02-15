@@ -328,14 +328,16 @@ export function Header() {
         <div className="max-w-7xl mx-auto px-4">
           {/* Main Header Row */}
           <div className="flex items-center justify-between h-16">
-            {/* Left: Hamburger + Logo Icon + Logo Text */}
+            {/* Left: Hamburger (only when signed in) + Logo */}
             <div className="flex items-center gap-2">
-              <button
-                onClick={() => setIsMobileMenuOpen(true)}
-                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-              >
-                <Menu className="h-6 w-6 text-gray-700" />
-              </button>
+              {isAuthenticated && (
+                <button
+                  onClick={() => setIsMobileMenuOpen(true)}
+                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                >
+                  <Menu className="h-6 w-6 text-gray-700" />
+                </button>
+              )}
               <Link href="/" className="flex items-center gap-2 flex-shrink-0">
                 <img
                   src="/WurldBAsketLogo.png"
@@ -350,24 +352,34 @@ export function Header() {
               </Link>
             </div>
 
-            {/* Right: Cart */}
+            {/* Right: Cart (signed in) or Sign In button (signed out) */}
             <div className="flex items-center gap-2">
-              <button
-                onClick={openCart}
-                className="flex items-center gap-1 px-3 py-2 rounded-xl bg-gray-100 hover:bg-gray-200 transition-colors"
-              >
-                <div className="relative">
-                  <ShoppingCart className="h-6 w-6 text-gray-700" />
-                  {totalItems > 0 && (
-                    <span className="absolute -top-2 -right-2 w-5 h-5 bg-primary text-white text-xs font-bold rounded-full flex items-center justify-center">
-                      {totalItems}
-                    </span>
-                  )}
-                </div>
-                <span className="font-semibold text-gray-900 ml-1">
-                  £{items.reduce((sum, item) => sum + item.price * item.quantity, 0).toFixed(2)}
-                </span>
-              </button>
+              {isAuthenticated ? (
+                <button
+                  onClick={openCart}
+                  className="flex items-center gap-1 px-3 py-2 rounded-xl bg-gray-100 hover:bg-gray-200 transition-colors"
+                >
+                  <div className="relative">
+                    <ShoppingCart className="h-6 w-6 text-gray-700" />
+                    {totalItems > 0 && (
+                      <span className="absolute -top-2 -right-2 w-5 h-5 bg-primary text-white text-xs font-bold rounded-full flex items-center justify-center">
+                        {totalItems}
+                      </span>
+                    )}
+                  </div>
+                  <span className="font-semibold text-gray-900 ml-1">
+                    £{items.reduce((sum, item) => sum + item.price * item.quantity, 0).toFixed(2)}
+                  </span>
+                </button>
+              ) : (
+                <Link
+                  href="/login"
+                  className="flex items-center gap-2 px-4 py-2 rounded-xl bg-primary text-white font-medium hover:bg-primary-dark transition-colors"
+                >
+                  <User className="h-5 w-5" />
+                  <span>Sign In</span>
+                </Link>
+              )}
             </div>
           </div>
 
