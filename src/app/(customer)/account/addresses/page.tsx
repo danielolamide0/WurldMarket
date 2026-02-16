@@ -143,19 +143,14 @@ function SavedAddressesContent() {
 
   return (
     <div className="min-h-screen bg-gray-50 pb-20">
-      {/* Header */}
-      <div className="bg-white border-b border-gray-100 sticky top-0 z-10">
-        <div className="max-w-3xl mx-auto px-4 py-4">
-          <Link
-            href={fromPage === 'home' ? '/' : fromPage === 'cart' ? '/cart' : fromPage === 'checkout' ? '/checkout' : '/account'}
-            className="p-2 -ml-2 rounded-xl hover:bg-gray-100 transition-colors inline-block"
-          >
-            <ArrowLeft className="h-5 w-5 text-primary" />
-          </Link>
-        </div>
-      </div>
-
-      <div className="max-w-3xl mx-auto px-4 py-6 space-y-4">
+      <div className="max-w-3xl mx-auto px-4 py-4 space-y-4">
+        {/* Back Arrow */}
+        <Link
+          href={fromPage === 'home' ? '/' : fromPage === 'cart' ? '/cart' : fromPage === 'checkout' ? '/checkout' : '/account'}
+          className="p-2 -ml-2 rounded-xl hover:bg-gray-100 transition-colors inline-block"
+        >
+          <ArrowLeft className="h-5 w-5 text-primary" />
+        </Link>
         {/* Add/Edit Form */}
         {isAdding ? (
           <Card className="p-4">

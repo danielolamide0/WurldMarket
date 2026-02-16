@@ -52,29 +52,22 @@ function SearchResults() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 py-6">
-        {/* Back Arrow */}
-        <Link
-          href="/"
-          className="inline-block p-2 -ml-2 rounded-xl hover:bg-gray-100 transition-colors mb-4"
-        >
-          <ArrowLeft className="h-5 w-5 text-primary" />
-        </Link>
+      <div className="max-w-7xl mx-auto px-4 py-4">
+        {/* Back Arrow + Filter Tabs Row */}
+        <div className="flex items-center gap-3 mb-4">
+          <Link
+            href="/"
+            className="p-2 -ml-2 rounded-xl hover:bg-gray-100 transition-colors flex-shrink-0"
+          >
+            <ArrowLeft className="h-5 w-5 text-primary" />
+          </Link>
 
-        {/* Search Query Display */}
-        {query && (
-          <div className="mb-4">
-            <h1 className="text-xl font-bold text-gray-900 capitalize">{query}</h1>
-            <p className="text-sm text-gray-500">{totalResults} results found</p>
-          </div>
-        )}
-
-        {/* Filter Tabs */}
-        {totalResults > 0 && (
-          <div className="flex gap-2 mb-6">
+          {/* Filter Tabs */}
+          {totalResults > 0 && (
+            <div className="flex gap-2 overflow-x-auto scrollbar-hide">
             <button
               onClick={() => setFilter('all')}
-              className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
+              className={`px-4 py-2 rounded-full text-sm font-medium transition-all whitespace-nowrap ${
                 filter === 'all'
                   ? 'bg-primary text-white'
                   : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
@@ -84,7 +77,7 @@ function SearchResults() {
             </button>
             <button
               onClick={() => setFilter('stores')}
-              className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all ${
+              className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all whitespace-nowrap ${
                 filter === 'stores'
                   ? 'bg-primary text-white'
                   : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
@@ -95,7 +88,7 @@ function SearchResults() {
             </button>
             <button
               onClick={() => setFilter('products')}
-              className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all ${
+              className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all whitespace-nowrap ${
                 filter === 'products'
                   ? 'bg-primary text-white'
                   : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
@@ -104,8 +97,9 @@ function SearchResults() {
               <Package className="h-4 w-4" />
               Products ({matchedProducts.length})
             </button>
-          </div>
-        )}
+            </div>
+          )}
+        </div>
 
         {totalResults === 0 ? (
           <Card className="p-12 text-center">

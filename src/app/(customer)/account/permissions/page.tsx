@@ -3,9 +3,8 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { ArrowLeft, Bell, Mail, MessageSquare, Shield } from 'lucide-react'
+import { ArrowLeft, Bell, Mail, MessageSquare } from 'lucide-react'
 import { useAuthStore } from '@/stores/authStore'
-import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 
 export default function PermissionsPage() {
@@ -34,22 +33,19 @@ export default function PermissionsPage() {
 
   return (
     <div className="min-h-screen pb-20">
-      {/* Header */}
-      <div className="bg-white border-b border-gray-100 sticky top-0 z-10">
-        <div className="max-w-3xl mx-auto px-4 py-4">
+      <div className="max-w-3xl mx-auto px-4 py-4">
+        {/* Back Arrow + Title Row */}
+        <div className="flex items-center gap-3 mb-4">
           <Link
             href="/account"
-            className="p-2 -ml-2 rounded-xl hover:bg-gray-100 transition-colors inline-block"
+            className="p-2 -ml-2 rounded-xl hover:bg-gray-100 transition-colors"
           >
             <ArrowLeft className="h-5 w-5 text-primary" />
           </Link>
         </div>
-      </div>
-
-      <div className="max-w-3xl mx-auto px-4 py-6">
 
         {/* Notifications Section */}
-        <Card className="p-6 mb-6">
+        <Card className="p-6">
           <div className="flex items-center gap-3 mb-6">
             <Bell className="h-5 w-5 text-primary" />
             <h2 className="text-lg font-semibold text-gray-900">Notifications</h2>
@@ -186,27 +182,6 @@ export default function PermissionsPage() {
             </div>
           </div>
         </Card>
-
-        {/* Save Button */}
-        <div className="flex gap-4">
-          <Button
-            onClick={() => {
-              // TODO: Save preferences to backend
-              router.push('/account')
-            }}
-            className="flex-1"
-            size="lg"
-          >
-            Save Preferences
-          </Button>
-          <Button
-            variant="outline"
-            onClick={() => router.push('/account')}
-            size="lg"
-          >
-            Cancel
-          </Button>
-        </div>
       </div>
     </div>
   )

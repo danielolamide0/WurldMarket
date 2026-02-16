@@ -78,19 +78,14 @@ export default function SettingsPage() {
 
   return (
     <div className="min-h-screen">
-      {/* Header */}
-      <div className="bg-white border-b border-gray-100 sticky top-0 z-10">
-        <div className="max-w-3xl mx-auto px-4 py-4">
-          <Link
-            href="/account"
-            className="p-2 -ml-2 rounded-xl hover:bg-gray-100 transition-colors inline-block"
-          >
-            <ArrowLeft className="h-5 w-5 text-primary" />
-          </Link>
-        </div>
-      </div>
-
-      <div className="max-w-3xl mx-auto px-4 py-6">
+      <div className="max-w-3xl mx-auto px-4 py-4">
+        {/* Back Arrow */}
+        <Link
+          href="/account"
+          className="p-2 -ml-2 rounded-xl hover:bg-gray-100 transition-colors inline-block mb-4"
+        >
+          <ArrowLeft className="h-5 w-5 text-primary" />
+        </Link>
         {/* Name (Uneditable) */}
         <Card className="mb-6">
           <div className="p-4">
