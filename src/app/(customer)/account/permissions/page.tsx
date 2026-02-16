@@ -34,22 +34,19 @@ export default function PermissionsPage() {
 
   return (
     <div className="min-h-screen pb-20">
-      <div className="max-w-3xl mx-auto px-4 py-6">
-        {/* Header */}
-        <div className="mb-6">
+      {/* Header */}
+      <div className="bg-white border-b border-gray-100 sticky top-0 z-10">
+        <div className="max-w-3xl mx-auto px-4 py-4">
           <Link
             href="/account"
-            className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-4"
+            className="p-2 -ml-2 rounded-xl hover:bg-gray-100 transition-colors inline-block"
           >
-            <ArrowLeft className="h-4 w-4" />
-            Back to Account
+            <ArrowLeft className="h-5 w-5 text-primary" />
           </Link>
-          <div className="flex items-center gap-3 mb-2">
-            <Shield className="h-6 w-6 text-primary" />
-            <h1 className="text-2xl font-bold text-gray-900">Permissions</h1>
-          </div>
-          <p className="text-gray-600">Manage your notification and privacy preferences</p>
         </div>
+      </div>
+
+      <div className="max-w-3xl mx-auto px-4 py-6">
 
         {/* Notifications Section */}
         <Card className="p-6 mb-6">

@@ -144,17 +144,14 @@ function SavedAddressesContent() {
   return (
     <div className="min-h-screen bg-gray-50 pb-20">
       {/* Header */}
-      <div className="bg-white border-b border-gray-100">
-        <div className="max-w-3xl mx-auto px-4 py-6">
+      <div className="bg-white border-b border-gray-100 sticky top-0 z-10">
+        <div className="max-w-3xl mx-auto px-4 py-4">
           <Link
             href={fromPage === 'home' ? '/' : fromPage === 'cart' ? '/cart' : fromPage === 'checkout' ? '/checkout' : '/account'}
-            className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-4"
+            className="p-2 -ml-2 rounded-xl hover:bg-gray-100 transition-colors inline-block"
           >
-            <ArrowLeft className="h-4 w-4" />
-            {fromPage === 'home' ? 'Back to Home' : fromPage === 'cart' ? 'Back to Cart' : fromPage === 'checkout' ? 'Back to Checkout' : 'Back to Account'}
+            <ArrowLeft className="h-5 w-5 text-primary" />
           </Link>
-          <h1 className="text-2xl font-bold text-gray-900">Saved Addresses</h1>
-          <p className="text-gray-600">Manage your delivery addresses</p>
         </div>
       </div>
 
