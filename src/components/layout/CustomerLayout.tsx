@@ -3,6 +3,7 @@
 import { Header } from './Header'
 import { MobileNav } from './MobileNav'
 import { Footer } from './Footer'
+import { FloatingCart } from './FloatingCart'
 import { CartDrawer } from '@/components/cart/CartDrawer'
 
 interface CustomerLayoutProps {
@@ -18,6 +19,7 @@ export function CustomerLayout({ children }: CustomerLayoutProps) {
       </main>
       <Footer />
       <MobileNav />
+      <FloatingCart />
       <CartDrawer />
     </div>
   )

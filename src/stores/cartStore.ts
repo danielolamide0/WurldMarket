@@ -30,8 +30,9 @@ export const useCartStore = create<CartState>()(
       userId: null,
       isLoading: false,
 
-      setUserId: (userId: string | null) => {
+      setUserId: async (userId: string | null) => {
         const currentUserId = get().userId
+        const guestItems = get().items // Save current items before any changes
 
         // If user is switching accounts, clear cart and fetch new user's cart
         if (currentUserId && userId && currentUserId !== userId) {
@@ -47,8 +48,42 @@ export const useCartStore = create<CartState>()(
         // If logging out, clear cart
         if (!userId) {
           set({ items: [] })
+        } else if (!currentUserId && guestItems.length > 0) {
+          // If logging in with guest items, merge them with user's existing cart
+          set({ isLoading: true })
+          try {
+            const response = await fetch(`/api/cart?userId=${userId}`)
+            const data = await response.json()
+            const existingItems = data.cart?.items || []
+
+            // Merge guest items with existing user cart
+            const mergedItems = [...existingItems]
+            for (const guestItem of guestItems) {
+              const existingIndex = mergedItems.findIndex(
+                (item) => item.productId === guestItem.productId
+              )
+              if (existingIndex >= 0) {
+                // Add quantities if product already exists
+                mergedItems[existingIndex].quantity = Math.min(
+                  mergedItems[existingIndex].quantity + guestItem.quantity,
+                  guestItem.stock
+                )
+              } else {
+                // Add new item
+                mergedItems.push(guestItem)
+              }
+            }
+
+            set({ items: mergedItems, isLoading: false })
+            // Sync merged cart to database
+            setTimeout(() => get().syncCart(), 0)
+          } catch {
+            // If fetch fails, keep guest items
+            set({ isLoading: false })
+            setTimeout(() => get().syncCart(), 0)
+          }
         } else if (!currentUserId) {
-          // If logging in, fetch cart from DB
+          // If logging in without guest items, just fetch user's cart
           get().fetchCart(userId)
         }
       },
