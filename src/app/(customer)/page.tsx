@@ -273,9 +273,9 @@ export default function HomePage() {
                 <Link
                   key={cat.id}
                   href={`/category/${cat.slug}`}
-                  className="flex flex-col items-center gap-1 min-w-[80px] flex-shrink-0"
+                  className="flex flex-col items-center gap-1 min-w-[80px] flex-shrink-0 hover:scale-110 transition-transform duration-200"
                 >
-                  <div className="w-12 h-12 bg-gray-100 rounded-xl overflow-hidden hover:bg-gray-200 transition-colors">
+                  <div className="w-12 h-12 bg-gray-100 rounded-xl overflow-hidden hover:bg-gray-200 transition-colors hover:shadow-md">
                     <img
                       src={cat.image}
                       alt={cat.name}
@@ -299,9 +299,9 @@ export default function HomePage() {
               <Link
                 key={cuisine.id}
                 href={cuisine.href}
-                className="flex flex-col items-center gap-1 min-w-[60px] md:min-w-0 md:flex-1 md:max-w-[120px]"
+                className="flex flex-col items-center gap-1 min-w-[60px] md:min-w-0 md:flex-1 md:max-w-[120px] hover:scale-110 transition-transform duration-200"
               >
-                <div className="w-14 h-14 rounded-full overflow-hidden border-2 border-gray-100 hover:border-primary transition-colors">
+                <div className="w-14 h-14 rounded-full overflow-hidden border-2 border-gray-100 hover:border-primary hover:shadow-lg transition-all">
                   <img
                     src={cuisine.image}
                     alt={cuisine.name}
@@ -368,10 +368,10 @@ export default function HomePage() {
                 <Link
                   key={store.id}
                   href={`/stores/${store.id}`}
-                  className="flex-shrink-0 w-20 md:flex-1 md:max-w-[140px]"
+                  className="flex-shrink-0 w-20 md:flex-1 md:max-w-[140px] hover:scale-110 transition-transform duration-200"
                 >
                   <div className="flex flex-col items-center">
-                    <div className="w-16 h-16 bg-white border border-gray-200 rounded-xl mb-1 overflow-hidden flex items-center justify-center">
+                    <div className="w-16 h-16 bg-white border border-gray-200 rounded-xl mb-1 overflow-hidden flex items-center justify-center hover:border-primary hover:shadow-lg transition-all">
                       {store.image ? (
                       <img
                         src={store.image}
