@@ -264,25 +264,25 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen bg-white">
-      {/* Categories Row - Compact */}
+      {/* Categories Row */}
       <section className="border-b border-gray-100">
-        <div className="max-w-7xl mx-auto px-4 py-3">
-          <div ref={categoriesRef} className="flex gap-3 overflow-x-auto scrollbar-hide">
+        <div className="max-w-7xl mx-auto px-4 py-3 md:py-6">
+          <div ref={categoriesRef} className="flex gap-3 md:gap-6 overflow-x-auto scrollbar-hide">
             {CATEGORIES.map((cat) => {
     return (
                 <Link
                   key={cat.id}
                   href={`/category/${cat.slug}`}
-                  className="flex flex-col items-center gap-1 min-w-[80px] flex-shrink-0 hover:scale-110 transition-transform duration-200"
+                  className="flex flex-col items-center gap-1 md:gap-2 min-w-[80px] md:min-w-[100px] flex-shrink-0 hover:scale-110 transition-transform duration-200"
                 >
-                  <div className="w-12 h-12 bg-gray-100 rounded-xl overflow-hidden hover:bg-gray-200 transition-colors hover:shadow-md">
+                  <div className="w-12 h-12 md:w-24 md:h-24 bg-gray-100 rounded-xl md:rounded-2xl overflow-hidden hover:bg-gray-200 transition-colors hover:shadow-md">
                     <img
                       src={cat.image}
                       alt={cat.name}
                       className="w-full h-full object-cover"
                     />
                   </div>
-                  <span className="text-[10px] text-gray-600 whitespace-nowrap text-center leading-tight">{cat.name}</span>
+                  <span className="text-[10px] md:text-sm text-gray-600 whitespace-nowrap text-center leading-tight">{cat.name}</span>
                 </Link>
               )
             })}
@@ -290,25 +290,25 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Find Your Flavour - Compact */}
-      <section className="py-3">
+      {/* Find Your Flavour */}
+      <section className="py-3 md:py-6">
         <div className="max-w-7xl mx-auto px-4">
-          <h2 className="text-base font-bold text-gray-900 mb-2">Find your flavour</h2>
-          <div ref={cuisinesRef} className="flex gap-3 overflow-x-auto scrollbar-hide md:justify-between">
+          <h2 className="text-base md:text-lg font-bold text-gray-900 mb-2 md:mb-4">Find your flavour</h2>
+          <div ref={cuisinesRef} className="flex gap-3 md:gap-6 overflow-x-auto scrollbar-hide md:justify-between">
             {CUISINES.map((cuisine) => (
               <Link
                 key={cuisine.id}
                 href={cuisine.href}
-                className="flex flex-col items-center gap-1 min-w-[60px] md:min-w-0 md:flex-1 md:max-w-[120px] hover:scale-110 transition-transform duration-200"
+                className="flex flex-col items-center gap-1 md:gap-2 min-w-[60px] md:min-w-0 md:flex-1 md:max-w-[140px] hover:scale-110 transition-transform duration-200"
               >
-                <div className="w-14 h-14 rounded-full overflow-hidden border-2 border-gray-100 hover:border-primary hover:shadow-lg transition-all">
+                <div className="w-14 h-14 md:w-24 md:h-24 rounded-full overflow-hidden border-2 border-gray-100 hover:border-primary hover:shadow-lg transition-all">
                   <img
                     src={cuisine.image}
                     alt={cuisine.name}
                     className="w-full h-full object-cover"
                   />
               </div>
-                <span className="text-xs text-gray-700 font-medium">{cuisine.name}</span>
+                <span className="text-xs md:text-sm text-gray-700 font-medium">{cuisine.name}</span>
               </Link>
             ))}
           </div>
@@ -337,11 +337,11 @@ export default function HomePage() {
       </section>
       )}
 
-      {/* Shops in Your Area - Compact */}
-      <section className="py-3">
+      {/* Shops in Your Area */}
+      <section className="py-3 md:py-6">
         <div className="max-w-7xl mx-auto px-4">
-          <div className="flex items-center justify-between mb-2">
-            <h2 className="text-base font-bold text-gray-900">Shops in your area</h2>
+          <div className="flex items-center justify-between mb-2 md:mb-4">
+            <h2 className="text-base md:text-lg font-bold text-gray-900">Shops in your area</h2>
             <Link
               href="/stores"
               className="flex items-center gap-1.5 px-3 py-1.5 bg-primary text-white rounded-full hover:bg-primary-dark transition-colors"
@@ -350,7 +350,7 @@ export default function HomePage() {
               <span className="text-sm font-medium">STORE FINDER</span>
             </Link>
           </div>
-          <div ref={storesRef} className="flex gap-3 overflow-x-auto scrollbar-hide pb-1 md:justify-between">
+          <div ref={storesRef} className="flex gap-3 md:gap-6 overflow-x-auto scrollbar-hide pb-1 md:justify-between">
             {sortedStores.map((store) => {
               // Calculate delivery time if user has primary address
               let deliveryTime: string | null = null
@@ -368,10 +368,10 @@ export default function HomePage() {
                 <Link
                   key={store.id}
                   href={`/stores/${store.id}`}
-                  className="flex-shrink-0 w-20 md:flex-1 md:max-w-[140px] hover:scale-110 transition-transform duration-200"
+                  className="flex-shrink-0 w-20 md:w-[100px] md:flex-1 md:max-w-[140px] hover:scale-110 transition-transform duration-200"
                 >
                   <div className="flex flex-col items-center">
-                    <div className="w-16 h-16 bg-white border border-gray-200 rounded-xl mb-1 overflow-hidden flex items-center justify-center hover:border-primary hover:shadow-lg transition-all">
+                    <div className="w-16 h-16 md:w-24 md:h-24 bg-white border border-gray-200 rounded-xl md:rounded-2xl mb-1 md:mb-2 overflow-hidden flex items-center justify-center hover:border-primary hover:shadow-lg transition-all">
                       {store.image ? (
                       <img
                         src={store.image}
@@ -379,12 +379,12 @@ export default function HomePage() {
                         className="w-full h-full object-cover"
                       />
                       ) : (
-                        <ShoppingBag className="h-6 w-6 text-gray-400" />
+                        <ShoppingBag className="h-6 w-6 md:h-8 md:w-8 text-gray-400" />
                       )}
                     </div>
-                    <p className="text-xs font-medium text-gray-900 truncate w-full text-center">{store.name}</p>
+                    <p className="text-xs md:text-sm font-medium text-gray-900 truncate w-full text-center">{store.name}</p>
                     {deliveryTime && (
-                      <p className="text-[10px] text-gray-500">{deliveryTime}</p>
+                      <p className="text-[10px] md:text-xs text-gray-500">{deliveryTime}</p>
                     )}
                     </div>
                 </Link>
