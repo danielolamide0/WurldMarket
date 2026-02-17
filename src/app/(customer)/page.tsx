@@ -267,7 +267,7 @@ export default function HomePage() {
       {/* Categories Row */}
       <section className="border-b border-gray-100">
         <div className="max-w-7xl mx-auto px-4 py-3 md:py-6">
-          <div ref={categoriesRef} className="flex gap-3 md:gap-6 overflow-x-auto scrollbar-hide py-2">
+          <div ref={categoriesRef} className="flex gap-3 md:gap-6 overflow-x-auto scrollbar-hide py-2 px-2 -mx-2">
             {CATEGORIES.map((cat) => {
     return (
                 <Link
@@ -294,7 +294,7 @@ export default function HomePage() {
       <section className="py-3 md:py-6">
         <div className="max-w-7xl mx-auto px-4">
           <h2 className="text-base md:text-lg font-bold text-gray-900 mb-2 md:mb-4">Find your flavour</h2>
-          <div ref={cuisinesRef} className="flex gap-3 md:gap-6 overflow-x-auto scrollbar-hide py-2 md:justify-between">
+          <div ref={cuisinesRef} className="flex gap-3 md:gap-6 overflow-x-auto scrollbar-hide py-2 px-2 -mx-2 md:justify-between">
             {CUISINES.map((cuisine) => (
               <Link
                 key={cuisine.id}
@@ -350,7 +350,7 @@ export default function HomePage() {
               <span className="text-sm font-medium">STORE FINDER</span>
             </Link>
           </div>
-          <div ref={storesRef} className="flex gap-3 md:gap-6 overflow-x-auto scrollbar-hide py-2 md:justify-between">
+          <div ref={storesRef} className="flex gap-3 md:gap-6 overflow-x-auto scrollbar-hide py-2 px-2 -mx-2 md:justify-between">
             {sortedStores.map((store) => {
               // Calculate delivery time if user has primary address
               let deliveryTime: string | null = null
