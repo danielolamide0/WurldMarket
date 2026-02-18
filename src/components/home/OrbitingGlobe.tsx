@@ -174,9 +174,10 @@ export function OrbitingGlobe() {
           onTouchMove={handleTouchMove}
           onTouchEnd={handleTouchEnd}
         >
-          {/* Up arrow - top left */}
+          {/* Up arrow - above "Find Your Flavour" text */}
           <button
-            className="absolute top-0 left-0 z-40 p-2 select-none"
+            className="absolute z-40 p-2 select-none"
+            style={{ top: '10%', left: '20%' }}
             style={{ WebkitTouchCallout: 'none', WebkitUserSelect: 'none', touchAction: 'none' }}
             onMouseDown={handleButtonDown}
             onMouseUp={handleButtonUp}
