@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, useCallback } from 'react'
 import Link from 'next/link'
 
 // Cuisine types for the orbit
@@ -19,14 +19,18 @@ const CUISINES = [
 export function OrbitingGlobe() {
   const [rotation, setRotation] = useState(0)
   const [isDragging, setIsDragging] = useState(false)
+  const [isButtonPressed, setIsButtonPressed] = useState(false)
+  const [buttonDirection, setButtonDirection] = useState<'up' | 'down' | null>(null)
   const [startX, setStartX] = useState(0)
   const [startRotation, setStartRotation] = useState(0)
   const containerRef = useRef<HTMLDivElement>(null)
   const animationRef = useRef<number | null>(null)
+  const buttonAnimationRef = useRef<number | null>(null)
+  const resumeTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
-  // Auto-rotate when not dragging
+  // Auto-rotate when not dragging and not using buttons
   useEffect(() => {
-    if (!isDragging) {
+    if (!isDragging && !isButtonPressed) {
       const animate = () => {
         setRotation(prev => (prev + 0.3) % 360)
         animationRef.current = requestAnimationFrame(animate)
@@ -38,7 +42,42 @@ export function OrbitingGlobe() {
         cancelAnimationFrame(animationRef.current)
       }
     }
-  }, [isDragging])
+  }, [isDragging, isButtonPressed])
+
+  // Button press animation
+  useEffect(() => {
+    if (isButtonPressed && buttonDirection) {
+      const animate = () => {
+        // UP arrow = anticlockwise (decrease rotation), DOWN arrow = clockwise (increase rotation)
+        const speed = buttonDirection === 'up' ? -1.5 : 1.5
+        setRotation(prev => (prev + speed + 360) % 360)
+        buttonAnimationRef.current = requestAnimationFrame(animate)
+      }
+      buttonAnimationRef.current = requestAnimationFrame(animate)
+    }
+    return () => {
+      if (buttonAnimationRef.current) {
+        cancelAnimationFrame(buttonAnimationRef.current)
+      }
+    }
+  }, [isButtonPressed, buttonDirection])
+
+  const handleButtonDown = useCallback((direction: 'up' | 'down') => {
+    // Clear any pending resume timeout
+    if (resumeTimeoutRef.current) {
+      clearTimeout(resumeTimeoutRef.current)
+      resumeTimeoutRef.current = null
+    }
+    setIsButtonPressed(true)
+    setButtonDirection(direction)
+  }, [])
+
+  const handleButtonUp = useCallback(() => {
+    setIsButtonPressed(false)
+    setButtonDirection(null)
+    // Resume auto-rotation after 3 seconds - but we need to keep isButtonPressed true
+    // Actually, we just let the useEffect handle it since isButtonPressed becomes false
+  }, [])
 
   const handleMouseDown = (e: React.MouseEvent) => {
     setIsDragging(true)
@@ -49,7 +88,8 @@ export function OrbitingGlobe() {
   const handleMouseMove = (e: React.MouseEvent) => {
     if (!isDragging) return
     const deltaX = e.clientX - startX
-    setRotation((startRotation + deltaX * 0.5) % 360)
+    // Flipped direction: positive deltaX (swipe right) = increase rotation (clockwise)
+    setRotation((startRotation + deltaX * 0.5 + 360) % 360)
   }
 
   const handleMouseUp = () => {
@@ -57,18 +97,24 @@ export function OrbitingGlobe() {
   }
 
   const handleTouchStart = (e: React.TouchEvent) => {
+    // Prevent page scrolling when interacting with globe
+    e.preventDefault()
     setIsDragging(true)
     setStartX(e.touches[0].clientX)
     setStartRotation(rotation)
   }
 
   const handleTouchMove = (e: React.TouchEvent) => {
+    // Prevent page scrolling
+    e.preventDefault()
     if (!isDragging) return
     const deltaX = e.touches[0].clientX - startX
-    setRotation((startRotation + deltaX * 0.5) % 360)
+    // Flipped direction: positive deltaX (swipe right) = increase rotation (clockwise)
+    setRotation((startRotation + deltaX * 0.5 + 360) % 360)
   }
 
-  const handleTouchEnd = () => {
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    e.preventDefault()
     setIsDragging(false)
   }
 
@@ -120,7 +166,7 @@ export function OrbitingGlobe() {
 
         <div
           ref={containerRef}
-          className="relative mx-auto cursor-grab active:cursor-grabbing select-none"
+          className="relative mx-auto select-none touch-none"
           style={{
             height: '260px',
             maxWidth: '400px',
@@ -133,21 +179,39 @@ export function OrbitingGlobe() {
           onTouchMove={handleTouchMove}
           onTouchEnd={handleTouchEnd}
         >
-          {/* Up arrow - top left */}
-          <img
-            src="/arrow-up.png"
-            alt=""
-            className="absolute top-2 left-4 w-12 h-auto opacity-60"
-            draggable={false}
-          />
+          {/* Up arrow - top left (anticlockwise) */}
+          <button
+            className="absolute top-2 left-4 z-40 p-2"
+            onMouseDown={() => handleButtonDown('up')}
+            onMouseUp={handleButtonUp}
+            onMouseLeave={handleButtonUp}
+            onTouchStart={(e) => { e.preventDefault(); handleButtonDown('up'); }}
+            onTouchEnd={(e) => { e.preventDefault(); handleButtonUp(); }}
+          >
+            <img
+              src="/arrow-up.png"
+              alt="Scroll up"
+              className={`w-12 h-auto transition-opacity ${isButtonPressed && buttonDirection === 'up' ? 'opacity-100' : 'opacity-60'}`}
+              draggable={false}
+            />
+          </button>
 
-          {/* Down arrow - bottom right */}
-          <img
-            src="/arrow-down.png"
-            alt=""
-            className="absolute bottom-4 right-4 w-12 h-auto opacity-60"
-            draggable={false}
-          />
+          {/* Down arrow - bottom right (clockwise) */}
+          <button
+            className="absolute bottom-4 right-4 z-40 p-2"
+            onMouseDown={() => handleButtonDown('down')}
+            onMouseUp={handleButtonUp}
+            onMouseLeave={handleButtonUp}
+            onTouchStart={(e) => { e.preventDefault(); handleButtonDown('down'); }}
+            onTouchEnd={(e) => { e.preventDefault(); handleButtonUp(); }}
+          >
+            <img
+              src="/arrow-down.png"
+              alt="Scroll down"
+              className={`w-12 h-auto transition-opacity ${isButtonPressed && buttonDirection === 'down' ? 'opacity-100' : 'opacity-60'}`}
+              draggable={false}
+            />
+          </button>
 
           {/* Globe in center */}
           <div
