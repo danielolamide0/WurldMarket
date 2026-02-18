@@ -194,13 +194,12 @@ export function OrbitingGlobe() {
             />
           </button>
 
-          {/* Find Your Flavour - vertical text on left, aligned with globe center */}
+          {/* Find Your Flavour - horizontal, left side, aligned with globe center */}
           <div
             className="absolute left-0 z-10"
             style={{
               top: '50%',
-              transform: 'translateY(-50%) rotate(-90deg)',
-              transformOrigin: 'center center',
+              transform: 'translateY(-50%)',
             }}
           >
             <img
