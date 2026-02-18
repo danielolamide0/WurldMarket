@@ -72,27 +72,32 @@ export function OrbitingGlobe() {
     setIsDragging(false)
   }
 
-  // Calculate position for each cuisine on the tilted elliptical orbit
+  // Calculate position for each cuisine on 45-degree tilted elliptical orbit
   const getOrbitPosition = (index: number, total: number) => {
     const angleOffset = (360 / total) * index
     const angle = ((rotation + angleOffset) % 360) * (Math.PI / 180)
 
-    // Ellipse parameters (wider than tall for tilted effect)
-    const radiusX = 140 // horizontal radius (percentage-based for responsiveness)
-    const radiusY = 50  // vertical radius (creates the tilt)
+    // Ellipse parameters
+    const radiusX = 180 // horizontal radius
+    const radiusY = 90  // vertical radius
 
-    // Calculate position
-    const x = Math.cos(angle) * radiusX
-    const y = Math.sin(angle) * radiusY
+    // Calculate base position on ellipse
+    const baseX = Math.cos(angle) * radiusX
+    const baseY = Math.sin(angle) * radiusY
+
+    // Apply 45-degree tilt rotation to the orbit
+    const tiltAngle = 45 * (Math.PI / 180)
+    const x = baseX * Math.cos(tiltAngle) - baseY * Math.sin(tiltAngle)
+    const y = baseX * Math.sin(tiltAngle) + baseY * Math.cos(tiltAngle)
 
     // Z-depth for 3D effect (items at back should be behind globe)
     const z = Math.sin(angle)
 
     // Scale based on depth (smaller when at back)
-    const scale = 0.6 + (z + 1) * 0.2
+    const scale = 0.65 + (z + 1) * 0.2
 
     // Opacity - fade out when going behind globe
-    const opacity = z < -0.3 ? 0 : z < 0 ? (z + 0.3) / 0.3 : 1
+    const opacity = z < -0.2 ? 0 : z < 0.1 ? (z + 0.2) / 0.3 : 1
 
     // Z-index - items in front should be above globe
     const zIndex = z > 0 ? 30 : 5
@@ -101,9 +106,9 @@ export function OrbitingGlobe() {
   }
 
   return (
-    <section className="py-6 md:py-10 overflow-hidden">
+    <section className="py-1 md:py-2 overflow-hidden">
       <div className="max-w-7xl mx-auto px-4">
-        <h2 className="text-base md:text-lg font-bold text-gray-900 mb-4 md:mb-6 text-center">
+        <h2 className="text-base md:text-lg font-bold text-gray-900 mb-0 text-center">
           Find your flavour
         </h2>
 
@@ -111,7 +116,7 @@ export function OrbitingGlobe() {
           ref={containerRef}
           className="relative mx-auto cursor-grab active:cursor-grabbing select-none"
           style={{
-            height: '280px',
+            height: '240px',
             maxWidth: '600px',
           }}
           onMouseDown={handleMouseDown}
@@ -122,12 +127,12 @@ export function OrbitingGlobe() {
           onTouchMove={handleTouchMove}
           onTouchEnd={handleTouchEnd}
         >
-          {/* Globe in center */}
+          {/* Globe in center - doubled size */}
           <div
             className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-20"
             style={{
-              width: 'clamp(100px, 25vw, 180px)',
-              height: 'clamp(100px, 25vw, 180px)',
+              width: 'clamp(160px, 40vw, 300px)',
+              height: 'clamp(160px, 40vw, 300px)',
             }}
           >
             <img
@@ -180,8 +185,8 @@ export function OrbitingGlobe() {
         </div>
 
         {/* Drag hint */}
-        <p className="text-center text-xs text-gray-400 mt-2">
-          Drag to explore cuisines
+        <p className="text-center text-xs text-gray-400 -mt-2">
+          Drag to explore
         </p>
       </div>
     </section>
