@@ -72,52 +72,58 @@ export function OrbitingGlobe() {
     setIsDragging(false)
   }
 
-  // Calculate position for each cuisine on 45-degree tilted elliptical orbit
+  // Calculate position for each cuisine - orbit from top-right to bottom-left
   const getOrbitPosition = (index: number, total: number) => {
     const angleOffset = (360 / total) * index
     const angle = ((rotation + angleOffset) % 360) * (Math.PI / 180)
 
     // Ellipse parameters
-    const radiusX = 180 // horizontal radius
-    const radiusY = 90  // vertical radius
+    const radiusX = 160
+    const radiusY = 80
 
     // Calculate base position on ellipse
     const baseX = Math.cos(angle) * radiusX
     const baseY = Math.sin(angle) * radiusY
 
-    // Apply 45-degree tilt rotation to the orbit
-    const tiltAngle = 45 * (Math.PI / 180)
+    // Apply -45 degree tilt (from top-right to bottom-left)
+    const tiltAngle = -45 * (Math.PI / 180)
     const x = baseX * Math.cos(tiltAngle) - baseY * Math.sin(tiltAngle)
     const y = baseX * Math.sin(tiltAngle) + baseY * Math.cos(tiltAngle)
 
-    // Z-depth for 3D effect (items at back should be behind globe)
+    // Z-depth for 3D effect
     const z = Math.sin(angle)
 
-    // Scale based on depth (smaller when at back)
+    // Scale based on depth
     const scale = 0.65 + (z + 1) * 0.2
 
     // Opacity - fade out when going behind globe
     const opacity = z < -0.2 ? 0 : z < 0.1 ? (z + 0.2) / 0.3 : 1
 
-    // Z-index - items in front should be above globe
+    // Z-index
     const zIndex = z > 0 ? 30 : 5
 
     return { x, y, scale, opacity, zIndex, z }
   }
 
   return (
-    <section className="py-1 md:py-2 overflow-hidden">
+    <section className="py-1 overflow-hidden md:hidden">
       <div className="max-w-7xl mx-auto px-4">
-        <h2 className="text-base md:text-lg font-bold text-gray-900 mb-0 text-center">
-          Find your flavour
-        </h2>
+        {/* Find Your Flavour title image */}
+        <div className="flex justify-center mb-1">
+          <img
+            src="/find-your-flavour.png"
+            alt="Find Your Flavour"
+            className="h-5"
+            draggable={false}
+          />
+        </div>
 
         <div
           ref={containerRef}
           className="relative mx-auto cursor-grab active:cursor-grabbing select-none"
           style={{
-            height: '240px',
-            maxWidth: '600px',
+            height: '260px',
+            maxWidth: '400px',
           }}
           onMouseDown={handleMouseDown}
           onMouseMove={handleMouseMove}
@@ -127,12 +133,28 @@ export function OrbitingGlobe() {
           onTouchMove={handleTouchMove}
           onTouchEnd={handleTouchEnd}
         >
-          {/* Globe in center - doubled size */}
+          {/* Up arrow - top left */}
+          <img
+            src="/arrow-up.png"
+            alt=""
+            className="absolute top-2 left-4 w-12 h-auto opacity-60"
+            draggable={false}
+          />
+
+          {/* Down arrow - bottom right */}
+          <img
+            src="/arrow-down.png"
+            alt=""
+            className="absolute bottom-4 right-4 w-12 h-auto opacity-60"
+            draggable={false}
+          />
+
+          {/* Globe in center */}
           <div
             className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-20"
             style={{
-              width: 'clamp(160px, 40vw, 300px)',
-              height: 'clamp(160px, 40vw, 300px)',
+              width: '150px',
+              height: '150px',
             }}
           >
             <img
@@ -145,7 +167,7 @@ export function OrbitingGlobe() {
 
           {/* Orbiting cuisines */}
           {CUISINES.map((cuisine, index) => {
-            const { x, y, scale, opacity, zIndex, z } = getOrbitPosition(index, CUISINES.length)
+            const { x, y, scale, opacity, zIndex } = getOrbitPosition(index, CUISINES.length)
 
             return (
               <Link
@@ -164,10 +186,8 @@ export function OrbitingGlobe() {
                   }
                 }}
               >
-                <div className="flex flex-col items-center gap-1">
-                  <div
-                    className="w-12 h-12 md:w-16 md:h-16 rounded-full overflow-hidden border-2 border-gray-200 bg-white shadow-lg hover:border-primary hover:scale-110 transition-all"
-                  >
+                <div className="flex flex-col items-center gap-0.5">
+                  <div className="w-14 h-14 rounded-full overflow-hidden border-2 border-gray-200 bg-white shadow-lg">
                     <img
                       src={cuisine.image}
                       alt={cuisine.name}
@@ -175,7 +195,7 @@ export function OrbitingGlobe() {
                       draggable={false}
                     />
                   </div>
-                  <span className="text-xs md:text-sm font-medium text-gray-700 whitespace-nowrap bg-white/80 px-2 py-0.5 rounded-full">
+                  <span className="text-xs font-medium text-gray-700 whitespace-nowrap">
                     {cuisine.name}
                   </span>
                 </div>
@@ -183,11 +203,6 @@ export function OrbitingGlobe() {
             )
           })}
         </div>
-
-        {/* Drag hint */}
-        <p className="text-center text-xs text-gray-400 -mt-2">
-          Drag to explore
-        </p>
       </div>
     </section>
   )

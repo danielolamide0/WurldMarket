@@ -364,8 +364,43 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Find Your Flavour - Orbiting Globe */}
+      {/* Find Your Flavour - Orbiting Globe (Mobile only) */}
       <OrbitingGlobe />
+
+      {/* Find Your Flavour - Horizontal scroll (Desktop only) */}
+      <section className="hidden md:block py-6">
+        <div className="max-w-7xl mx-auto px-4">
+          <h2 className="text-lg font-bold text-gray-900 mb-4">Find your flavour</h2>
+          <div className="flex gap-6 overflow-x-auto scrollbar-hide py-2 px-2 -mx-2 justify-between">
+            {[
+              { id: 'chinese', name: 'Chinese', image: 'https://images.unsplash.com/photo-1563245372-f21724e3856d?w=200', href: '/search?q=chinese' },
+              { id: 'african', name: 'African', image: 'https://images.unsplash.com/photo-1604329760661-e71dc83f8f26?w=200', href: '/search?q=african' },
+              { id: 'nigerian', name: 'Nigerian', image: 'https://images.unsplash.com/photo-1604329760661-e71dc83f8f26?w=200', href: '/search?q=nigerian' },
+              { id: 'ghanaian', name: 'Ghanaian', image: 'https://images.unsplash.com/photo-1604329760661-e71dc83f8f26?w=200', href: '/search?q=ghanaian' },
+              { id: 'pakistani', name: 'Pakistani', image: 'https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=200', href: '/search?q=pakistani' },
+              { id: 'indian', name: 'Indian', image: 'https://images.unsplash.com/photo-1585937421612-70a008356fbe?w=200', href: '/search?q=indian' },
+              { id: 'caribbean', name: 'Caribbean', image: 'https://images.unsplash.com/photo-1534422298391-e4f8c172dddb?w=200', href: '/search?q=caribbean' },
+              { id: 'persian', name: 'Persian', image: 'https://images.unsplash.com/photo-1567188040759-fb8a883dc6d8?w=200', href: '/search?q=persian' },
+              { id: 'turkish', name: 'Turkish', image: 'https://images.unsplash.com/photo-1601050690597-df0568f70950?w=200', href: '/search?q=turkish' },
+            ].map((cuisine) => (
+              <Link
+                key={cuisine.id}
+                href={cuisine.href}
+                className="flex flex-col items-center gap-2 flex-1 max-w-[140px] hover:scale-110 transition-transform duration-200"
+              >
+                <div className="w-24 h-24 rounded-full overflow-hidden border-2 border-gray-100 hover:border-primary hover:shadow-lg transition-all">
+                  <img
+                    src={cuisine.image}
+                    alt={cuisine.name}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <span className="text-sm text-gray-700 font-medium">{cuisine.name}</span>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
 
       {/* Hello Card - Right after Find your flavour */}
       {isAuthenticated && user?.role === 'customer' && (
