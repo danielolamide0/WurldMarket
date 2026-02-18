@@ -73,7 +73,7 @@ function SearchResults() {
                   : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
               }`}
             >
-              All ({totalResults})
+              All
             </button>
             <button
               onClick={() => setFilter('stores')}
@@ -84,7 +84,7 @@ function SearchResults() {
               }`}
             >
               <Store className="h-4 w-4" />
-              Stores ({matchedStores.length})
+              Stores
             </button>
             <button
               onClick={() => setFilter('products')}
@@ -95,7 +95,7 @@ function SearchResults() {
               }`}
             >
               <Package className="h-4 w-4" />
-              Products ({matchedProducts.length})
+              Products
             </button>
             </div>
           )}
@@ -117,11 +117,6 @@ function SearchResults() {
             {/* Stores Section */}
             {showStores && matchedStores.length > 0 && (
               <section>
-                {filter === 'all' && (
-                  <h2 className="text-lg font-semibold text-gray-900 mb-4">
-                    Stores ({matchedStores.length})
-                  </h2>
-                )}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                   {matchedStores.map((store) => (
                     <Link key={store.id} href={`/stores/${store.id}`}>
@@ -153,11 +148,6 @@ function SearchResults() {
             {/* Products Section */}
             {showProducts && matchedProducts.length > 0 && (
               <section>
-                {filter === 'all' && (
-                  <h2 className="text-lg font-semibold text-gray-900 mb-4">
-                    Products ({matchedProducts.length})
-                  </h2>
-                )}
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
                   {matchedProducts.map((product) => (
                     <ProductCard key={product.id} product={product} />

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { MapPin, Clock, ExternalLink, ChevronRight, Loader2 } from 'lucide-react'
+import { MapPin, Clock, ExternalLink, ChevronRight, Loader2, ArrowLeft } from 'lucide-react'
 import { useVendorStore } from '@/stores/vendorStore'
 import { StoreLocation } from '@/types'
 import { StoreMap } from '@/components/stores/StoreMap'
@@ -89,15 +89,14 @@ export default function StoresPage() {
 
   return (
     <div className="min-h-screen">
-      {/* Header */}
-      <div className="bg-white border-b border-gray-100">
-        <div className="max-w-7xl mx-auto px-4 py-6">
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">Find Stores Near You</h1>
-          <p className="text-gray-600">Discover international food stores in your area</p>
-        </div>
-      </div>
-
-      <div className="max-w-7xl mx-auto px-4 py-6">
+      <div className="max-w-7xl mx-auto px-4 py-4">
+        {/* Back Arrow */}
+        <Link
+          href="/"
+          className="p-2 -ml-2 rounded-xl hover:bg-gray-100 transition-colors inline-block mb-2"
+        >
+          <ArrowLeft className="h-5 w-5 text-primary" />
+        </Link>
         {/* Location Status */}
         {isLocating && (
           <div className="mb-4 flex items-center gap-2 text-gray-600">
@@ -127,10 +126,6 @@ export default function StoresPage() {
 
           {/* Store List */}
           <div className="space-y-4">
-            <h2 className="text-lg font-semibold text-gray-900">
-              {stores.length} Stores Available
-            </h2>
-
             <div className="space-y-4 max-h-[550px] overflow-y-auto pr-2">
               {sortedStores.map((store) => {
                 const vendor = vendors.find((v) => v.id === store.vendorId)
