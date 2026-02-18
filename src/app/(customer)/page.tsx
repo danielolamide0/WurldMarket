@@ -1,8 +1,8 @@
 'use client'
 
-import { useEffect, useMemo, useRef } from 'react'
+import { useEffect, useMemo, useRef, useState, useCallback } from 'react'
 import Link from 'next/link'
-import { MapPin, ArrowRight, Clock, ChevronRight, Utensils, ShoppingBag, Sparkles, Heart, Wheat, Flame, Snowflake, Leaf, Cookie, Coffee, Carrot, Salad, Apple, Beef, Fish, Droplet, Droplets, ChefHat, Package, Egg, Home, WheatOff, Circle } from 'lucide-react'
+import { MapPin, ArrowRight, Clock, ChevronRight, ChevronLeft, Utensils, ShoppingBag, Sparkles, Heart, Wheat, Flame, Snowflake, Leaf, Cookie, Coffee, Carrot, Salad, Apple, Beef, Fish, Droplet, Droplets, ChefHat, Package, Egg, Home, WheatOff, Circle } from 'lucide-react'
 import { CATEGORIES } from '@/lib/constants'
 import { useProductStore } from '@/stores/productStore'
 import { useOrderStore } from '@/stores/orderStore'
@@ -74,6 +74,34 @@ export default function HomePage() {
   const categoriesRef = useRef<HTMLDivElement>(null)
   const cuisinesRef = useRef<HTMLDivElement>(null)
   const storesRef = useRef<HTMLDivElement>(null)
+  const offersRef = useRef<HTMLDivElement>(null)
+
+  // Scroll arrow visibility state
+  const [categoriesScroll, setCategoriesScroll] = useState({ canScrollLeft: false, canScrollRight: true })
+  const [storesScroll, setStoresScroll] = useState({ canScrollLeft: false, canScrollRight: true })
+  const [offersScroll, setOffersScroll] = useState({ canScrollLeft: false, canScrollRight: true })
+
+  // Check scroll position and update arrow visibility
+  const updateScrollState = useCallback((ref: React.RefObject<HTMLDivElement>, setState: React.Dispatch<React.SetStateAction<{ canScrollLeft: boolean; canScrollRight: boolean }>>) => {
+    if (ref.current) {
+      const { scrollLeft, scrollWidth, clientWidth } = ref.current
+      setState({
+        canScrollLeft: scrollLeft > 0,
+        canScrollRight: scrollLeft < scrollWidth - clientWidth - 1
+      })
+    }
+  }, [])
+
+  // Scroll handler for arrow buttons
+  const handleScroll = (ref: React.RefObject<HTMLDivElement>, direction: 'left' | 'right') => {
+    if (ref.current) {
+      const scrollAmount = ref.current.clientWidth * 0.8
+      ref.current.scrollBy({
+        left: direction === 'left' ? -scrollAmount : scrollAmount,
+        behavior: 'smooth'
+      })
+    }
+  }
 
   // Restore scroll positions on mount
   useEffect(() => {
@@ -97,15 +125,17 @@ export default function HomePage() {
     }
   }, [])
 
-  // Save scroll positions when scrolling
+  // Save scroll positions when scrolling and update arrow visibility
   useEffect(() => {
     const categoriesEl = categoriesRef.current
     const cuisinesEl = cuisinesRef.current
     const storesEl = storesRef.current
+    const offersEl = offersRef.current
 
     const handleCategoriesScroll = () => {
       if (categoriesEl) {
         sessionStorage.setItem('homepage-categories-scroll', categoriesEl.scrollLeft.toString())
+        updateScrollState(categoriesRef, setCategoriesScroll)
       }
     }
 
@@ -118,8 +148,20 @@ export default function HomePage() {
     const handleStoresScroll = () => {
       if (storesEl) {
         sessionStorage.setItem('homepage-stores-scroll', storesEl.scrollLeft.toString())
+        updateScrollState(storesRef, setStoresScroll)
       }
     }
+
+    const handleOffersScroll = () => {
+      if (offersEl) {
+        updateScrollState(offersRef, setOffersScroll)
+      }
+    }
+
+    // Initial check for scroll state
+    updateScrollState(categoriesRef, setCategoriesScroll)
+    updateScrollState(storesRef, setStoresScroll)
+    updateScrollState(offersRef, setOffersScroll)
 
     if (categoriesEl) {
       categoriesEl.addEventListener('scroll', handleCategoriesScroll)
@@ -129,6 +171,9 @@ export default function HomePage() {
     }
     if (storesEl) {
       storesEl.addEventListener('scroll', handleStoresScroll)
+    }
+    if (offersEl) {
+      offersEl.addEventListener('scroll', handleOffersScroll)
     }
 
     return () => {
@@ -141,8 +186,11 @@ export default function HomePage() {
       if (storesEl) {
         storesEl.removeEventListener('scroll', handleStoresScroll)
       }
+      if (offersEl) {
+        offersEl.removeEventListener('scroll', handleOffersScroll)
+      }
     }
-  }, [])
+  }, [updateScrollState])
 
   // Fetch data on mount
   useEffect(() => {
@@ -267,25 +315,66 @@ export default function HomePage() {
       {/* Categories Row */}
       <section className="border-b border-gray-100">
         <div className="max-w-7xl mx-auto px-4 py-3 md:py-6">
-          <div ref={categoriesRef} className="flex gap-3 md:gap-6 overflow-x-auto scrollbar-hide py-2 px-2 -mx-2">
-            {CATEGORIES.map((cat) => {
-    return (
-                <Link
-                  key={cat.id}
-                  href={`/category/${cat.slug}`}
-                  className="flex flex-col items-center gap-1 md:gap-2 min-w-[80px] md:min-w-[100px] flex-shrink-0 hover:scale-110 transition-transform duration-200"
-                >
-                  <div className="w-12 h-12 md:w-24 md:h-24 bg-gray-100 rounded-xl md:rounded-2xl overflow-hidden hover:bg-gray-200 transition-colors hover:shadow-md">
-                    <img
-                      src={cat.image}
-                      alt={cat.name}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                  <span className="text-[10px] md:text-sm text-gray-600 whitespace-nowrap text-center leading-tight">{cat.name}</span>
-                </Link>
-              )
-            })}
+          <div className="relative">
+            {/* Left Arrow - Desktop */}
+            {categoriesScroll.canScrollLeft && (
+              <button
+                onClick={() => handleScroll(categoriesRef, 'left')}
+                className="hidden lg:flex absolute left-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 items-center justify-center rounded-full bg-white/80 backdrop-blur-md shadow-lg border border-gray-200 hover:bg-white transition-all"
+              >
+                <ChevronLeft className="h-5 w-5 text-primary" />
+              </button>
+            )}
+            {/* Right Arrow - Desktop */}
+            {categoriesScroll.canScrollRight && (
+              <button
+                onClick={() => handleScroll(categoriesRef, 'right')}
+                className="hidden lg:flex absolute right-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 items-center justify-center rounded-full bg-white/80 backdrop-blur-md shadow-lg border border-gray-200 hover:bg-white transition-all"
+              >
+                <ChevronRight className="h-5 w-5 text-primary" />
+              </button>
+            )}
+            <div ref={categoriesRef} className="flex gap-3 md:gap-6 overflow-x-auto scrollbar-hide py-2 px-2 -mx-2">
+              {CATEGORIES.map((cat) => {
+      return (
+                  <Link
+                    key={cat.id}
+                    href={`/category/${cat.slug}`}
+                    className="flex flex-col items-center gap-1 md:gap-2 min-w-[80px] md:min-w-[100px] flex-shrink-0 hover:scale-110 transition-transform duration-200"
+                  >
+                    <div className="w-12 h-12 md:w-24 md:h-24 bg-gray-100 rounded-xl md:rounded-2xl overflow-hidden hover:bg-gray-200 transition-colors hover:shadow-md">
+                      <img
+                        src={cat.image}
+                        alt={cat.name}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    <span className="text-[10px] md:text-sm text-gray-600 whitespace-nowrap text-center leading-tight">{cat.name}</span>
+                  </Link>
+                )
+              })}
+            </div>
+            {/* Mobile Arrows - Below content */}
+            <div className="flex lg:hidden justify-center gap-4 mt-3">
+              <button
+                onClick={() => handleScroll(categoriesRef, 'left')}
+                disabled={!categoriesScroll.canScrollLeft}
+                className={`w-9 h-9 flex items-center justify-center rounded-full border border-gray-200 transition-all ${
+                  categoriesScroll.canScrollLeft ? 'bg-white shadow-md text-primary' : 'bg-gray-100 text-gray-300'
+                }`}
+              >
+                <ChevronLeft className="h-5 w-5" />
+              </button>
+              <button
+                onClick={() => handleScroll(categoriesRef, 'right')}
+                disabled={!categoriesScroll.canScrollRight}
+                className={`w-9 h-9 flex items-center justify-center rounded-full border border-gray-200 transition-all ${
+                  categoriesScroll.canScrollRight ? 'bg-white shadow-md text-primary' : 'bg-gray-100 text-gray-300'
+                }`}
+              >
+                <ChevronRight className="h-5 w-5" />
+              </button>
+            </div>
           </div>
         </div>
       </section>
@@ -350,46 +439,87 @@ export default function HomePage() {
               <span className="text-sm font-medium">STORE FINDER</span>
             </Link>
           </div>
-          <div ref={storesRef} className="flex gap-3 md:gap-6 overflow-x-auto scrollbar-hide py-2 px-2 -mx-2 md:justify-between">
-            {sortedStores.map((store) => {
-              // Calculate delivery time if user has primary address
-              let deliveryTime: string | null = null
-              if (isAuthenticated && currentPrimaryAddress?.coordinates && store.coordinates) {
-                const distance = calculateDistance(
-                  currentPrimaryAddress.coordinates.lat,
-                  currentPrimaryAddress.coordinates.lng,
-                  store.coordinates.lat,
-                  store.coordinates.lng
-                )
-                deliveryTime = calculateDeliveryTime(distance)
-              }
+          <div className="relative">
+            {/* Left Arrow - Desktop */}
+            {storesScroll.canScrollLeft && (
+              <button
+                onClick={() => handleScroll(storesRef, 'left')}
+                className="hidden lg:flex absolute left-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 items-center justify-center rounded-full bg-white/80 backdrop-blur-md shadow-lg border border-gray-200 hover:bg-white transition-all"
+              >
+                <ChevronLeft className="h-5 w-5 text-primary" />
+              </button>
+            )}
+            {/* Right Arrow - Desktop */}
+            {storesScroll.canScrollRight && (
+              <button
+                onClick={() => handleScroll(storesRef, 'right')}
+                className="hidden lg:flex absolute right-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 items-center justify-center rounded-full bg-white/80 backdrop-blur-md shadow-lg border border-gray-200 hover:bg-white transition-all"
+              >
+                <ChevronRight className="h-5 w-5 text-primary" />
+              </button>
+            )}
+            <div ref={storesRef} className="flex gap-3 md:gap-6 overflow-x-auto scrollbar-hide py-2 px-2 -mx-2 md:justify-between">
+              {sortedStores.map((store) => {
+                // Calculate delivery time if user has primary address
+                let deliveryTime: string | null = null
+                if (isAuthenticated && currentPrimaryAddress?.coordinates && store.coordinates) {
+                  const distance = calculateDistance(
+                    currentPrimaryAddress.coordinates.lat,
+                    currentPrimaryAddress.coordinates.lng,
+                    store.coordinates.lat,
+                    store.coordinates.lng
+                  )
+                  deliveryTime = calculateDeliveryTime(distance)
+                }
 
-              return (
-                <Link
-                  key={store.id}
-                  href={`/stores/${store.id}`}
-                  className="flex-shrink-0 w-20 md:w-[100px] md:flex-1 md:max-w-[140px] hover:scale-110 transition-transform duration-200"
-                >
-                  <div className="flex flex-col items-center">
-                    <div className="w-16 h-16 md:w-24 md:h-24 bg-white border border-gray-200 rounded-xl md:rounded-2xl mb-1 md:mb-2 overflow-hidden flex items-center justify-center hover:border-primary hover:shadow-lg transition-all">
-                      {store.image ? (
-                      <img
-                        src={store.image}
-                        alt={store.name}
-                        className="w-full h-full object-cover"
-                      />
-                      ) : (
-                        <ShoppingBag className="h-6 w-6 md:h-8 md:w-8 text-gray-400" />
+                return (
+                  <Link
+                    key={store.id}
+                    href={`/stores/${store.id}`}
+                    className="flex-shrink-0 w-20 md:w-[100px] md:flex-1 md:max-w-[140px] hover:scale-110 transition-transform duration-200"
+                  >
+                    <div className="flex flex-col items-center">
+                      <div className="w-16 h-16 md:w-24 md:h-24 bg-white border border-gray-200 rounded-xl md:rounded-2xl mb-1 md:mb-2 overflow-hidden flex items-center justify-center hover:border-primary hover:shadow-lg transition-all">
+                        {store.image ? (
+                        <img
+                          src={store.image}
+                          alt={store.name}
+                          className="w-full h-full object-cover"
+                        />
+                        ) : (
+                          <ShoppingBag className="h-6 w-6 md:h-8 md:w-8 text-gray-400" />
+                        )}
+                      </div>
+                      <p className="text-xs md:text-sm font-medium text-gray-900 truncate w-full text-center">{store.name}</p>
+                      {deliveryTime && (
+                        <p className="text-[10px] md:text-xs text-gray-500">{deliveryTime}</p>
                       )}
-                    </div>
-                    <p className="text-xs md:text-sm font-medium text-gray-900 truncate w-full text-center">{store.name}</p>
-                    {deliveryTime && (
-                      <p className="text-[10px] md:text-xs text-gray-500">{deliveryTime}</p>
-                    )}
-                    </div>
-                </Link>
-              )
-            })}
+                      </div>
+                  </Link>
+                )
+              })}
+            </div>
+            {/* Mobile Arrows - Below content */}
+            <div className="flex lg:hidden justify-center gap-4 mt-3">
+              <button
+                onClick={() => handleScroll(storesRef, 'left')}
+                disabled={!storesScroll.canScrollLeft}
+                className={`w-9 h-9 flex items-center justify-center rounded-full border border-gray-200 transition-all ${
+                  storesScroll.canScrollLeft ? 'bg-white shadow-md text-primary' : 'bg-gray-100 text-gray-300'
+                }`}
+              >
+                <ChevronLeft className="h-5 w-5" />
+              </button>
+              <button
+                onClick={() => handleScroll(storesRef, 'right')}
+                disabled={!storesScroll.canScrollRight}
+                className={`w-9 h-9 flex items-center justify-center rounded-full border border-gray-200 transition-all ${
+                  storesScroll.canScrollRight ? 'bg-white shadow-md text-primary' : 'bg-gray-100 text-gray-300'
+                }`}
+              >
+                <ChevronRight className="h-5 w-5" />
+              </button>
+            </div>
           </div>
         </div>
       </section>
@@ -438,61 +568,102 @@ export default function HomePage() {
           <div className="max-w-7xl mx-auto px-4">
             <h2 className="text-lg font-bold text-primary mb-1">Offers ending soon</h2>
             <p className="text-sm text-gray-500 mb-3">Don&apos;t miss the chance to shop our trusted sellers</p>
-            <div className="flex gap-3 overflow-x-auto scrollbar-hide pb-2">
-              {offerProducts.map((product) => {
-                const store = sortedStores.find(s => s.id === product.storeId)
-                const originalPrice = product.originalPrice || (product.price * 1.25)
-                const offerEndDate = product.offerEndDate ? new Date(product.offerEndDate) : new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+            <div className="relative">
+              {/* Left Arrow - Desktop */}
+              {offersScroll.canScrollLeft && (
+                <button
+                  onClick={() => handleScroll(offersRef, 'left')}
+                  className="hidden lg:flex absolute left-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 items-center justify-center rounded-full bg-white/80 backdrop-blur-md shadow-lg border border-gray-200 hover:bg-white transition-all"
+                >
+                  <ChevronLeft className="h-5 w-5 text-primary" />
+                </button>
+              )}
+              {/* Right Arrow - Desktop */}
+              {offersScroll.canScrollRight && (
+                <button
+                  onClick={() => handleScroll(offersRef, 'right')}
+                  className="hidden lg:flex absolute right-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 items-center justify-center rounded-full bg-white/80 backdrop-blur-md shadow-lg border border-gray-200 hover:bg-white transition-all"
+                >
+                  <ChevronRight className="h-5 w-5 text-primary" />
+                </button>
+              )}
+              <div ref={offersRef} className="flex gap-3 overflow-x-auto scrollbar-hide py-2 px-2 -mx-2">
+                {offerProducts.map((product) => {
+                  const store = sortedStores.find(s => s.id === product.storeId)
+                  const originalPrice = product.originalPrice || (product.price * 1.25)
+                  const offerEndDate = product.offerEndDate ? new Date(product.offerEndDate) : new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
 
-                return (
-                  <div
-                    key={product.id}
-                    className="flex-shrink-0 w-44 bg-white border border-gray-200 rounded-xl overflow-hidden"
-                  >
-                    {/* Store badge */}
-                    <div className="px-2 py-1 bg-gray-100 text-xs text-gray-600">
-                      {store?.name ? `${store.name}-` : 'Marketplace-'}
-          </div>
-
-                    {/* Product image */}
-                    <div className="h-28 bg-white flex items-center justify-center p-2">
-                      <img
-                        src={product.image}
-                        alt={product.name}
-                        className="max-h-full max-w-full object-contain"
-                      />
-        </div>
-
-                    {/* Product info */}
-                    <div className="p-2">
-                      <p className="text-xs font-medium text-gray-900 line-clamp-2 h-8">{product.name}</p>
-                      <p className="text-[10px] text-gray-500 mb-2">Sold by {store?.name || 'Marketplace seller'}</p>
-
-                      {/* Offer banner */}
-                      <div className="bg-yellow-400 text-xs font-semibold text-gray-900 px-2 py-1 rounded mb-1">
-                        Was £{originalPrice.toFixed(2)} Now £{product.price.toFixed(2)}
+                  return (
+                    <div
+                      key={product.id}
+                      className="flex-shrink-0 w-44 bg-white border border-gray-200 rounded-xl overflow-hidden hover:shadow-lg transition-shadow"
+                    >
+                      {/* Store badge */}
+                      <div className="px-2 py-1 bg-gray-100 text-xs text-gray-600">
+                        {store?.name ? `${store.name}-` : 'Marketplace-'}
                       </div>
-                      <p className="text-[10px] text-gray-500 mb-2">
-                        Offer valid until {offerEndDate.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' })}
-                      </p>
 
-                      {/* Price and Add button */}
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <p className="text-sm font-bold text-gray-900">£{product.price.toFixed(2)}</p>
-                          <p className="text-[10px] text-gray-500">£{product.price.toFixed(2)}/each</p>
+                      {/* Product image */}
+                      <div className="h-28 bg-white flex items-center justify-center p-2">
+                        <img
+                          src={product.image}
+                          alt={product.name}
+                          className="max-h-full max-w-full object-contain"
+                        />
+                      </div>
+
+                      {/* Product info */}
+                      <div className="p-2">
+                        <p className="text-xs font-medium text-gray-900 line-clamp-2 h-8">{product.name}</p>
+                        <p className="text-[10px] text-gray-500 mb-2">Sold by {store?.name || 'Marketplace seller'}</p>
+
+                        {/* Offer banner */}
+                        <div className="bg-yellow-400 text-xs font-semibold text-gray-900 px-2 py-1 rounded mb-1">
+                          Was £{originalPrice.toFixed(2)} Now £{product.price.toFixed(2)}
                         </div>
-                        <Link href={`/products/${product.id}`}>
-                          <Button size="sm" className="text-xs px-3 py-1">Add</Button>
-          </Link>
+                        <p className="text-[10px] text-gray-500 mb-2">
+                          Offer valid until {offerEndDate.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' })}
+                        </p>
+
+                        {/* Price and Add button */}
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <p className="text-sm font-bold text-gray-900">£{product.price.toFixed(2)}</p>
+                            <p className="text-[10px] text-gray-500">£{product.price.toFixed(2)}/each</p>
+                          </div>
+                          <Link href={`/products/${product.id}`}>
+                            <Button size="sm" className="text-xs px-3 py-1">Add</Button>
+                          </Link>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                )
-              })}
+                  )
+                })}
+              </div>
+              {/* Mobile Arrows - Below content */}
+              <div className="flex lg:hidden justify-center gap-4 mt-3">
+                <button
+                  onClick={() => handleScroll(offersRef, 'left')}
+                  disabled={!offersScroll.canScrollLeft}
+                  className={`w-9 h-9 flex items-center justify-center rounded-full border border-gray-200 transition-all ${
+                    offersScroll.canScrollLeft ? 'bg-white shadow-md text-primary' : 'bg-gray-100 text-gray-300'
+                  }`}
+                >
+                  <ChevronLeft className="h-5 w-5" />
+                </button>
+                <button
+                  onClick={() => handleScroll(offersRef, 'right')}
+                  disabled={!offersScroll.canScrollRight}
+                  className={`w-9 h-9 flex items-center justify-center rounded-full border border-gray-200 transition-all ${
+                    offersScroll.canScrollRight ? 'bg-white shadow-md text-primary' : 'bg-gray-100 text-gray-300'
+                  }`}
+                >
+                  <ChevronRight className="h-5 w-5" />
+                </button>
+              </div>
             </div>
-        </div>
-      </section>
+          </div>
+        </section>
       )}
 
     </div>
