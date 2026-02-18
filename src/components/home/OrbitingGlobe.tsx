@@ -181,35 +181,41 @@ export function OrbitingGlobe() {
         >
           {/* Up arrow - top left (anticlockwise) */}
           <button
-            className="absolute top-2 left-4 z-40 p-2"
+            className="absolute top-2 left-4 z-40 p-2 select-none touch-none"
+            style={{ WebkitTouchCallout: 'none', WebkitUserSelect: 'none' }}
             onMouseDown={() => handleButtonDown('up')}
             onMouseUp={handleButtonUp}
             onMouseLeave={handleButtonUp}
-            onTouchStart={(e) => { e.preventDefault(); handleButtonDown('up'); }}
-            onTouchEnd={(e) => { e.preventDefault(); handleButtonUp(); }}
+            onTouchStart={(e) => { e.preventDefault(); e.stopPropagation(); handleButtonDown('up'); }}
+            onTouchEnd={(e) => { e.preventDefault(); e.stopPropagation(); handleButtonUp(); }}
+            onContextMenu={(e) => e.preventDefault()}
           >
             <img
               src="/arrow-up.png"
-              alt="Scroll up"
-              className={`w-12 h-auto transition-opacity ${isButtonPressed && buttonDirection === 'up' ? 'opacity-100' : 'opacity-60'}`}
+              alt=""
+              className={`w-12 h-auto transition-opacity pointer-events-none ${isButtonPressed && buttonDirection === 'up' ? 'opacity-100' : 'opacity-60'}`}
               draggable={false}
+              style={{ WebkitTouchCallout: 'none', WebkitUserSelect: 'none' }}
             />
           </button>
 
           {/* Down arrow - bottom right (clockwise) */}
           <button
-            className="absolute bottom-4 right-4 z-40 p-2"
+            className="absolute bottom-4 right-4 z-40 p-2 select-none touch-none"
+            style={{ WebkitTouchCallout: 'none', WebkitUserSelect: 'none' }}
             onMouseDown={() => handleButtonDown('down')}
             onMouseUp={handleButtonUp}
             onMouseLeave={handleButtonUp}
-            onTouchStart={(e) => { e.preventDefault(); handleButtonDown('down'); }}
-            onTouchEnd={(e) => { e.preventDefault(); handleButtonUp(); }}
+            onTouchStart={(e) => { e.preventDefault(); e.stopPropagation(); handleButtonDown('down'); }}
+            onTouchEnd={(e) => { e.preventDefault(); e.stopPropagation(); handleButtonUp(); }}
+            onContextMenu={(e) => e.preventDefault()}
           >
             <img
               src="/arrow-down.png"
-              alt="Scroll down"
-              className={`w-12 h-auto transition-opacity ${isButtonPressed && buttonDirection === 'down' ? 'opacity-100' : 'opacity-60'}`}
+              alt=""
+              className={`w-12 h-auto transition-opacity pointer-events-none ${isButtonPressed && buttonDirection === 'down' ? 'opacity-100' : 'opacity-60'}`}
               draggable={false}
+              style={{ WebkitTouchCallout: 'none', WebkitUserSelect: 'none' }}
             />
           </button>
 
