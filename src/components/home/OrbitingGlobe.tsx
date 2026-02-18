@@ -97,7 +97,8 @@ export function OrbitingGlobe() {
   const handleMouseMove = (e: React.MouseEvent) => {
     if (!isDragging) return
     const deltaX = e.clientX - startX
-    setRotation((startRotation + deltaX * 0.5 + 360) % 360)
+    // Swipe left = clockwise (increase), swipe right = anticlockwise (decrease)
+    setRotation((startRotation - deltaX * 0.5 + 360) % 360)
   }
 
   const handleMouseUp = () => {
@@ -107,20 +108,24 @@ export function OrbitingGlobe() {
   const handleTouchStart = (e: React.TouchEvent) => {
     // Don't start dragging if touching a link
     if ((e.target as HTMLElement).closest('a')) return
+    // Prevent page scrolling immediately
+    e.preventDefault()
     setIsDragging(true)
     setStartX(e.touches[0].clientX)
     setStartRotation(rotation)
   }
 
   const handleTouchMove = (e: React.TouchEvent) => {
-    if (!isDragging) return
-    // Prevent page scrolling only when dragging
+    // Always prevent page scrolling when touching the globe area
     e.preventDefault()
+    if (!isDragging) return
     const deltaX = e.touches[0].clientX - startX
-    setRotation((startRotation + deltaX * 0.5 + 360) % 360)
+    // Swipe left = clockwise (increase), swipe right = anticlockwise (decrease)
+    setRotation((startRotation - deltaX * 0.5 + 360) % 360)
   }
 
-  const handleTouchEnd = () => {
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    e.preventDefault()
     setIsDragging(false)
   }
 
@@ -165,6 +170,7 @@ export function OrbitingGlobe() {
           className="relative select-none"
           style={{
             height: '260px',
+            touchAction: 'none',
           }}
           onMouseDown={handleMouseDown}
           onMouseMove={handleMouseMove}
