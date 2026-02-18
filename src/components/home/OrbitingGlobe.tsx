@@ -160,22 +160,11 @@ export function OrbitingGlobe() {
   return (
     <section className="py-1 overflow-hidden md:hidden">
       <div className="max-w-7xl mx-auto px-4">
-        {/* Find Your Flavour title image */}
-        <div className="flex justify-center mb-1">
-          <img
-            src="/find-your-flavour.png"
-            alt="Find Your Flavour"
-            className="h-5"
-            draggable={false}
-          />
-        </div>
-
         <div
           ref={containerRef}
-          className="relative mx-auto select-none"
+          className="relative select-none"
           style={{
             height: '260px',
-            maxWidth: '400px',
           }}
           onMouseDown={handleMouseDown}
           onMouseMove={handleMouseMove}
@@ -185,9 +174,9 @@ export function OrbitingGlobe() {
           onTouchMove={handleTouchMove}
           onTouchEnd={handleTouchEnd}
         >
-          {/* Up arrow - top left (anticlockwise) */}
+          {/* Up arrow - top left */}
           <button
-            className="absolute top-2 left-4 z-40 p-2 select-none"
+            className="absolute top-0 left-0 z-40 p-2 select-none"
             style={{ WebkitTouchCallout: 'none', WebkitUserSelect: 'none', touchAction: 'none' }}
             onMouseDown={handleButtonDown}
             onMouseUp={handleButtonUp}
@@ -199,15 +188,32 @@ export function OrbitingGlobe() {
             <img
               src="/arrow-up.png"
               alt=""
-              className={`w-12 h-auto transition-opacity pointer-events-none ${isButtonPressed ? 'opacity-100' : 'opacity-60'}`}
+              className={`w-10 h-auto transition-opacity pointer-events-none ${isButtonPressed ? 'opacity-100' : 'opacity-60'}`}
               draggable={false}
               style={{ WebkitTouchCallout: 'none', WebkitUserSelect: 'none' }}
             />
           </button>
 
-          {/* Down arrow - bottom right (also anticlockwise) */}
+          {/* Find Your Flavour - vertical text on left, aligned with globe center */}
+          <div
+            className="absolute left-0 z-10"
+            style={{
+              top: '50%',
+              transform: 'translateY(-50%) rotate(-90deg)',
+              transformOrigin: 'center center',
+            }}
+          >
+            <img
+              src="/find-your-flavour.png"
+              alt="Find Your Flavour"
+              className="h-4"
+              draggable={false}
+            />
+          </div>
+
+          {/* Down arrow - bottom right */}
           <button
-            className="absolute bottom-4 right-4 z-40 p-2 select-none"
+            className="absolute bottom-2 right-4 z-40 p-2 select-none"
             style={{ WebkitTouchCallout: 'none', WebkitUserSelect: 'none', touchAction: 'none' }}
             onMouseDown={handleButtonDown}
             onMouseUp={handleButtonUp}
@@ -219,18 +225,21 @@ export function OrbitingGlobe() {
             <img
               src="/arrow-down.png"
               alt=""
-              className={`w-12 h-auto transition-opacity pointer-events-none ${isButtonPressed ? 'opacity-100' : 'opacity-60'}`}
+              className={`w-10 h-auto transition-opacity pointer-events-none ${isButtonPressed ? 'opacity-100' : 'opacity-60'}`}
               draggable={false}
               style={{ WebkitTouchCallout: 'none', WebkitUserSelect: 'none' }}
             />
           </button>
 
-          {/* Globe in center */}
+          {/* Globe - positioned to the right */}
           <div
-            className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-20 pointer-events-none"
+            className="absolute z-20 pointer-events-none"
             style={{
               width: '150px',
               height: '150px',
+              top: '50%',
+              left: '55%',
+              transform: 'translate(-50%, -50%)',
             }}
           >
             <img
@@ -241,7 +250,7 @@ export function OrbitingGlobe() {
             />
           </div>
 
-          {/* Orbiting cuisines */}
+          {/* Orbiting cuisines - orbit around globe position (55% from left) */}
           {CUISINES.map((cuisine, index) => {
             const { x, y, scale, opacity, zIndex } = getOrbitPosition(index, CUISINES.length)
 
@@ -249,8 +258,10 @@ export function OrbitingGlobe() {
               <Link
                 key={cuisine.id}
                 href={cuisine.href}
-                className="absolute left-1/2 top-1/2 transition-opacity duration-200"
+                className="absolute transition-opacity duration-200"
                 style={{
+                  left: '55%',
+                  top: '50%',
                   transform: `translate(-50%, -50%) translate(${x}%, ${y}%) scale(${scale})`,
                   opacity,
                   zIndex,
