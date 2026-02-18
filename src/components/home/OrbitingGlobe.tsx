@@ -170,16 +170,27 @@ export function OrbitingGlobe() {
           className="relative select-none"
           style={{
             height: '260px',
-            touchAction: 'none',
           }}
-          onMouseDown={handleMouseDown}
-          onMouseMove={handleMouseMove}
-          onMouseUp={handleMouseUp}
-          onMouseLeave={handleMouseUp}
-          onTouchStart={handleTouchStart}
-          onTouchMove={handleTouchMove}
-          onTouchEnd={handleTouchEnd}
         >
+          {/* Touch area for globe/orbit - covers right 70% where globe and orbits are */}
+          <div
+            className="absolute z-10"
+            style={{
+              top: 0,
+              right: 0,
+              width: '75%',
+              height: '100%',
+              touchAction: 'none',
+            }}
+            onMouseDown={handleMouseDown}
+            onMouseMove={handleMouseMove}
+            onMouseUp={handleMouseUp}
+            onMouseLeave={handleMouseUp}
+            onTouchStart={handleTouchStart}
+            onTouchMove={handleTouchMove}
+            onTouchEnd={handleTouchEnd}
+          />
+
           {/* Up arrow - above "Find Your Flavour" text */}
           <button
             className="absolute z-40 p-2 select-none"
