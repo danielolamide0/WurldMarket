@@ -16,6 +16,7 @@ import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { calculateDistance, calculateDeliveryTime } from '@/lib/utils'
+import { OrbitingGlobe } from '@/components/home/OrbitingGlobe'
 
 // Icon mapping for categories
 const iconMap: { [key: string]: React.ComponentType<{ className?: string }> } = {
@@ -42,19 +43,6 @@ const iconMap: { [key: string]: React.ComponentType<{ className?: string }> } = 
   Bean: Circle,
 }
 
-// Find your flavour - Cuisine types (matching actual stores)
-const CUISINES = [
-  { id: 'chinese', name: 'Chinese', image: 'https://images.unsplash.com/photo-1563245372-f21724e3856d?w=200', href: '/search?q=chinese' },
-  { id: 'african', name: 'African', image: 'https://images.unsplash.com/photo-1604329760661-e71dc83f8f26?w=200', href: '/search?q=african' },
-  { id: 'nigerian', name: 'Nigerian', image: 'https://images.unsplash.com/photo-1604329760661-e71dc83f8f26?w=200', href: '/search?q=nigerian' },
-  { id: 'ghanaian', name: 'Ghanaian', image: 'https://images.unsplash.com/photo-1604329760661-e71dc83f8f26?w=200', href: '/search?q=ghanaian' },
-  { id: 'pakistani', name: 'Pakistani', image: 'https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=200', href: '/search?q=pakistani' },
-  { id: 'indian', name: 'Indian', image: 'https://images.unsplash.com/photo-1585937421612-70a008356fbe?w=200', href: '/search?q=indian' },
-  { id: 'afghan', name: 'Afghan', image: 'https://images.unsplash.com/photo-1601050690597-df0568f70950?w=200', href: '/search?q=afghan' },
-  { id: 'iranian', name: 'Iranian', image: 'https://images.unsplash.com/photo-1567188040759-fb8a883dc6d8?w=200', href: '/search?q=iranian' },
-  { id: 'caribbean', name: 'Caribbean', image: 'https://images.unsplash.com/photo-1534422298391-e4f8c172dddb?w=200', href: '/search?q=caribbean' },
-]
-
 export default function HomePage() {
   const products = useProductStore((state) => state.products)
   const fetchProducts = useProductStore((state) => state.fetchProducts)
@@ -72,7 +60,6 @@ export default function HomePage() {
 
   // Refs for scrollable sections
   const categoriesRef = useRef<HTMLDivElement>(null)
-  const cuisinesRef = useRef<HTMLDivElement>(null)
   const storesRef = useRef<HTMLDivElement>(null)
   const offersRef = useRef<HTMLDivElement>(null)
 
@@ -111,12 +98,6 @@ export default function HomePage() {
         categoriesRef.current.scrollLeft = parseInt(savedScroll, 10)
       }
     }
-    if (cuisinesRef.current) {
-      const savedScroll = sessionStorage.getItem('homepage-cuisines-scroll')
-      if (savedScroll) {
-        cuisinesRef.current.scrollLeft = parseInt(savedScroll, 10)
-      }
-    }
     if (storesRef.current) {
       const savedScroll = sessionStorage.getItem('homepage-stores-scroll')
       if (savedScroll) {
@@ -128,7 +109,6 @@ export default function HomePage() {
   // Save scroll positions when scrolling and update arrow visibility
   useEffect(() => {
     const categoriesEl = categoriesRef.current
-    const cuisinesEl = cuisinesRef.current
     const storesEl = storesRef.current
     const offersEl = offersRef.current
 
@@ -136,12 +116,6 @@ export default function HomePage() {
       if (categoriesEl) {
         sessionStorage.setItem('homepage-categories-scroll', categoriesEl.scrollLeft.toString())
         updateScrollState(categoriesRef, setCategoriesScroll)
-      }
-    }
-
-    const handleCuisinesScroll = () => {
-      if (cuisinesEl) {
-        sessionStorage.setItem('homepage-cuisines-scroll', cuisinesEl.scrollLeft.toString())
       }
     }
 
@@ -166,9 +140,6 @@ export default function HomePage() {
     if (categoriesEl) {
       categoriesEl.addEventListener('scroll', handleCategoriesScroll)
     }
-    if (cuisinesEl) {
-      cuisinesEl.addEventListener('scroll', handleCuisinesScroll)
-    }
     if (storesEl) {
       storesEl.addEventListener('scroll', handleStoresScroll)
     }
@@ -179,9 +150,6 @@ export default function HomePage() {
     return () => {
       if (categoriesEl) {
         categoriesEl.removeEventListener('scroll', handleCategoriesScroll)
-      }
-      if (cuisinesEl) {
-        cuisinesEl.removeEventListener('scroll', handleCuisinesScroll)
       }
       if (storesEl) {
         storesEl.removeEventListener('scroll', handleStoresScroll)
@@ -396,30 +364,8 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Find Your Flavour */}
-      <section className="py-3 md:py-6">
-        <div className="max-w-7xl mx-auto px-4">
-          <h2 className="text-base md:text-lg font-bold text-gray-900 mb-2 md:mb-4">Find your flavour</h2>
-          <div ref={cuisinesRef} className="flex gap-3 md:gap-6 overflow-x-auto scrollbar-hide py-2 px-2 -mx-2 md:justify-between">
-            {CUISINES.map((cuisine) => (
-              <Link
-                key={cuisine.id}
-                href={cuisine.href}
-                className="flex flex-col items-center gap-1 md:gap-2 min-w-[60px] md:min-w-0 md:flex-1 md:max-w-[140px] hover:scale-110 transition-transform duration-200"
-              >
-                <div className="w-14 h-14 md:w-24 md:h-24 rounded-full overflow-hidden border-2 border-gray-100 hover:border-primary hover:shadow-lg transition-all">
-                  <img
-                    src={cuisine.image}
-                    alt={cuisine.name}
-                    className="w-full h-full object-cover"
-                  />
-              </div>
-                <span className="text-xs md:text-sm text-gray-700 font-medium">{cuisine.name}</span>
-              </Link>
-            ))}
-          </div>
-        </div>
-      </section>
+      {/* Find Your Flavour - Orbiting Globe */}
+      <OrbitingGlobe />
 
       {/* Hello Card - Right after Find your flavour */}
       {isAuthenticated && user?.role === 'customer' && (
