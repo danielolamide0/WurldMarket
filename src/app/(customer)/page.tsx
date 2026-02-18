@@ -198,6 +198,23 @@ export default function HomePage() {
     fetchStores()
   }, [fetchProducts, fetchStores])
 
+  // Update stores scroll state when stores data loads
+  useEffect(() => {
+    // Small delay to ensure DOM has updated with new store items
+    const timer = setTimeout(() => {
+      updateScrollState(storesRef, setStoresScroll)
+    }, 100)
+    return () => clearTimeout(timer)
+  }, [sortedStores.length, updateScrollState])
+
+  // Update offers scroll state when offer products load
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      updateScrollState(offersRef, setOffersScroll)
+    }, 100)
+    return () => clearTimeout(timer)
+  }, [offerProducts.length, updateScrollState])
+
   // Fetch addresses when user logs in
   useEffect(() => {
     if (isAuthenticated && user?.id) {
