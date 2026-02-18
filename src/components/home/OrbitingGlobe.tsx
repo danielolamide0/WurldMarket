@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useRef, useEffect, useCallback } from 'react'
+import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 
 // Reduced cuisine types - 6 regions equidistant
@@ -14,6 +15,7 @@ const CUISINES = [
 ]
 
 export function OrbitingGlobe() {
+  const router = useRouter()
   const [rotation, setRotation] = useState(0)
   const [isDragging, setIsDragging] = useState(false)
   const [isButtonPressed, setIsButtonPressed] = useState(false)
@@ -289,10 +291,8 @@ export function OrbitingGlobe() {
                   touchAction: 'none',
                 }}
                 onClick={(e) => {
-                  // Prevent navigation if user was dragging
-                  if (hasDraggedRef.current) {
-                    e.preventDefault()
-                  }
+                  // On mobile, we handle navigation via touch events
+                  // This onClick is for desktop mouse clicks
                 }}
                 onTouchStart={(e) => {
                   // Start tracking for drag
@@ -317,6 +317,10 @@ export function OrbitingGlobe() {
                 onTouchEnd={(e) => {
                   e.preventDefault()
                   setIsDragging(false)
+                  // Navigate if it was a tap (not a drag)
+                  if (!hasDraggedRef.current) {
+                    router.push(cuisine.href)
+                  }
                 }}
               >
                 <div className="flex flex-col items-center gap-0.5" style={{ touchAction: 'none' }}>
