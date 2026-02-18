@@ -24,6 +24,10 @@ export function OrbitingGlobe() {
   const animationRef = useRef<number | null>(null)
   const buttonAnimationRef = useRef<number | null>(null)
   const resumeTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+  const touchStartXRef = useRef<number>(0)
+  const hasDraggedRef = useRef<boolean>(false)
+  const dragStartXRef = useRef<number>(0)
+  const dragStartRotationRef = useRef<number>(0)
 
   // Auto-rotate when not dragging, not using buttons, and not paused
   useEffect(() => {
@@ -282,18 +286,49 @@ export function OrbitingGlobe() {
                   opacity,
                   zIndex,
                   pointerEvents: opacity < 0.5 ? 'none' : 'auto',
+                  touchAction: 'none',
+                }}
+                onClick={(e) => {
+                  // Prevent navigation if user was dragging
+                  if (hasDraggedRef.current) {
+                    e.preventDefault()
+                  }
+                }}
+                onTouchStart={(e) => {
+                  // Start tracking for drag
+                  e.preventDefault()
+                  touchStartXRef.current = e.touches[0].clientX
+                  hasDraggedRef.current = false
+                  dragStartXRef.current = e.touches[0].clientX
+                  dragStartRotationRef.current = rotation
+                  setIsDragging(true)
+                }}
+                onTouchMove={(e) => {
+                  // Prevent page scrolling and rotate
+                  e.preventDefault()
+                  const deltaX = e.touches[0].clientX - dragStartXRef.current
+                  // Mark as dragged if moved more than 10px
+                  if (Math.abs(e.touches[0].clientX - touchStartXRef.current) > 10) {
+                    hasDraggedRef.current = true
+                  }
+                  // Swipe left = clockwise, swipe right = anticlockwise
+                  setRotation((dragStartRotationRef.current - deltaX * 0.5 + 360) % 360)
+                }}
+                onTouchEnd={(e) => {
+                  e.preventDefault()
+                  setIsDragging(false)
                 }}
               >
-                <div className="flex flex-col items-center gap-0.5">
+                <div className="flex flex-col items-center gap-0.5" style={{ touchAction: 'none' }}>
                   <div className="w-14 h-14 rounded-full overflow-hidden border-2 border-gray-200 bg-white shadow-lg">
                     <img
                       src={cuisine.image}
                       alt={cuisine.name}
-                      className="w-full h-full object-cover"
+                      className="w-full h-full object-cover pointer-events-none"
                       draggable={false}
                     />
                   </div>
-                  <span className="text-xs font-medium text-gray-700 whitespace-nowrap">
+                  <span className="text-xs font-medium text-gray-700 whitespace-nowrap pointer-events-none">
                     {cuisine.name}
                   </span>
                 </div>
