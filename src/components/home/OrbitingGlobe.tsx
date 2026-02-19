@@ -178,7 +178,7 @@ export function OrbitingGlobe() {
 
           {/* Up arrow - above "Find Your Flavour" text */}
           <button
-            className="absolute z-40 p-2 select-none"
+            className="absolute z-10 p-2 select-none"
             style={{ top: '10%', left: '20%', WebkitTouchCallout: 'none', WebkitUserSelect: 'none', touchAction: 'none' }}
             onMouseDown={handleButtonDown}
             onMouseUp={handleButtonUp}
@@ -204,17 +204,17 @@ export function OrbitingGlobe() {
               transform: 'translateY(-50%)',
             }}
           >
-            <span
-              className="text-sm font-semibold whitespace-nowrap"
-              style={{ color: '#859129' }}
-            >
-              Find Your Flavour
-            </span>
+            <img
+              src="/find-your-flavour.png"
+              alt="Find Your Flavour"
+              className="h-4 brown-tint"
+              draggable={false}
+            />
           </div>
 
           {/* Down arrow - bottom right */}
           <button
-            className="absolute bottom-2 right-4 z-40 p-2 select-none"
+            className="absolute bottom-2 right-4 z-10 p-2 select-none"
             style={{ WebkitTouchCallout: 'none', WebkitUserSelect: 'none', touchAction: 'none' }}
             onMouseDown={handleButtonDown}
             onMouseUp={handleButtonUp}
