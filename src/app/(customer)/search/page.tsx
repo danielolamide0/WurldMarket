@@ -22,7 +22,7 @@ function SearchResults() {
   const searchParams = useSearchParams()
   const query = searchParams.get('q') || ''
   const [filter, setFilter] = useState<FilterType>('products')
-  const [selectedStoreId, setSelectedStoreId] = useState<string | null>(null)
+  const [selectedStoreIds, setSelectedStoreIds] = useState<string[]>([])
   const [isStoreFilterOpen, setIsStoreFilterOpen] = useState(false)
   const storeFilterRef = useRef<HTMLDivElement>(null)
   
@@ -121,9 +121,9 @@ function SearchResults() {
     })
   }
 
-  // Filter products by selected store
-  if (selectedStoreId) {
-    matchedProducts = matchedProducts.filter((p) => p.storeId === selectedStoreId)
+  // Filter products by selected stores
+  if (selectedStoreIds.length > 0) {
+    matchedProducts = matchedProducts.filter((p) => selectedStoreIds.includes(p.storeId))
   }
 
   // Sort products by proximity if user has location
@@ -201,22 +201,24 @@ function SearchResults() {
               <button
                 onClick={() => setIsStoreFilterOpen(!isStoreFilterOpen)}
                 className={`flex items-center gap-2 px-3 py-2 rounded-full text-sm font-medium transition-all ${
-                  selectedStoreId
+                  selectedStoreIds.length > 0
                     ? 'bg-primary text-white'
                     : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                 }`}
               >
                 <Filter className="h-4 w-4" />
-                {selectedStoreId ? (
+                {selectedStoreIds.length > 0 ? (
                   <>
                     <span className="hidden sm:inline">
-                      {stores.find((s) => s.id === selectedStoreId)?.name || 'Store'}
+                      {selectedStoreIds.length === 1
+                        ? stores.find((s) => s.id === selectedStoreIds[0])?.name || 'Store'
+                        : `${selectedStoreIds.length} stores`}
                     </span>
                     <X
                       className="h-3 w-3"
                       onClick={(e) => {
                         e.stopPropagation()
-                        setSelectedStoreId(null)
+                        setSelectedStoreIds([])
                       }}
                     />
                   </>
@@ -233,46 +235,52 @@ function SearchResults() {
                   </div>
                   <button
                     onClick={() => {
-                      setSelectedStoreId(null)
+                      setSelectedStoreIds([])
                       setIsStoreFilterOpen(false)
                     }}
                     className={`w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-50 text-left transition-colors ${
-                      !selectedStoreId ? 'bg-primary/5' : ''
+                      selectedStoreIds.length === 0 ? 'bg-primary/5' : ''
                     }`}
                   >
                     <div className={`w-5 h-5 rounded border-2 flex items-center justify-center flex-shrink-0 ${
-                      !selectedStoreId ? 'border-primary bg-primary' : 'border-gray-300'
+                      selectedStoreIds.length === 0 ? 'border-primary bg-primary' : 'border-gray-300'
                     }`}>
-                      {!selectedStoreId && <Check className="h-3 w-3 text-white" />}
+                      {selectedStoreIds.length === 0 && <Check className="h-3 w-3 text-white" />}
                     </div>
-                    <span className={`flex-1 ${!selectedStoreId ? 'font-medium text-primary' : 'text-gray-700'}`}>
+                    <span className={`flex-1 ${selectedStoreIds.length === 0 ? 'font-medium text-primary' : 'text-gray-700'}`}>
                       All Stores
                     </span>
                   </button>
-                  {matchedStores.map((store) => (
-                    <button
-                      key={store.id}
-                      onClick={() => {
-                        setSelectedStoreId(store.id)
-                        setIsStoreFilterOpen(false)
-                      }}
-                      className={`w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-50 text-left transition-colors ${
-                        selectedStoreId === store.id ? 'bg-primary/5' : ''
-                      }`}
-                    >
-                      <div className={`w-5 h-5 rounded border-2 flex items-center justify-center flex-shrink-0 ${
-                        selectedStoreId === store.id ? 'border-primary bg-primary' : 'border-gray-300'
-                      }`}>
-                        {selectedStoreId === store.id && <Check className="h-3 w-3 text-white" />}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className={`truncate ${selectedStoreId === store.id ? 'font-medium text-primary' : 'text-gray-900'}`}>
-                          {store.name}
-                        </p>
-                        <p className="text-xs text-gray-500 truncate">{store.address}</p>
-                      </div>
-                    </button>
-                  ))}
+                  {matchedStores.map((store) => {
+                    const isSelected = selectedStoreIds.includes(store.id)
+                    return (
+                      <button
+                        key={store.id}
+                        onClick={() => {
+                          if (isSelected) {
+                            setSelectedStoreIds(selectedStoreIds.filter((id) => id !== store.id))
+                          } else {
+                            setSelectedStoreIds([...selectedStoreIds, store.id])
+                          }
+                        }}
+                        className={`w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-50 text-left transition-colors ${
+                          isSelected ? 'bg-primary/5' : ''
+                        }`}
+                      >
+                        <div className={`w-5 h-5 rounded border-2 flex items-center justify-center flex-shrink-0 ${
+                          isSelected ? 'border-primary bg-primary' : 'border-gray-300'
+                        }`}>
+                          {isSelected && <Check className="h-3 w-3 text-white" />}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className={`truncate ${isSelected ? 'font-medium text-primary' : 'text-gray-900'}`}>
+                            {store.name}
+                          </p>
+                          <p className="text-xs text-gray-500 truncate">{store.address}</p>
+                        </div>
+                      </button>
+                    )
+                  })}
                   {matchedStores.length === 0 && (
                     <div className="px-4 py-3 text-sm text-gray-500 text-center">
                       No stores found
