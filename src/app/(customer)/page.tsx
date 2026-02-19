@@ -49,7 +49,7 @@ export default function HomePage() {
   const fetchProducts = useProductStore((state) => state.fetchProducts)
   const featuredProducts = products.filter((p) => p.isActive).slice(0, 8)
   const { user, isAuthenticated } = useAuthStore()
-  const { orders, fetchOrders } = useOrderStore()
+  const { orders, fetchOrders, getOrdersByCustomer } = useOrderStore()
   const { favourites, getRegulars, userId, setUserId, fetchCustomerData, purchaseHistory } = useCustomerStore()
   const stores = useVendorStore((state) => state.stores)
   const fetchStores = useVendorStore((state) => state.fetchStores)
@@ -257,7 +257,7 @@ export default function HomePage() {
 
     // Append stores without coordinates at the end
     return [...sorted, ...storesWithoutCoords]
-  }, [stores, currentPrimaryAddress, isAuthenticated])
+  }, [stores, currentPrimaryAddress])
 
   // Get products on offer, sorted by proximity to user's primary address
   const offerProducts = useMemo(() => {
