@@ -26,7 +26,7 @@ const config: Config = {
           light: '#BAC095',
           dark: '#3D4127',
         },
-        cream: '#D4D395',
+        cream: '#E8E9C8',
         sand: '#BAC095',
         brown: '#3D4127',
       },
