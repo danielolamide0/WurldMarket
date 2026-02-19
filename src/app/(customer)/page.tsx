@@ -763,7 +763,7 @@ export default function HomePage() {
                         <p className="text-[10px] text-gray-500 mb-2">Sold by {store?.name || 'Marketplace seller'}</p>
 
                         {/* Trending badge */}
-                        <div className="bg-primary/10 text-xs font-semibold text-primary px-2 py-1 rounded mb-2">
+                        <div className="bg-yellow-400 text-xs font-semibold text-gray-900 px-2 py-1 rounded mb-2">
                           Trending
                         </div>
 
