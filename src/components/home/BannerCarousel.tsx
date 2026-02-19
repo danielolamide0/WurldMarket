@@ -1,7 +1,6 @@
 'use client'
 
 import { useState, useEffect, useRef, useCallback } from 'react'
-import Link from 'next/link'
 
 // Banner data - update these to change the adverts
 const BANNERS = [
@@ -151,16 +150,9 @@ export function BannerCarousel({ className = '' }: BannerCarouselProps) {
           }}
         >
           {BANNERS.map((banner) => (
-            <Link
+            <div
               key={banner.id}
-              href={banner.link}
               className="flex-shrink-0 w-full h-full relative"
-              onClick={(e) => {
-                // Prevent navigation if user was dragging
-                if (Math.abs(translateX) > 10) {
-                  e.preventDefault()
-                }
-              }}
             >
               <div
                 className="w-full h-full flex flex-col items-center justify-center text-white p-6 text-center"
@@ -170,7 +162,7 @@ export function BannerCarousel({ className = '' }: BannerCarouselProps) {
                 <h3 className="text-xl md:text-2xl font-bold mb-2">{banner.title}</h3>
                 <p className="text-sm md:text-base opacity-90">{banner.subtitle}</p>
               </div>
-            </Link>
+            </div>
           ))}
         </div>
       </div>
