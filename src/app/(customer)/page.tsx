@@ -62,11 +62,13 @@ export default function HomePage() {
   const categoriesRef = useRef<HTMLDivElement>(null)
   const storesRef = useRef<HTMLDivElement>(null)
   const offersRef = useRef<HTMLDivElement>(null)
+  const trendingRef = useRef<HTMLDivElement>(null)
 
   // Scroll arrow visibility state
   const [categoriesScroll, setCategoriesScroll] = useState({ canScrollLeft: false, canScrollRight: true })
   const [storesScroll, setStoresScroll] = useState({ canScrollLeft: false, canScrollRight: true })
   const [offersScroll, setOffersScroll] = useState({ canScrollLeft: false, canScrollRight: true })
+  const [trendingScroll, setTrendingScroll] = useState({ canScrollLeft: false, canScrollRight: true })
 
   // Check scroll position and update arrow visibility
   const updateScrollState = useCallback((ref: React.RefObject<HTMLDivElement>, setState: React.Dispatch<React.SetStateAction<{ canScrollLeft: boolean; canScrollRight: boolean }>>) => {
@@ -111,6 +113,7 @@ export default function HomePage() {
     const categoriesEl = categoriesRef.current
     const storesEl = storesRef.current
     const offersEl = offersRef.current
+    const trendingEl = trendingRef.current
 
     const handleCategoriesScroll = () => {
       if (categoriesEl) {
@@ -132,10 +135,17 @@ export default function HomePage() {
       }
     }
 
+    const handleTrendingScroll = () => {
+      if (trendingEl) {
+        updateScrollState(trendingRef, setTrendingScroll)
+      }
+    }
+
     // Initial check for scroll state
     updateScrollState(categoriesRef, setCategoriesScroll)
     updateScrollState(storesRef, setStoresScroll)
     updateScrollState(offersRef, setOffersScroll)
+    updateScrollState(trendingRef, setTrendingScroll)
 
     if (categoriesEl) {
       categoriesEl.addEventListener('scroll', handleCategoriesScroll)
@@ -145,6 +155,9 @@ export default function HomePage() {
     }
     if (offersEl) {
       offersEl.addEventListener('scroll', handleOffersScroll)
+    }
+    if (trendingEl) {
+      trendingEl.addEventListener('scroll', handleTrendingScroll)
     }
 
     return () => {
@@ -156,6 +169,9 @@ export default function HomePage() {
       }
       if (offersEl) {
         offersEl.removeEventListener('scroll', handleOffersScroll)
+      }
+      if (trendingEl) {
+        trendingEl.removeEventListener('scroll', handleTrendingScroll)
       }
     }
   }, [updateScrollState])
@@ -278,6 +294,28 @@ export default function HomePage() {
     return onOfferProducts.slice(0, 10)
   }, [products, currentPrimaryAddress, sortedStores])
 
+  // Get trending products, sorted by proximity to user's primary address
+  const trendingProducts = useMemo(() => {
+    // Filter products that are trending and active
+    const trendingItems = products.filter(p => p.isTrending && p.isActive)
+
+    // If user has primary address, sort by store proximity
+    if (currentPrimaryAddress?.coordinates && sortedStores.length > 0) {
+      const storeDistanceMap = new Map<string, number>()
+      sortedStores.forEach((store, index) => {
+        storeDistanceMap.set(store.id, index)
+      })
+
+      return [...trendingItems].sort((a, b) => {
+        const distA = storeDistanceMap.get(a.storeId) ?? 999
+        const distB = storeDistanceMap.get(b.storeId) ?? 999
+        return distA - distB
+      }).slice(0, 10)
+    }
+
+    return trendingItems.slice(0, 10)
+  }, [products, currentPrimaryAddress, sortedStores])
+
   // Update stores scroll state when stores data loads
   useEffect(() => {
     // Small delay to ensure DOM has updated with new store items
@@ -294,6 +332,14 @@ export default function HomePage() {
     }, 100)
     return () => clearTimeout(timer)
   }, [offerProducts.length, updateScrollState])
+
+  // Update trending scroll state when trending products load
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      updateScrollState(trendingRef, setTrendingScroll)
+    }, 100)
+    return () => clearTimeout(timer)
+  }, [trendingProducts.length, updateScrollState])
 
   return (
     <div className="min-h-screen bg-cream">
@@ -651,6 +697,107 @@ export default function HomePage() {
                   disabled={!offersScroll.canScrollRight}
                   className={`w-9 h-9 flex items-center justify-center rounded-full border border-gray-200 transition-all ${
                     offersScroll.canScrollRight ? 'bg-cream shadow-md text-primary' : 'bg-gray-100 text-gray-300'
+                  }`}
+                >
+                  <ChevronRight className="h-5 w-5" />
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Trending Section */}
+      {trendingProducts.length > 0 && (
+        <section className="py-4">
+          <div className="max-w-7xl mx-auto px-4">
+            <h2 className="text-lg font-bold text-primary mb-1">
+              {isAuthenticated ? 'Trending in your area' : 'Trending now'}
+            </h2>
+            <p className="text-sm text-gray-500 mb-3">Popular picks from our trusted sellers</p>
+            <div className="relative">
+              {/* Left Arrow - Desktop */}
+              {trendingScroll.canScrollLeft && (
+                <button
+                  onClick={() => handleScroll(trendingRef, 'left')}
+                  className="hidden lg:flex absolute left-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 items-center justify-center rounded-full bg-cream/80 backdrop-blur-md shadow-lg border border-gray-200 hover:bg-cream transition-all"
+                >
+                  <ChevronLeft className="h-5 w-5 text-primary" />
+                </button>
+              )}
+              {/* Right Arrow - Desktop */}
+              {trendingScroll.canScrollRight && (
+                <button
+                  onClick={() => handleScroll(trendingRef, 'right')}
+                  className="hidden lg:flex absolute right-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 items-center justify-center rounded-full bg-cream/80 backdrop-blur-md shadow-lg border border-gray-200 hover:bg-cream transition-all"
+                >
+                  <ChevronRight className="h-5 w-5 text-primary" />
+                </button>
+              )}
+              <div ref={trendingRef} className="flex gap-3 overflow-x-auto scrollbar-hide py-2 px-2 -mx-2">
+                {trendingProducts.map((product) => {
+                  const store = sortedStores.find(s => s.id === product.storeId)
+
+                  return (
+                    <div
+                      key={product.id}
+                      className="flex-shrink-0 w-44 bg-cream border border-gray-200 rounded-xl overflow-hidden hover:shadow-lg transition-shadow"
+                    >
+                      {/* Store badge */}
+                      <div className="px-2 py-1 bg-gray-100 text-xs text-gray-600">
+                        {store?.name ? `${store.name}` : 'Marketplace'}
+                      </div>
+
+                      {/* Product image */}
+                      <div className="h-28 bg-cream flex items-center justify-center p-2">
+                        <img
+                          src={product.image}
+                          alt={product.name}
+                          className="max-h-full max-w-full object-contain"
+                        />
+                      </div>
+
+                      {/* Product info */}
+                      <div className="p-2">
+                        <p className="text-xs font-medium text-gray-900 line-clamp-2 h-8">{product.name}</p>
+                        <p className="text-[10px] text-gray-500 mb-2">Sold by {store?.name || 'Marketplace seller'}</p>
+
+                        {/* Trending badge */}
+                        <div className="bg-primary/10 text-xs font-semibold text-primary px-2 py-1 rounded mb-2">
+                          Trending
+                        </div>
+
+                        {/* Price and Add button */}
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <p className="text-sm font-bold text-gray-900">£{product.price.toFixed(2)}</p>
+                            <p className="text-[10px] text-gray-500">£{product.price.toFixed(2)}/{product.unit || 'each'}</p>
+                          </div>
+                          <Link href={`/products/${product.id}`}>
+                            <Button size="sm" className="text-xs px-3 py-1">Add</Button>
+                          </Link>
+                        </div>
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+              {/* Mobile Arrows - Below content */}
+              <div className="flex lg:hidden justify-center gap-4 mt-3">
+                <button
+                  onClick={() => handleScroll(trendingRef, 'left')}
+                  disabled={!trendingScroll.canScrollLeft}
+                  className={`w-9 h-9 flex items-center justify-center rounded-full border border-gray-200 transition-all ${
+                    trendingScroll.canScrollLeft ? 'bg-cream shadow-md text-primary' : 'bg-gray-100 text-gray-300'
+                  }`}
+                >
+                  <ChevronLeft className="h-5 w-5" />
+                </button>
+                <button
+                  onClick={() => handleScroll(trendingRef, 'right')}
+                  disabled={!trendingScroll.canScrollRight}
+                  className={`w-9 h-9 flex items-center justify-center rounded-full border border-gray-200 transition-all ${
+                    trendingScroll.canScrollRight ? 'bg-cream shadow-md text-primary' : 'bg-gray-100 text-gray-300'
                   }`}
                 >
                   <ChevronRight className="h-5 w-5" />

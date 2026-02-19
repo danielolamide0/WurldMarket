@@ -90,6 +90,7 @@ export interface Product {
   stock: number
   isActive: boolean
   isOnOffer?: boolean
+  isTrending?: boolean
   originalPrice?: number
   offerEndDate?: string
   createdAt: string

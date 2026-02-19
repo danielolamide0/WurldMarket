@@ -42,6 +42,7 @@ export interface IProduct extends Document {
   stock: number
   isActive: boolean
   isOnOffer: boolean
+  isTrending: boolean
   originalPrice?: number
   offerEndDate?: Date
   createdAt: Date
@@ -125,6 +126,10 @@ const ProductSchema = new Schema<IProduct>(
       default: true,
     },
     isOnOffer: {
+      type: Boolean,
+      default: false,
+    },
+    isTrending: {
       type: Boolean,
       default: false,
     },
