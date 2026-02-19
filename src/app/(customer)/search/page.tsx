@@ -1,25 +1,45 @@
 'use client'
 
-import { Suspense, useEffect, useState } from 'react'
+import { Suspense, useEffect, useState, useRef } from 'react'
 import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
-import { Search, MapPin, ArrowLeft, Loader2, Store, Package } from 'lucide-react'
+import { Search, MapPin, ArrowLeft, Loader2, Store, Package, Filter, X, Check } from 'lucide-react'
 import { useProductStore } from '@/stores/productStore'
 import { useVendorStore } from '@/stores/vendorStore'
+import { useAuthStore } from '@/stores/authStore'
+import { useAddressStore } from '@/stores/addressStore'
+import { useLocationStore, useActiveLocation } from '@/stores/locationStore'
 import { ProductCard } from '@/components/products/ProductCard'
 import { Card } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import { calculateDistance } from '@/lib/utils'
+import { Product } from '@/types'
 
-type FilterType = 'all' | 'stores' | 'products'
+type FilterType = 'stores' | 'products'
 
 function SearchResults() {
   const searchParams = useSearchParams()
   const query = searchParams.get('q') || ''
-  const [filter, setFilter] = useState<FilterType>('all')
+  const [filter, setFilter] = useState<FilterType>('products')
+  const [selectedStoreId, setSelectedStoreId] = useState<string | null>(null)
+  const [isStoreFilterOpen, setIsStoreFilterOpen] = useState(false)
+  const storeFilterRef = useRef<HTMLDivElement>(null)
+  
+  const { user, isAuthenticated } = useAuthStore()
+  const { getPrimaryAddress } = useAddressStore()
   const products = useProductStore((state) => state.products)
   const fetchProducts = useProductStore((state) => state.fetchProducts)
   const { stores, fetchStores } = useVendorStore()
+
+  // Get user's primary address
+  const primaryAddress = user ? getPrimaryAddress(user.id) : undefined
+
+  // Get active location for city filtering and proximity sorting
+  const activeLocation = useActiveLocation(
+    isAuthenticated,
+    primaryAddress ? { city: primaryAddress.city, coordinates: primaryAddress.coordinates } : null
+  )
 
   // Fetch data on mount
   useEffect(() => {
@@ -27,18 +47,29 @@ function SearchResults() {
     fetchStores()
   }, [fetchProducts, fetchStores])
 
+  // Close store filter when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (storeFilterRef.current && !storeFilterRef.current.contains(event.target as Node)) {
+        setIsStoreFilterOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
+
   const searchQuery = query.toLowerCase()
 
-  // Search products
-  const matchedProducts = products.filter(
-    (p) =>
-      p.name.toLowerCase().includes(searchQuery) ||
-      p.description.toLowerCase().includes(searchQuery) ||
-      p.category.toLowerCase().includes(searchQuery)
-  )
+  // Filter stores by city if user has location
+  let availableStores = stores
+  if (activeLocation.city) {
+    availableStores = stores.filter((s) => 
+      s.city.toLowerCase() === activeLocation.city!.toLowerCase()
+    )
+  }
 
   // Search stores
-  const matchedStores = stores.filter(
+  let matchedStores = availableStores.filter(
     (s) =>
       s.name.toLowerCase().includes(searchQuery) ||
       s.address.toLowerCase().includes(searchQuery) ||
@@ -46,57 +77,203 @@ function SearchResults() {
       s.postcode.toLowerCase().includes(searchQuery)
   )
 
+  // Sort stores by proximity if user has location
+  if (activeLocation.coordinates) {
+    matchedStores = matchedStores.sort((a, b) => {
+      const distA = a.coordinates
+        ? calculateDistance(
+            activeLocation.coordinates!.lat,
+            activeLocation.coordinates!.lng,
+            a.coordinates.lat,
+            a.coordinates.lng
+          )
+        : Infinity
+      const distB = b.coordinates
+        ? calculateDistance(
+            activeLocation.coordinates!.lat,
+            activeLocation.coordinates!.lng,
+            b.coordinates.lat,
+            b.coordinates.lng
+          )
+        : Infinity
+      return distA - distB
+    })
+  }
+
+  // Search products
+  let matchedProducts = products
+    .filter(
+      (p) =>
+        p.name.toLowerCase().includes(searchQuery) ||
+        p.description.toLowerCase().includes(searchQuery) ||
+        p.category.toLowerCase().includes(searchQuery)
+    )
+    .map((product) => {
+      const store = stores.find((s) => s.id === product.storeId)
+      return { ...product, storeName: store?.name, storeCoordinates: store?.coordinates }
+    })
+
+  // Filter products by city if user has location
+  if (activeLocation.city) {
+    matchedProducts = matchedProducts.filter((p) => {
+      const store = stores.find((s) => s.id === p.storeId)
+      return store && store.city.toLowerCase() === activeLocation.city!.toLowerCase()
+    })
+  }
+
+  // Filter products by selected store
+  if (selectedStoreId) {
+    matchedProducts = matchedProducts.filter((p) => p.storeId === selectedStoreId)
+  }
+
+  // Sort products by proximity if user has location
+  if (activeLocation.coordinates) {
+    matchedProducts = matchedProducts.sort((a, b) => {
+      const distA = a.storeCoordinates
+        ? calculateDistance(
+            activeLocation.coordinates!.lat,
+            activeLocation.coordinates!.lng,
+            a.storeCoordinates.lat,
+            a.storeCoordinates.lng
+          )
+        : Infinity
+      const distB = b.storeCoordinates
+        ? calculateDistance(
+            activeLocation.coordinates!.lat,
+            activeLocation.coordinates!.lng,
+            b.storeCoordinates.lat,
+            b.storeCoordinates.lng
+          )
+        : Infinity
+      return distA - distB
+    })
+  }
+
   const totalResults = matchedProducts.length + matchedStores.length
-  const showStores = filter === 'all' || filter === 'stores'
-  const showProducts = filter === 'all' || filter === 'products'
+  const showStores = filter === 'stores'
+  const showProducts = filter === 'products'
 
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 py-4">
-        {/* Back Arrow + Filter Tabs Row */}
-        <div className="flex items-center gap-3 mb-4">
-          <Link
-            href="/"
-            className="p-2 -ml-2 rounded-xl hover:bg-gray-100 transition-colors flex-shrink-0"
-          >
-            <ArrowLeft className="h-5 w-5 text-primary" />
-          </Link>
+        {/* Back Arrow + Filter Tabs + Store Filter Row */}
+        <div className="flex items-center justify-between gap-3 mb-4">
+          <div className="flex items-center gap-3 flex-1 min-w-0">
+            <Link
+              href="/"
+              className="p-2 -ml-2 rounded-xl hover:bg-gray-100 transition-colors flex-shrink-0"
+            >
+              <ArrowLeft className="h-5 w-5 text-primary" />
+            </Link>
 
-          {/* Filter Tabs */}
-          {totalResults > 0 && (
-            <div className="flex gap-2 overflow-x-auto scrollbar-hide">
-            <button
-              onClick={() => setFilter('all')}
-              className={`px-4 py-2 rounded-full text-sm font-medium transition-all whitespace-nowrap ${
-                filter === 'all'
-                  ? 'bg-primary text-white'
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-              }`}
-            >
-              All
-            </button>
-            <button
-              onClick={() => setFilter('stores')}
-              className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all whitespace-nowrap ${
-                filter === 'stores'
-                  ? 'bg-primary text-white'
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-              }`}
-            >
-              <Store className="h-4 w-4" />
-              Stores
-            </button>
-            <button
-              onClick={() => setFilter('products')}
-              className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all whitespace-nowrap ${
-                filter === 'products'
-                  ? 'bg-primary text-white'
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-              }`}
-            >
-              <Package className="h-4 w-4" />
-              Products
-            </button>
+            {/* Filter Tabs */}
+            {totalResults > 0 && (
+              <div className="flex gap-2 overflow-x-auto scrollbar-hide">
+                <button
+                  onClick={() => setFilter('stores')}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all whitespace-nowrap ${
+                    filter === 'stores'
+                      ? 'bg-primary text-white'
+                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                  }`}
+                >
+                  <Store className="h-4 w-4" />
+                  Stores
+                </button>
+                <button
+                  onClick={() => setFilter('products')}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all whitespace-nowrap ${
+                    filter === 'products'
+                      ? 'bg-primary text-white'
+                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                  }`}
+                >
+                  <Package className="h-4 w-4" />
+                  Products
+                </button>
+              </div>
+            )}
+          </div>
+
+          {/* Store Filter Button */}
+          {filter === 'products' && (
+            <div className="relative flex-shrink-0" ref={storeFilterRef}>
+              <button
+                onClick={() => setIsStoreFilterOpen(!isStoreFilterOpen)}
+                className={`flex items-center gap-2 px-3 py-2 rounded-full text-sm font-medium transition-all ${
+                  selectedStoreId
+                    ? 'bg-primary text-white'
+                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                }`}
+              >
+                <Filter className="h-4 w-4" />
+                {selectedStoreId ? (
+                  <>
+                    <span className="hidden sm:inline">
+                      {stores.find((s) => s.id === selectedStoreId)?.name || 'Store'}
+                    </span>
+                    <X
+                      className="h-3 w-3"
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        setSelectedStoreId(null)
+                      }}
+                    />
+                  </>
+                ) : (
+                  <span className="hidden sm:inline">Filter</span>
+                )}
+              </button>
+
+              {/* Store Filter Dropdown */}
+              {isStoreFilterOpen && (
+                <div className="absolute top-full right-0 mt-2 w-64 bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden z-50 max-h-80 overflow-y-auto">
+                  <div className="px-4 py-2 bg-gray-50 text-xs font-semibold text-gray-500 uppercase tracking-wide border-b border-gray-100">
+                    {activeLocation.city ? `Stores in ${activeLocation.city}` : 'All Stores'}
+                  </div>
+                  <button
+                    onClick={() => {
+                      setSelectedStoreId(null)
+                      setIsStoreFilterOpen(false)
+                    }}
+                    className={`w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-50 text-left transition-colors ${
+                      !selectedStoreId ? 'bg-primary/5' : ''
+                    }`}
+                  >
+                    {!selectedStoreId && <Check className="h-4 w-4 text-primary flex-shrink-0" />}
+                    <span className={`flex-1 ${!selectedStoreId ? 'font-medium text-primary' : 'text-gray-700'}`}>
+                      All Stores
+                    </span>
+                  </button>
+                  {matchedStores.map((store) => (
+                    <button
+                      key={store.id}
+                      onClick={() => {
+                        setSelectedStoreId(store.id)
+                        setIsStoreFilterOpen(false)
+                      }}
+                      className={`w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-50 text-left transition-colors ${
+                        selectedStoreId === store.id ? 'bg-primary/5' : ''
+                      }`}
+                    >
+                      {selectedStoreId === store.id && (
+                        <Check className="h-4 w-4 text-primary flex-shrink-0" />
+                      )}
+                      <div className="flex-1 min-w-0">
+                        <p className={`truncate ${selectedStoreId === store.id ? 'font-medium text-primary' : 'text-gray-900'}`}>
+                          {store.name}
+                        </p>
+                        <p className="text-xs text-gray-500 truncate">{store.address}</p>
+                      </div>
+                    </button>
+                  ))}
+                  {matchedStores.length === 0 && (
+                    <div className="px-4 py-3 text-sm text-gray-500 text-center">
+                      No stores found
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           )}
         </div>
