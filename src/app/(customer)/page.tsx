@@ -49,7 +49,7 @@ export default function HomePage() {
   const fetchProducts = useProductStore((state) => state.fetchProducts)
   const featuredProducts = products.filter((p) => p.isActive).slice(0, 8)
   const { user, isAuthenticated } = useAuthStore()
-  const { getOrdersByCustomer } = useOrderStore()
+  const { orders, fetchOrders } = useOrderStore()
   const { favourites, getRegulars, userId, setUserId, fetchCustomerData, purchaseHistory } = useCustomerStore()
   const stores = useVendorStore((state) => state.stores)
   const fetchStores = useVendorStore((state) => state.fetchStores)
@@ -63,11 +63,13 @@ export default function HomePage() {
   const categoriesRef = useRef<HTMLDivElement>(null)
   const offersRef = useRef<HTMLDivElement>(null)
   const trendingRef = useRef<HTMLDivElement>(null)
+  const trendingDesktopRef = useRef<HTMLDivElement>(null)
 
   // Scroll arrow visibility state
   const [categoriesScroll, setCategoriesScroll] = useState({ canScrollLeft: false, canScrollRight: true })
   const [offersScroll, setOffersScroll] = useState({ canScrollLeft: false, canScrollRight: true })
   const [trendingScroll, setTrendingScroll] = useState({ canScrollLeft: false, canScrollRight: true })
+  const [trendingDesktopScroll, setTrendingDesktopScroll] = useState({ canScrollLeft: false, canScrollRight: true })
 
   // Check scroll position and update arrow visibility
   const updateScrollState = useCallback((ref: React.RefObject<HTMLDivElement>, setState: React.Dispatch<React.SetStateAction<{ canScrollLeft: boolean; canScrollRight: boolean }>>) => {
@@ -106,6 +108,7 @@ export default function HomePage() {
     const categoriesEl = categoriesRef.current
     const offersEl = offersRef.current
     const trendingEl = trendingRef.current
+    const trendingDesktopEl = trendingDesktopRef.current
 
     const handleCategoriesScroll = () => {
       if (categoriesEl) {
@@ -126,10 +129,17 @@ export default function HomePage() {
       }
     }
 
+    const handleTrendingDesktopScroll = () => {
+      if (trendingDesktopEl) {
+        updateScrollState(trendingDesktopRef, setTrendingDesktopScroll)
+      }
+    }
+
     // Initial check for scroll state
     updateScrollState(categoriesRef, setCategoriesScroll)
     updateScrollState(offersRef, setOffersScroll)
     updateScrollState(trendingRef, setTrendingScroll)
+    updateScrollState(trendingDesktopRef, setTrendingDesktopScroll)
 
     if (categoriesEl) {
       categoriesEl.addEventListener('scroll', handleCategoriesScroll)
@@ -139,6 +149,9 @@ export default function HomePage() {
     }
     if (trendingEl) {
       trendingEl.addEventListener('scroll', handleTrendingScroll)
+    }
+    if (trendingDesktopEl) {
+      trendingDesktopEl.addEventListener('scroll', handleTrendingDesktopScroll)
     }
 
     return () => {
@@ -151,6 +164,9 @@ export default function HomePage() {
       if (trendingEl) {
         trendingEl.removeEventListener('scroll', handleTrendingScroll)
       }
+      if (trendingDesktopEl) {
+        trendingDesktopEl.removeEventListener('scroll', handleTrendingDesktopScroll)
+      }
     }
   }, [updateScrollState])
 
@@ -158,7 +174,8 @@ export default function HomePage() {
   useEffect(() => {
     fetchProducts({})
     fetchStores()
-  }, [fetchProducts, fetchStores])
+    fetchOrders() // Fetch all orders for trending calculation
+  }, [fetchProducts, fetchStores, fetchOrders])
 
   // Fetch addresses when user logs in
   useEffect(() => {
@@ -272,19 +289,45 @@ export default function HomePage() {
     return onOfferProducts.slice(0, 10)
   }, [products, currentPrimaryAddress, sortedStores])
 
-  // Get trending products, sorted by proximity to user's primary address
+  // Get trending products based on completed orders (most sold products)
   const trendingProducts = useMemo(() => {
-    // Filter products that are trending and active
-    const trendingItems = products.filter(p => p.isTrending && p.isActive)
+    // Count product sales from completed orders
+    const productSalesCount = new Map<string, number>()
 
-    // If user has primary address, sort by store proximity
+    const completedOrders = orders.filter(o => o.status === 'completed')
+    completedOrders.forEach(order => {
+      order.items.forEach(item => {
+        const currentCount = productSalesCount.get(item.productId) || 0
+        productSalesCount.set(item.productId, currentCount + item.quantity)
+      })
+    })
+
+    // Get active products sorted by sales count
+    const activeProducts = products.filter(p => p.isActive)
+    const sortedBySales = [...activeProducts].sort((a, b) => {
+      const salesA = productSalesCount.get(a.id) || 0
+      const salesB = productSalesCount.get(b.id) || 0
+      return salesB - salesA // Highest sales first
+    })
+
+    // If no completed orders yet, fall back to products marked as trending
+    let trendingItems = sortedBySales.filter(p => productSalesCount.get(p.id) || 0 > 0)
+    if (trendingItems.length === 0) {
+      trendingItems = products.filter(p => p.isTrending && p.isActive)
+    }
+
+    // If user has primary address, sort by store proximity as secondary sort
     if (currentPrimaryAddress?.coordinates && sortedStores.length > 0) {
       const storeDistanceMap = new Map<string, number>()
       sortedStores.forEach((store, index) => {
         storeDistanceMap.set(store.id, index)
       })
 
+      // Sort by sales first, then by proximity
       return [...trendingItems].sort((a, b) => {
+        const salesA = productSalesCount.get(a.id) || 0
+        const salesB = productSalesCount.get(b.id) || 0
+        if (salesB !== salesA) return salesB - salesA
         const distA = storeDistanceMap.get(a.storeId) ?? 999
         const distB = storeDistanceMap.get(b.storeId) ?? 999
         return distA - distB
@@ -292,7 +335,7 @@ export default function HomePage() {
     }
 
     return trendingItems.slice(0, 10)
-  }, [products, currentPrimaryAddress, sortedStores])
+  }, [products, orders, currentPrimaryAddress, sortedStores])
 
   // Update offers scroll state when offer products load
   useEffect(() => {
@@ -306,6 +349,7 @@ export default function HomePage() {
   useEffect(() => {
     const timer = setTimeout(() => {
       updateScrollState(trendingRef, setTrendingScroll)
+      updateScrollState(trendingDesktopRef, setTrendingDesktopScroll)
     }, 100)
     return () => clearTimeout(timer)
   }, [trendingProducts.length, updateScrollState])
@@ -403,10 +447,30 @@ export default function HomePage() {
                 <h2 className="text-lg font-bold text-primary">
                   {isAuthenticated ? 'Trending in your area' : 'Trending now'}
                 </h2>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => handleScroll(trendingDesktopRef, 'left')}
+                    disabled={!trendingDesktopScroll.canScrollLeft}
+                    className={`w-8 h-8 flex items-center justify-center rounded-full border border-gray-200 transition-all ${
+                      trendingDesktopScroll.canScrollLeft ? 'bg-cream shadow-md text-primary hover:bg-gray-100' : 'bg-gray-100 text-gray-300'
+                    }`}
+                  >
+                    <ChevronLeft className="h-4 w-4" />
+                  </button>
+                  <button
+                    onClick={() => handleScroll(trendingDesktopRef, 'right')}
+                    disabled={!trendingDesktopScroll.canScrollRight}
+                    className={`w-8 h-8 flex items-center justify-center rounded-full border border-gray-200 transition-all ${
+                      trendingDesktopScroll.canScrollRight ? 'bg-cream shadow-md text-primary hover:bg-gray-100' : 'bg-gray-100 text-gray-300'
+                    }`}
+                  >
+                    <ChevronRight className="h-4 w-4" />
+                  </button>
+                </div>
               </div>
-              <div className="flex-1 overflow-hidden rounded-xl border border-gray-200 bg-cream">
-                <div className="flex gap-3 overflow-x-auto scrollbar-hide p-3 h-full">
-                  {trendingProducts.slice(0, 4).map((product) => {
+              <div className="flex-1 overflow-hidden rounded-xl border border-gray-200 bg-cream relative">
+                <div ref={trendingDesktopRef} className="flex gap-3 overflow-x-auto scrollbar-hide p-3 h-full">
+                  {trendingProducts.map((product) => {
                     const store = sortedStores.find(s => s.id === product.storeId)
                     const quantity = getItemQuantity(product.id)
 
@@ -765,30 +829,13 @@ export default function HomePage() {
       {trendingProducts.length > 0 && (
         <section className="py-4 md:hidden">
           <div className="max-w-7xl mx-auto px-4">
-            <h2 className="text-lg font-bold text-primary mb-1">
-              {isAuthenticated ? 'Trending in your area' : 'Trending now'}
-            </h2>
-            <p className="text-sm text-gray-500 mb-3">Popular picks from our trusted sellers</p>
-            <div className="relative">
-              {/* Left Arrow - Desktop */}
-              {trendingScroll.canScrollLeft && (
-                <button
-                  onClick={() => handleScroll(trendingRef, 'left')}
-                  className="hidden lg:flex absolute left-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 items-center justify-center rounded-full bg-cream/80 backdrop-blur-md shadow-lg border border-gray-200 hover:bg-cream transition-all"
-                >
-                  <ChevronLeft className="h-5 w-5 text-primary" />
-                </button>
-              )}
-              {/* Right Arrow - Desktop */}
-              {trendingScroll.canScrollRight && (
-                <button
-                  onClick={() => handleScroll(trendingRef, 'right')}
-                  className="hidden lg:flex absolute right-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 items-center justify-center rounded-full bg-cream/80 backdrop-blur-md shadow-lg border border-gray-200 hover:bg-cream transition-all"
-                >
-                  <ChevronRight className="h-5 w-5 text-primary" />
-                </button>
-              )}
-              <div ref={trendingRef} className="flex gap-3 overflow-x-auto scrollbar-hide py-2 px-2 -mx-2">
+            <div className="flex items-center justify-between mb-3">
+              <h2 className="text-lg font-bold text-primary">
+                {isAuthenticated ? 'Trending in your area' : 'Trending now'}
+              </h2>
+            </div>
+            <div className="overflow-hidden rounded-xl border border-gray-200 bg-cream">
+              <div ref={trendingRef} className="flex gap-3 overflow-x-auto scrollbar-hide p-3">
                 {trendingProducts.map((product) => {
                   const store = sortedStores.find(s => s.id === product.storeId)
                   const quantity = getItemQuantity(product.id)
@@ -829,56 +876,43 @@ export default function HomePage() {
                     <Link
                       key={product.id}
                       href={`/products/${product.id}`}
-                      className="flex-shrink-0 w-44 bg-cream border border-gray-200 rounded-xl overflow-hidden hover:shadow-lg transition-shadow"
+                      className="flex-shrink-0 w-32 bg-white border border-gray-100 rounded-lg overflow-hidden hover:shadow-md transition-shadow"
                     >
-                      {/* Store badge */}
-                      <div className="px-2 py-1 bg-gray-100 text-xs text-gray-600">
-                        {store?.name ? `${store.name}` : 'Marketplace'}
-                      </div>
-
-                      {/* Product image */}
-                      <div className="h-28 bg-cream flex items-center justify-center p-2">
+                      <div className="h-20 bg-gray-50 flex items-center justify-center p-2">
                         <img
                           src={product.image}
                           alt={product.name}
                           className="max-h-full max-w-full object-contain"
                         />
                       </div>
-
-                      {/* Product info */}
                       <div className="p-2">
-                        <p className="text-xs font-medium text-gray-900 line-clamp-2 h-8">{product.name}</p>
-                        <p className="text-[10px] text-gray-500 mb-2">Sold by {store?.name || 'Marketplace seller'}</p>
-
-                        {/* Trending badge */}
-                        <div className="bg-yellow-400 text-xs font-semibold text-gray-900 px-2 py-1 rounded mb-2">
-                          Trending
-                        </div>
-
-                        {/* Price and Add button */}
+                        <p className="text-xs font-medium text-gray-900 line-clamp-1">{product.name}</p>
+                        <p className="text-[10px] text-gray-500 mb-1">{store?.name || 'Marketplace'}</p>
                         <div className="flex items-center justify-between">
-                          <div>
-                            <p className="text-sm font-bold text-gray-900">£{product.price.toFixed(2)}</p>
-                            <p className="text-[10px] text-gray-500">£{product.price.toFixed(2)}/{product.unit || 'each'}</p>
-                          </div>
+                          <p className="text-sm font-bold text-gray-900">£{product.price.toFixed(2)}</p>
                           {quantity > 0 ? (
-                            <div className="flex items-center gap-1">
+                            <div className="flex items-center gap-0.5">
                               <button
                                 onClick={handleDecrement}
-                                className="w-7 h-7 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 transition-colors"
+                                className="w-5 h-5 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200"
                               >
-                                <Minus className="h-3 w-3" />
+                                <Minus className="h-2.5 w-2.5" />
                               </button>
-                              <span className="w-6 text-center text-sm font-medium">{quantity}</span>
+                              <span className="w-4 text-center text-xs font-medium">{quantity}</span>
                               <button
                                 onClick={handleIncrement}
-                                className="w-7 h-7 flex items-center justify-center rounded-full bg-primary text-white hover:bg-primary-dark transition-colors"
+                                className="w-5 h-5 flex items-center justify-center rounded-full bg-primary text-white"
                               >
-                                <Plus className="h-3 w-3" />
+                                <Plus className="h-2.5 w-2.5" />
                               </button>
                             </div>
                           ) : (
-                            <Button size="sm" className="text-xs px-3 py-1" onClick={handleAddToCart}>Add</Button>
+                            <button
+                              onClick={handleAddToCart}
+                              className="w-5 h-5 flex items-center justify-center rounded-full bg-primary text-white"
+                            >
+                              <Plus className="h-3 w-3" />
+                            </button>
                           )}
                         </div>
                       </div>
@@ -886,27 +920,27 @@ export default function HomePage() {
                   )
                 })}
               </div>
-              {/* Mobile Arrows - Below content */}
-              <div className="flex lg:hidden justify-center gap-4 mt-3">
-                <button
-                  onClick={() => handleScroll(trendingRef, 'left')}
-                  disabled={!trendingScroll.canScrollLeft}
-                  className={`w-9 h-9 flex items-center justify-center rounded-full border border-gray-200 transition-all ${
-                    trendingScroll.canScrollLeft ? 'bg-cream shadow-md text-primary' : 'bg-gray-100 text-gray-300'
-                  }`}
-                >
-                  <ChevronLeft className="h-5 w-5" />
-                </button>
-                <button
-                  onClick={() => handleScroll(trendingRef, 'right')}
-                  disabled={!trendingScroll.canScrollRight}
-                  className={`w-9 h-9 flex items-center justify-center rounded-full border border-gray-200 transition-all ${
-                    trendingScroll.canScrollRight ? 'bg-cream shadow-md text-primary' : 'bg-gray-100 text-gray-300'
-                  }`}
-                >
-                  <ChevronRight className="h-5 w-5" />
-                </button>
-              </div>
+            </div>
+            {/* Mobile Arrows - Below content */}
+            <div className="flex justify-center gap-4 mt-3">
+              <button
+                onClick={() => handleScroll(trendingRef, 'left')}
+                disabled={!trendingScroll.canScrollLeft}
+                className={`w-9 h-9 flex items-center justify-center rounded-full border border-gray-200 transition-all ${
+                  trendingScroll.canScrollLeft ? 'bg-cream shadow-md text-primary' : 'bg-gray-100 text-gray-300'
+                }`}
+              >
+                <ChevronLeft className="h-5 w-5" />
+              </button>
+              <button
+                onClick={() => handleScroll(trendingRef, 'right')}
+                disabled={!trendingScroll.canScrollRight}
+                className={`w-9 h-9 flex items-center justify-center rounded-full border border-gray-200 transition-all ${
+                  trendingScroll.canScrollRight ? 'bg-cream shadow-md text-primary' : 'bg-gray-100 text-gray-300'
+                }`}
+              >
+                <ChevronRight className="h-5 w-5" />
+              </button>
             </div>
           </div>
         </section>
