@@ -9,8 +9,10 @@ import { useCartStore } from '@/stores/cartStore'
 import { useProductStore } from '@/stores/productStore'
 import { useVendorStore } from '@/stores/vendorStore'
 import { useAddressStore } from '@/stores/addressStore'
+import { useLocationStore, useActiveLocation } from '@/stores/locationStore'
 import { Button } from '@/components/ui/button'
 import { Product, StoreLocation } from '@/types'
+import { calculateDistance } from '@/lib/utils'
 
 // Popular searches for the dropdown
 const POPULAR_SEARCHES = [
@@ -87,7 +89,7 @@ export function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [isAddressDropdownOpen, setIsAddressDropdownOpen] = useState(false)
   const [searchResults, setSearchResults] = useState<{
-    products: Product[]
+    products: (Product & { storeName?: string; storeCoordinates?: { lat: number; lng: number } })[]
     stores: StoreLocation[]
   }>({ products: [], stores: [] })
   const desktopSearchRef = useRef<HTMLDivElement>(null)
@@ -99,6 +101,12 @@ export function Header() {
   // Get user's addresses
   const userAddresses = user ? getAddressesByUser(user.id) : []
   const primaryAddress = user ? getPrimaryAddress(user.id) : undefined
+
+  // Get active location for proximity sorting
+  const activeLocation = useActiveLocation(
+    isAuthenticated,
+    primaryAddress ? { city: primaryAddress.city, coordinates: primaryAddress.coordinates } : null
+  )
 
   // Fetch addresses when user logs in
   useEffect(() => {
@@ -143,7 +151,7 @@ export function Header() {
     router.push('/')
   }
 
-  // Search functionality
+  // Search functionality with proximity sorting
   useEffect(() => {
     if (searchQuery.trim().length < 2) {
       setSearchResults({ products: [], stores: [] })
@@ -152,29 +160,81 @@ export function Header() {
 
     const query = searchQuery.toLowerCase()
 
-    // Search products
-    const matchedProducts = products
+    // Search products and include store info
+    let matchedProducts = products
       .filter(
         (p) =>
           p.name.toLowerCase().includes(query) ||
           p.description.toLowerCase().includes(query) ||
           p.category.toLowerCase().includes(query)
       )
-      .slice(0, 5)
+      .map((product) => {
+        // Find the store for this product
+        const store = stores.find((s) => s.id === product.storeId)
+        return { ...product, storeName: store?.name, storeCoordinates: store?.coordinates }
+      })
+
+    // Sort by proximity if user has location
+    if (activeLocation.coordinates) {
+      matchedProducts = matchedProducts.sort((a, b) => {
+        const distA = a.storeCoordinates
+          ? calculateDistance(
+              activeLocation.coordinates!.lat,
+              activeLocation.coordinates!.lng,
+              a.storeCoordinates.lat,
+              a.storeCoordinates.lng
+            )
+          : Infinity
+        const distB = b.storeCoordinates
+          ? calculateDistance(
+              activeLocation.coordinates!.lat,
+              activeLocation.coordinates!.lng,
+              b.storeCoordinates.lat,
+              b.storeCoordinates.lng
+            )
+          : Infinity
+        return distA - distB
+      })
+    }
+
+    matchedProducts = matchedProducts.slice(0, 5)
 
     // Search stores
-    const matchedStores = stores
-      .filter(
-        (s) =>
-          s.name.toLowerCase().includes(query) ||
-          s.address.toLowerCase().includes(query) ||
-          s.city.toLowerCase().includes(query) ||
-          s.postcode.toLowerCase().includes(query)
-      )
-      .slice(0, 3)
+    let matchedStores = stores.filter(
+      (s) =>
+        s.name.toLowerCase().includes(query) ||
+        s.address.toLowerCase().includes(query) ||
+        s.city.toLowerCase().includes(query) ||
+        s.postcode.toLowerCase().includes(query)
+    )
+
+    // Sort stores by proximity if user has location
+    if (activeLocation.coordinates) {
+      matchedStores = matchedStores.sort((a, b) => {
+        const distA = a.coordinates
+          ? calculateDistance(
+              activeLocation.coordinates!.lat,
+              activeLocation.coordinates!.lng,
+              a.coordinates.lat,
+              a.coordinates.lng
+            )
+          : Infinity
+        const distB = b.coordinates
+          ? calculateDistance(
+              activeLocation.coordinates!.lat,
+              activeLocation.coordinates!.lng,
+              b.coordinates.lat,
+              b.coordinates.lng
+            )
+          : Infinity
+        return distA - distB
+      })
+    }
+
+    matchedStores = matchedStores.slice(0, 3)
 
     setSearchResults({ products: matchedProducts, stores: matchedStores })
-  }, [searchQuery, products, stores])
+  }, [searchQuery, products, stores, activeLocation.coordinates])
 
   // Close search dropdown when clicking outside
   useEffect(() => {
@@ -225,25 +285,31 @@ export function Header() {
   const showPopularSearches = isSearchOpen && searchQuery.length < 2
 
   // Popular Searches Component
-  const PopularSearchesDropdown = ({ isMobile = false }: { isMobile?: boolean }) => (
-    <div className={`${isMobile ? '' : 'absolute top-full left-0 right-0 mt-2 rounded-xl shadow-lg border border-gray-100'} bg-cream overflow-hidden z-50`}>
-      <div className="px-4 py-2 bg-gray-50 text-xs font-semibold text-gray-500 uppercase tracking-wide">
-        Popular Searches
+  const PopularSearchesDropdown = ({ isMobile = false }: { isMobile?: boolean }) => {
+    // Show 3 items on mobile, 5 on desktop
+    const displayCount = isMobile ? 3 : 5
+    const displayedSearches = POPULAR_SEARCHES.slice(0, displayCount)
+
+    return (
+      <div className={`${isMobile ? '' : 'absolute top-full left-0 right-0 mt-2 rounded-xl shadow-lg border border-gray-100'} bg-cream overflow-hidden z-50`}>
+        <div className="px-4 py-2 bg-gray-50 text-xs font-semibold text-gray-500 uppercase tracking-wide">
+          Popular Searches
+        </div>
+        <div className="py-2">
+          {displayedSearches.map((term) => (
+            <button
+              key={term}
+              onClick={() => handlePopularSearchClick(term)}
+              className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-primary/5 active:bg-primary/10 transition-colors text-left"
+            >
+              <Search className="h-4 w-4 text-primary" />
+              <span className="text-gray-700 hover:text-primary">{term}</span>
+            </button>
+          ))}
+        </div>
       </div>
-      <div className="py-2">
-        {POPULAR_SEARCHES.map((term) => (
-          <button
-            key={term}
-            onClick={() => handlePopularSearchClick(term)}
-            className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-primary/5 active:bg-primary/10 transition-colors text-left"
-          >
-            <Search className="h-4 w-4 text-primary" />
-            <span className="text-gray-700 hover:text-primary">{term}</span>
-          </button>
-        ))}
-      </div>
-    </div>
-  )
+    )
+  }
 
   // Search Results Component (shared between mobile and desktop)
   const SearchResultsDropdown = ({ isMobile = false }: { isMobile?: boolean }) => (
@@ -275,7 +341,12 @@ export function Header() {
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="font-medium text-gray-900 truncate">{product.name}</p>
-                    <p className="text-sm text-primary">£{product.price.toFixed(2)}</p>
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm text-primary">£{product.price.toFixed(2)}</span>
+                      {product.storeName && (
+                        <span className="text-xs text-gray-500">• {product.storeName}</span>
+                      )}
+                    </div>
                   </div>
                   <Package className={`${isMobile ? 'h-5 w-5' : 'h-4 w-4'} text-gray-400 flex-shrink-0`} />
                 </button>

@@ -3,6 +3,7 @@
 import { useEffect, useState, ReactNode } from 'react'
 import { ToastProvider } from '@/components/ui/toast'
 import { SplashScreen } from '@/components/layout/SplashScreen'
+import { LocationPermissionPrompt } from '@/components/LocationPermissionPrompt'
 import { useProductStore } from '@/stores/productStore'
 import { useVendorStore } from '@/stores/vendorStore'
 
@@ -41,6 +42,7 @@ export function Providers({ children }: { children: ReactNode }) {
         <SplashScreen onComplete={handleSplashComplete} />
       )}
       {children}
+      <LocationPermissionPrompt />
     </ToastProvider>
   )
 }
