@@ -244,9 +244,9 @@ export function OrbitingGlobe() {
             }}
           >
             <img
-              src="/globe.png"
+              src="/goldglobe.png"
               alt="Globe"
-              className="w-full h-full object-contain olive-tint"
+              className="w-full h-full object-contain"
               draggable={false}
             />
           </div>
