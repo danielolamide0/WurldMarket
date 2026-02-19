@@ -354,7 +354,7 @@ export default function HomePage() {
               })}
             </div>
             {/* Mobile: Store Finder + Arrows */}
-            <div className="flex lg:hidden items-center justify-center gap-3 mt-3">
+            <div className="flex lg:hidden items-center justify-center gap-2 mt-3">
               <Link
                 href="/stores"
                 className="flex items-center gap-1.5 px-3 py-1.5 bg-primary text-white rounded-full hover:bg-primary-dark transition-colors"
@@ -362,24 +362,26 @@ export default function HomePage() {
                 <MapPin className="h-4 w-4" />
                 <span className="text-xs font-medium">STORE FINDER</span>
               </Link>
-              <button
-                onClick={() => handleScroll(categoriesRef, 'left')}
-                disabled={!categoriesScroll.canScrollLeft}
-                className={`w-9 h-9 flex items-center justify-center rounded-full border border-gray-200 transition-all ${
-                  categoriesScroll.canScrollLeft ? 'bg-cream shadow-md text-primary' : 'bg-gray-100 text-gray-300'
-                }`}
-              >
-                <ChevronLeft className="h-5 w-5" />
-              </button>
-              <button
-                onClick={() => handleScroll(categoriesRef, 'right')}
-                disabled={!categoriesScroll.canScrollRight}
-                className={`w-9 h-9 flex items-center justify-center rounded-full border border-gray-200 transition-all ${
-                  categoriesScroll.canScrollRight ? 'bg-cream shadow-md text-primary' : 'bg-gray-100 text-gray-300'
-                }`}
-              >
-                <ChevronRight className="h-5 w-5" />
-              </button>
+              <div className="flex items-center gap-4">
+                <button
+                  onClick={() => handleScroll(categoriesRef, 'left')}
+                  disabled={!categoriesScroll.canScrollLeft}
+                  className={`w-9 h-9 flex items-center justify-center rounded-full border border-gray-200 transition-all ${
+                    categoriesScroll.canScrollLeft ? 'bg-cream shadow-md text-primary' : 'bg-gray-100 text-gray-300'
+                  }`}
+                >
+                  <ChevronLeft className="h-5 w-5" />
+                </button>
+                <button
+                  onClick={() => handleScroll(categoriesRef, 'right')}
+                  disabled={!categoriesScroll.canScrollRight}
+                  className={`w-9 h-9 flex items-center justify-center rounded-full border border-gray-200 transition-all ${
+                    categoriesScroll.canScrollRight ? 'bg-cream shadow-md text-primary' : 'bg-gray-100 text-gray-300'
+                  }`}
+                >
+                  <ChevronRight className="h-5 w-5" />
+                </button>
+              </div>
             </div>
           </div>
         </div>
