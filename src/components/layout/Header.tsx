@@ -238,20 +238,27 @@ export function Header() {
 
   // Close search dropdown when clicking outside
   useEffect(() => {
+    if (!isSearchOpen) return
+
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as Node
-      const isOutsideDesktop = desktopSearchRef.current && !desktopSearchRef.current.contains(target)
-      const isOutsideMobile = mobileSearchRef.current && !mobileSearchRef.current.contains(target)
-
-      // Only close if clicking outside both search areas
-      if (isOutsideDesktop && isOutsideMobile) {
+      
+      // Check desktop search area
+      const isInsideDesktop = desktopSearchRef.current?.contains(target)
+      // Check mobile search area
+      const isInsideMobile = mobileSearchRef.current?.contains(target)
+      
+      // Close if clicking outside both search areas
+      if (!isInsideDesktop && !isInsideMobile) {
         setIsSearchOpen(false)
+        setSearchQuery('')
+        setSearchResults({ products: [], stores: [] })
       }
     }
 
     document.addEventListener('mousedown', handleClickOutside)
     return () => document.removeEventListener('mousedown', handleClickOutside)
-  }, [])
+  }, [isSearchOpen])
 
   const handleSearchSelect = (type: 'product' | 'store', id: string) => {
     const path = type === 'product' ? `/products/${id}` : `/stores/${id}`
