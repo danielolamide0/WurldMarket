@@ -173,7 +173,11 @@ export default function CategoryPage() {
                     !selectedStoreId ? 'bg-primary/5' : ''
                   }`}
                 >
-                  {!selectedStoreId && <Check className="h-4 w-4 text-primary flex-shrink-0" />}
+                  <div className={`w-5 h-5 rounded border-2 flex items-center justify-center flex-shrink-0 ${
+                    !selectedStoreId ? 'border-primary bg-primary' : 'border-gray-300'
+                  }`}>
+                    {!selectedStoreId && <Check className="h-3 w-3 text-white" />}
+                  </div>
                   <span className={`flex-1 ${!selectedStoreId ? 'font-medium text-primary' : 'text-gray-700'}`}>
                     All Stores
                   </span>
@@ -189,9 +193,11 @@ export default function CategoryPage() {
                       selectedStoreId === store.id ? 'bg-primary/5' : ''
                     }`}
                   >
-                    {selectedStoreId === store.id && (
-                      <Check className="h-4 w-4 text-primary flex-shrink-0" />
-                    )}
+                    <div className={`w-5 h-5 rounded border-2 flex items-center justify-center flex-shrink-0 ${
+                      selectedStoreId === store.id ? 'border-primary bg-primary' : 'border-gray-300'
+                    }`}>
+                      {selectedStoreId === store.id && <Check className="h-3 w-3 text-white" />}
+                    </div>
                     <div className="flex-1 min-w-0">
                       <p className={`truncate ${selectedStoreId === store.id ? 'font-medium text-primary' : 'text-gray-900'}`}>
                         {store.name}
