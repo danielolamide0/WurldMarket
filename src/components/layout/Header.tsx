@@ -94,7 +94,7 @@ export function Header() {
   const mobileSearchRef = useRef<HTMLDivElement>(null)
   const addressDropdownRef = useRef<HTMLDivElement>(null)
   const mobileAddressDropdownRef = useRef<HTMLDivElement>(null)
-  const mobileAddressButtonRef = useRef<HTMLDivElement>(null)
+  const mobileAddressButtonRef = useRef<HTMLButtonElement>(null)
 
   // Get user's addresses
   const userAddresses = user ? getAddressesByUser(user.id) : []
@@ -503,27 +503,26 @@ export function Header() {
                   />
                 </div>
                 {/* Location Selector - Only show for authenticated users */}
-                <div ref={mobileAddressButtonRef}>
-                  {isAuthenticated && userAddresses.length > 0 ? (
-                    <button
-                      type="button"
-                      onClick={() => setIsAddressDropdownOpen(!isAddressDropdownOpen)}
-                      className="flex items-center gap-1 px-3 bg-primary text-white rounded-r-full border-2 border-primary"
-                    >
-                      <MapPin className="h-4 w-4" />
-                      <span className="text-xs font-medium">{primaryAddress?.postcode || userAddresses[0]?.postcode}</span>
-                      <ChevronDown className={`h-3 w-3 transition-transform ${isAddressDropdownOpen ? 'rotate-180' : ''}`} />
-                    </button>
-                  ) : isAuthenticated ? (
-                    <Link
-                      href="/account/addresses?from=home"
-                      className="flex items-center gap-1 px-3 bg-primary text-white rounded-r-full border-2 border-primary"
-                    >
-                      <MapPin className="h-4 w-4" />
-                      <span className="text-xs font-medium">Add</span>
-                    </Link>
-                  ) : null}
-                </div>
+                {isAuthenticated && userAddresses.length > 0 ? (
+                  <button
+                    ref={mobileAddressButtonRef}
+                    type="button"
+                    onClick={() => setIsAddressDropdownOpen(!isAddressDropdownOpen)}
+                    className="flex items-center gap-1 px-3 bg-primary text-white rounded-r-full border-2 border-primary"
+                  >
+                    <MapPin className="h-4 w-4" />
+                    <span className="text-xs font-medium">{primaryAddress?.postcode || userAddresses[0]?.postcode}</span>
+                    <ChevronDown className={`h-3 w-3 transition-transform ${isAddressDropdownOpen ? 'rotate-180' : ''}`} />
+                  </button>
+                ) : isAuthenticated ? (
+                  <Link
+                    href="/account/addresses?from=home"
+                    className="flex items-center gap-1 px-3 bg-primary text-white rounded-r-full border-2 border-primary"
+                  >
+                    <MapPin className="h-4 w-4" />
+                    <span className="text-xs font-medium">Add</span>
+                  </Link>
+                ) : null}
               </form>
 
               {/* Mobile Address Dropdown */}
