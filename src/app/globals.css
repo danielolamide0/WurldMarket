@@ -14,7 +14,7 @@
   --color-forest: #636B2F;
   --color-forest-light: #BAC095;
   --color-forest-dark: #3D4127;
-  --color-cream: #E8E9C8;
+  --color-cream: #FFFFFF;
   --color-sand: #BAC095;
   --color-brown: #3D4127;
 }
@@ -33,7 +33,7 @@ body {
 }
 
 body {
-  background-color: #E8E9C8;
+  background-color: #FFFFFF;
   color: #1a1a1a;
 }
 
@@ -167,4 +167,9 @@ body {
 /* Olive tint filter for logo and globe images */
 .olive-tint {
   filter: sepia(100%) saturate(300%) brightness(70%) hue-rotate(30deg);
+}
+
+/* Dark green tint for arrows */
+.dark-green-tint {
+  filter: sepia(100%) saturate(500%) brightness(40%) hue-rotate(30deg);
 }

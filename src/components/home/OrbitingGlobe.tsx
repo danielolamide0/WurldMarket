@@ -190,7 +190,7 @@ export function OrbitingGlobe() {
             <img
               src="/arrow-up.png"
               alt=""
-              className={`w-10 h-auto transition-opacity pointer-events-none ${isButtonPressed ? 'opacity-100' : 'opacity-60'}`}
+              className={`w-10 h-auto transition-opacity pointer-events-none dark-green-tint ${isButtonPressed ? 'opacity-100' : 'opacity-60'}`}
               draggable={false}
               style={{ WebkitTouchCallout: 'none', WebkitUserSelect: 'none' }}
             />
@@ -226,7 +226,7 @@ export function OrbitingGlobe() {
             <img
               src="/arrow-down.png"
               alt=""
-              className={`w-10 h-auto transition-opacity pointer-events-none ${isButtonPressed ? 'opacity-100' : 'opacity-60'}`}
+              className={`w-10 h-auto transition-opacity pointer-events-none dark-green-tint ${isButtonPressed ? 'opacity-100' : 'opacity-60'}`}
               draggable={false}
               style={{ WebkitTouchCallout: 'none', WebkitUserSelect: 'none' }}
             />
