@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState, useCallback } from 'react'
 import Link from 'next/link'
-import { MapPin, ArrowRight, Clock, ChevronRight, ChevronLeft, Utensils, ShoppingBag, Sparkles, Heart, Wheat, Flame, Snowflake, Leaf, Cookie, Coffee, Carrot, Salad, Apple, Beef, Fish, Droplet, Droplets, ChefHat, Package, Egg, Home, WheatOff, Circle } from 'lucide-react'
+import { MapPin, ArrowRight, Clock, ChevronRight, ChevronLeft, Utensils, Sparkles, Heart, Wheat, Flame, Snowflake, Leaf, Cookie, Coffee, Carrot, Salad, Apple, Beef, Fish, Droplet, Droplets, ChefHat, Package, Egg, Home, WheatOff, Circle } from 'lucide-react'
 import { CATEGORIES } from '@/lib/constants'
 import { useProductStore } from '@/stores/productStore'
 import { useOrderStore } from '@/stores/orderStore'
@@ -15,7 +15,7 @@ import { ProductCard } from '@/components/products/ProductCard'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { calculateDistance, calculateDeliveryTime } from '@/lib/utils'
+import { calculateDistance } from '@/lib/utils'
 import { OrbitingGlobe } from '@/components/home/OrbitingGlobe'
 
 // Icon mapping for categories
@@ -60,13 +60,11 @@ export default function HomePage() {
 
   // Refs for scrollable sections
   const categoriesRef = useRef<HTMLDivElement>(null)
-  const storesRef = useRef<HTMLDivElement>(null)
   const offersRef = useRef<HTMLDivElement>(null)
   const trendingRef = useRef<HTMLDivElement>(null)
 
   // Scroll arrow visibility state
   const [categoriesScroll, setCategoriesScroll] = useState({ canScrollLeft: false, canScrollRight: true })
-  const [storesScroll, setStoresScroll] = useState({ canScrollLeft: false, canScrollRight: true })
   const [offersScroll, setOffersScroll] = useState({ canScrollLeft: false, canScrollRight: true })
   const [trendingScroll, setTrendingScroll] = useState({ canScrollLeft: false, canScrollRight: true })
 
@@ -100,18 +98,11 @@ export default function HomePage() {
         categoriesRef.current.scrollLeft = parseInt(savedScroll, 10)
       }
     }
-    if (storesRef.current) {
-      const savedScroll = sessionStorage.getItem('homepage-stores-scroll')
-      if (savedScroll) {
-        storesRef.current.scrollLeft = parseInt(savedScroll, 10)
-      }
-    }
   }, [])
 
   // Save scroll positions when scrolling and update arrow visibility
   useEffect(() => {
     const categoriesEl = categoriesRef.current
-    const storesEl = storesRef.current
     const offersEl = offersRef.current
     const trendingEl = trendingRef.current
 
@@ -119,13 +110,6 @@ export default function HomePage() {
       if (categoriesEl) {
         sessionStorage.setItem('homepage-categories-scroll', categoriesEl.scrollLeft.toString())
         updateScrollState(categoriesRef, setCategoriesScroll)
-      }
-    }
-
-    const handleStoresScroll = () => {
-      if (storesEl) {
-        sessionStorage.setItem('homepage-stores-scroll', storesEl.scrollLeft.toString())
-        updateScrollState(storesRef, setStoresScroll)
       }
     }
 
@@ -143,15 +127,11 @@ export default function HomePage() {
 
     // Initial check for scroll state
     updateScrollState(categoriesRef, setCategoriesScroll)
-    updateScrollState(storesRef, setStoresScroll)
     updateScrollState(offersRef, setOffersScroll)
     updateScrollState(trendingRef, setTrendingScroll)
 
     if (categoriesEl) {
       categoriesEl.addEventListener('scroll', handleCategoriesScroll)
-    }
-    if (storesEl) {
-      storesEl.addEventListener('scroll', handleStoresScroll)
     }
     if (offersEl) {
       offersEl.addEventListener('scroll', handleOffersScroll)
@@ -163,9 +143,6 @@ export default function HomePage() {
     return () => {
       if (categoriesEl) {
         categoriesEl.removeEventListener('scroll', handleCategoriesScroll)
-      }
-      if (storesEl) {
-        storesEl.removeEventListener('scroll', handleStoresScroll)
       }
       if (offersEl) {
         offersEl.removeEventListener('scroll', handleOffersScroll)
@@ -316,15 +293,6 @@ export default function HomePage() {
     return trendingItems.slice(0, 10)
   }, [products, currentPrimaryAddress, sortedStores])
 
-  // Update stores scroll state when stores data loads
-  useEffect(() => {
-    // Small delay to ensure DOM has updated with new store items
-    const timer = setTimeout(() => {
-      updateScrollState(storesRef, setStoresScroll)
-    }, 100)
-    return () => clearTimeout(timer)
-  }, [sortedStores.length, updateScrollState])
-
   // Update offers scroll state when offer products load
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -385,8 +353,15 @@ export default function HomePage() {
                 )
               })}
             </div>
-            {/* Mobile Arrows - Below content */}
-            <div className="flex lg:hidden justify-center gap-4 mt-3">
+            {/* Mobile: Store Finder + Arrows */}
+            <div className="flex lg:hidden items-center justify-center gap-3 mt-3">
+              <Link
+                href="/stores"
+                className="flex items-center gap-1.5 px-3 py-1.5 bg-primary text-white rounded-full hover:bg-primary-dark transition-colors"
+              >
+                <MapPin className="h-4 w-4" />
+                <span className="text-xs font-medium">STORE FINDER</span>
+              </Link>
               <button
                 onClick={() => handleScroll(categoriesRef, 'left')}
                 disabled={!categoriesScroll.canScrollLeft}
@@ -416,7 +391,16 @@ export default function HomePage() {
       {/* Find Your Flavour - Horizontal scroll (Desktop only) */}
       <section className="hidden md:block py-6">
         <div className="max-w-7xl mx-auto px-4">
-          <h2 className="text-lg font-bold text-gray-900 mb-4">Find your flavour</h2>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-bold text-gray-900">Find your flavour</h2>
+            <Link
+              href="/stores"
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-primary text-white rounded-full hover:bg-primary-dark transition-colors"
+            >
+              <MapPin className="h-4 w-4" />
+              <span className="text-sm font-medium">STORE FINDER</span>
+            </Link>
+          </div>
           <div className="flex gap-6 overflow-x-auto scrollbar-hide py-2 px-2 -mx-2 justify-between">
             {[
               { id: 'african', name: 'African', image: 'https://images.unsplash.com/photo-1604329760661-e71dc83f8f26?w=200', href: '/search?q=african' },
@@ -466,104 +450,6 @@ export default function HomePage() {
         </div>
       </section>
       )}
-
-      {/* Shops in Your Area */}
-      <section className="py-3 md:py-6">
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="flex items-center justify-between mb-2 md:mb-4">
-            <h2 className="text-base md:text-lg font-bold text-gray-900">Shops in your area</h2>
-            <Link
-              href="/stores"
-              className="flex items-center gap-1.5 px-3 py-1.5 bg-primary text-white rounded-full hover:bg-primary-dark transition-colors"
-            >
-              <MapPin className="h-4 w-4" />
-              <span className="text-sm font-medium">STORE FINDER</span>
-            </Link>
-          </div>
-          <div className="relative">
-            {/* Left Arrow - Desktop */}
-            {storesScroll.canScrollLeft && (
-              <button
-                onClick={() => handleScroll(storesRef, 'left')}
-                className="hidden lg:flex absolute left-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 items-center justify-center rounded-full bg-cream/80 backdrop-blur-md shadow-lg border border-gray-200 hover:bg-cream transition-all"
-              >
-                <ChevronLeft className="h-5 w-5 text-primary" />
-              </button>
-            )}
-            {/* Right Arrow - Desktop */}
-            {storesScroll.canScrollRight && (
-              <button
-                onClick={() => handleScroll(storesRef, 'right')}
-                className="hidden lg:flex absolute right-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 items-center justify-center rounded-full bg-cream/80 backdrop-blur-md shadow-lg border border-gray-200 hover:bg-cream transition-all"
-              >
-                <ChevronRight className="h-5 w-5 text-primary" />
-              </button>
-            )}
-            <div ref={storesRef} className="flex gap-3 md:gap-6 overflow-x-auto scrollbar-hide py-2 px-2 -mx-2 md:justify-between">
-              {sortedStores.map((store) => {
-                // Calculate delivery time if user has primary address
-                let deliveryTime: string | null = null
-                if (isAuthenticated && currentPrimaryAddress?.coordinates && store.coordinates) {
-                  const distance = calculateDistance(
-                    currentPrimaryAddress.coordinates.lat,
-                    currentPrimaryAddress.coordinates.lng,
-                    store.coordinates.lat,
-                    store.coordinates.lng
-                  )
-                  deliveryTime = calculateDeliveryTime(distance)
-                }
-
-                return (
-                  <Link
-                    key={store.id}
-                    href={`/stores/${store.id}`}
-                    className="flex-shrink-0 w-20 md:w-[100px] md:flex-1 md:max-w-[140px] hover:scale-110 transition-transform duration-200"
-                  >
-                    <div className="flex flex-col items-center">
-                      <div className="w-16 h-16 md:w-24 md:h-24 bg-cream border border-gray-200 rounded-xl md:rounded-2xl mb-1 md:mb-2 overflow-hidden flex items-center justify-center hover:border-primary hover:shadow-lg transition-all">
-                        {store.image ? (
-                        <img
-                          src={store.image}
-                          alt={store.name}
-                          className="w-full h-full object-cover"
-                        />
-                        ) : (
-                          <ShoppingBag className="h-6 w-6 md:h-8 md:w-8 text-gray-400" />
-                        )}
-                      </div>
-                      <p className="text-xs md:text-sm font-medium text-gray-900 truncate w-full text-center">{store.name}</p>
-                      {deliveryTime && (
-                        <p className="text-[10px] md:text-xs text-gray-500">{deliveryTime}</p>
-                      )}
-                      </div>
-                  </Link>
-                )
-              })}
-            </div>
-            {/* Mobile Arrows - Below content */}
-            <div className="flex lg:hidden justify-center gap-4 mt-3">
-              <button
-                onClick={() => handleScroll(storesRef, 'left')}
-                disabled={!storesScroll.canScrollLeft}
-                className={`w-9 h-9 flex items-center justify-center rounded-full border border-gray-200 transition-all ${
-                  storesScroll.canScrollLeft ? 'bg-cream shadow-md text-primary' : 'bg-gray-100 text-gray-300'
-                }`}
-              >
-                <ChevronLeft className="h-5 w-5" />
-              </button>
-              <button
-                onClick={() => handleScroll(storesRef, 'right')}
-                disabled={!storesScroll.canScrollRight}
-                className={`w-9 h-9 flex items-center justify-center rounded-full border border-gray-200 transition-all ${
-                  storesScroll.canScrollRight ? 'bg-cream shadow-md text-primary' : 'bg-gray-100 text-gray-300'
-                }`}
-              >
-                <ChevronRight className="h-5 w-5" />
-              </button>
-            </div>
-          </div>
-        </div>
-      </section>
 
       {/* Your Regulars - Only show if user has regulars, below the fold */}
       {isAuthenticated && user?.role === 'customer' && regularsCount > 0 && (
