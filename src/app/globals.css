@@ -174,7 +174,7 @@ body {
   filter: sepia(100%) saturate(500%) brightness(40%) hue-rotate(30deg);
 }
 
-/* Olive green tint for find your flavour */
+/* Olive/khaki tint for find your flavour (#859129) */
 .flavour-green-tint {
-  filter: sepia(100%) saturate(400%) brightness(55%) hue-rotate(35deg);
+  filter: brightness(0) saturate(100%) invert(53%) sepia(50%) saturate(600%) hue-rotate(30deg) brightness(90%);
 }
