@@ -19,21 +19,19 @@ export function OrbitingGlobe() {
   const [rotation, setRotation] = useState(0)
   const [isDragging, setIsDragging] = useState(false)
   const [isButtonPressed, setIsButtonPressed] = useState(false)
-  const [isPaused, setIsPaused] = useState(false)
   const [startX, setStartX] = useState(0)
   const [startRotation, setStartRotation] = useState(0)
   const containerRef = useRef<HTMLDivElement>(null)
   const animationRef = useRef<number | null>(null)
   const buttonAnimationRef = useRef<number | null>(null)
-  const resumeTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   const touchStartXRef = useRef<number>(0)
   const hasDraggedRef = useRef<boolean>(false)
   const dragStartXRef = useRef<number>(0)
   const dragStartRotationRef = useRef<number>(0)
 
-  // Auto-rotate when not dragging, not using buttons, and not paused
+  // Auto-rotate when not dragging and not using buttons
   useEffect(() => {
-    if (!isDragging && !isButtonPressed && !isPaused) {
+    if (!isDragging && !isButtonPressed) {
       const animate = () => {
         setRotation(prev => (prev + 0.3) % 360)
         animationRef.current = requestAnimationFrame(animate)
@@ -45,7 +43,7 @@ export function OrbitingGlobe() {
         cancelAnimationFrame(animationRef.current)
       }
     }
-  }, [isDragging, isButtonPressed, isPaused])
+  }, [isDragging, isButtonPressed])
 
   // Button press animation - both arrows rotate anticlockwise
   useEffect(() => {
@@ -65,32 +63,13 @@ export function OrbitingGlobe() {
   }, [isButtonPressed])
 
   const handleButtonDown = useCallback(() => {
-    // Clear any pending resume timeout
-    if (resumeTimeoutRef.current) {
-      clearTimeout(resumeTimeoutRef.current)
-      resumeTimeoutRef.current = null
-    }
-    setIsPaused(false)
     setIsButtonPressed(true)
   }, [])
 
   const handleButtonUp = useCallback(() => {
     setIsButtonPressed(false)
-    // Pause auto-rotation for 3 seconds after releasing button
-    setIsPaused(true)
-    resumeTimeoutRef.current = setTimeout(() => {
-      setIsPaused(false)
-    }, 3000)
   }, [])
 
-  // Cleanup timeout on unmount
-  useEffect(() => {
-    return () => {
-      if (resumeTimeoutRef.current) {
-        clearTimeout(resumeTimeoutRef.current)
-      }
-    }
-  }, [])
 
   const handleMouseDown = (e: React.MouseEvent) => {
     // Don't start dragging if clicking on a link
