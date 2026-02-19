@@ -236,8 +236,8 @@ export function OrbitingGlobe() {
           <div
             className="absolute z-20 pointer-events-none"
             style={{
-              width: '150px',
-              height: '150px',
+              width: '225px',
+              height: '225px',
               top: '50%',
               left: '55%',
               transform: 'translate(-50%, -50%)',
