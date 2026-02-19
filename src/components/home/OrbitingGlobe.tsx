@@ -204,12 +204,12 @@ export function OrbitingGlobe() {
               transform: 'translateY(-50%)',
             }}
           >
-            <img
-              src="/find-your-flavour.png"
-              alt="Find Your Flavour"
-              className="h-4 flavour-green-tint"
-              draggable={false}
-            />
+            <span
+              className="text-sm font-semibold whitespace-nowrap"
+              style={{ color: '#859129' }}
+            >
+              Find Your Flavour
+            </span>
           </div>
 
           {/* Down arrow - bottom right */}
