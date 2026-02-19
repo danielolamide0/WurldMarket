@@ -14,7 +14,7 @@
   --color-forest: #636B2F;
   --color-forest-light: #BAC095;
   --color-forest-dark: #3D4127;
-  --color-cream: #FFFFFF;
+  --color-cream: #F7F8F3;
   --color-sand: #BAC095;
   --color-brown: #3D4127;
 }
@@ -33,7 +33,7 @@ body {
 }
 
 body {
-  background-color: #FFFFFF;
+  background-color: #F7F8F3;
   color: #1a1a1a;
 }
 
