@@ -148,13 +148,13 @@ export function OrbitingGlobe() {
   }
 
   return (
-    <section className="py-1 overflow-hidden md:hidden">
+    <section className="overflow-hidden md:hidden -mt-2">
       <div className="max-w-7xl mx-auto px-4">
         <div
           ref={containerRef}
           className="relative select-none"
           style={{
-            height: '260px',
+            height: '240px',
           }}
         >
           {/* Touch area for globe/orbit - covers right 70% where globe and orbits are */}
