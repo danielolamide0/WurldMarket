@@ -94,6 +94,7 @@ export function Header() {
   const mobileSearchRef = useRef<HTMLDivElement>(null)
   const addressDropdownRef = useRef<HTMLDivElement>(null)
   const mobileAddressDropdownRef = useRef<HTMLDivElement>(null)
+  const mobileAddressButtonRef = useRef<HTMLDivElement>(null)
 
   // Get user's addresses
   const userAddresses = user ? getAddressesByUser(user.id) : []
@@ -119,8 +120,9 @@ export function Header() {
       const target = event.target as Node
       const isInsideDesktop = addressDropdownRef.current?.contains(target)
       const isInsideMobile = mobileAddressDropdownRef.current?.contains(target)
+      const isInsideMobileButton = mobileAddressButtonRef.current?.contains(target)
 
-      if (!isInsideDesktop && !isInsideMobile) {
+      if (!isInsideDesktop && !isInsideMobile && !isInsideMobileButton) {
         setIsAddressDropdownOpen(false)
       }
     }
@@ -423,9 +425,6 @@ export function Header() {
                     {/* Address Dropdown */}
                     {isAddressDropdownOpen && (
                       <div className="absolute top-full right-0 mt-2 w-64 bg-cream rounded-xl shadow-lg border border-gray-100 overflow-hidden z-50">
-                        <div className="px-4 py-2 bg-gray-50 text-xs font-semibold text-gray-500 uppercase tracking-wide">
-                          Deliver to
-                        </div>
                         {userAddresses.map((addr) => (
                           <button
                             key={addr.id}
@@ -504,33 +503,32 @@ export function Header() {
                   />
                 </div>
                 {/* Location Selector - Only show for authenticated users */}
-                {isAuthenticated && userAddresses.length > 0 ? (
-                  <button
-                    type="button"
-                    onClick={() => setIsAddressDropdownOpen(!isAddressDropdownOpen)}
-                    className="flex items-center gap-1 px-3 bg-primary text-white rounded-r-full border-2 border-primary"
-                  >
-                    <MapPin className="h-4 w-4" />
-                    <span className="text-xs font-medium">{primaryAddress?.postcode || userAddresses[0]?.postcode}</span>
-                    <ChevronDown className={`h-3 w-3 transition-transform ${isAddressDropdownOpen ? 'rotate-180' : ''}`} />
-                  </button>
-                ) : isAuthenticated ? (
-                  <Link
-                    href="/account/addresses?from=home"
-                    className="flex items-center gap-1 px-3 bg-primary text-white rounded-r-full border-2 border-primary"
-                  >
-                    <MapPin className="h-4 w-4" />
-                    <span className="text-xs font-medium">Add</span>
-                  </Link>
-                ) : null}
+                <div ref={mobileAddressButtonRef}>
+                  {isAuthenticated && userAddresses.length > 0 ? (
+                    <button
+                      type="button"
+                      onClick={() => setIsAddressDropdownOpen(!isAddressDropdownOpen)}
+                      className="flex items-center gap-1 px-3 bg-primary text-white rounded-r-full border-2 border-primary"
+                    >
+                      <MapPin className="h-4 w-4" />
+                      <span className="text-xs font-medium">{primaryAddress?.postcode || userAddresses[0]?.postcode}</span>
+                      <ChevronDown className={`h-3 w-3 transition-transform ${isAddressDropdownOpen ? 'rotate-180' : ''}`} />
+                    </button>
+                  ) : isAuthenticated ? (
+                    <Link
+                      href="/account/addresses?from=home"
+                      className="flex items-center gap-1 px-3 bg-primary text-white rounded-r-full border-2 border-primary"
+                    >
+                      <MapPin className="h-4 w-4" />
+                      <span className="text-xs font-medium">Add</span>
+                    </Link>
+                  ) : null}
+                </div>
               </form>
 
               {/* Mobile Address Dropdown */}
               {isAddressDropdownOpen && isAuthenticated && userAddresses.length > 0 && (
                 <div ref={mobileAddressDropdownRef} className="absolute top-full left-0 right-0 mt-2 bg-cream rounded-xl shadow-lg border border-gray-100 overflow-hidden z-50">
-                  <div className="px-4 py-2 bg-gray-50 text-xs font-semibold text-gray-500 uppercase tracking-wide">
-                    Deliver to
-                  </div>
                   {userAddresses.map((addr) => (
                     <button
                       key={addr.id}
