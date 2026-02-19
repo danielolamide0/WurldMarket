@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState, useCallback } from 'react'
 import Link from 'next/link'
-import { MapPin, ArrowRight, Clock, ChevronRight, ChevronLeft, Utensils, Sparkles, Heart, Wheat, Flame, Snowflake, Leaf, Cookie, Coffee, Carrot, Salad, Apple, Beef, Fish, Droplet, Droplets, ChefHat, Package, Egg, Home, WheatOff, Circle } from 'lucide-react'
+import { MapPin, ArrowRight, Clock, ChevronRight, ChevronLeft, Utensils, Sparkles, Heart, Wheat, Flame, Snowflake, Leaf, Cookie, Coffee, Carrot, Salad, Apple, Beef, Fish, Droplet, Droplets, ChefHat, Package, Egg, Home, WheatOff, Circle, Plus, Minus } from 'lucide-react'
 import { CATEGORIES } from '@/lib/constants'
 import { useProductStore } from '@/stores/productStore'
 import { useOrderStore } from '@/stores/orderStore'
@@ -53,7 +53,7 @@ export default function HomePage() {
   const stores = useVendorStore((state) => state.stores)
   const fetchStores = useVendorStore((state) => state.fetchStores)
   const { getPrimaryAddress, fetchAddresses, addresses } = useAddressStore()
-  const { setUserId: setCartUserId, userId: cartUserId } = useCartStore()
+  const { setUserId: setCartUserId, userId: cartUserId, addItem, updateQuantity, getItemQuantity, removeItem } = useCartStore()
 
   // Get user's primary address for proximity sorting (reactive to address store changes)
   const primaryAddress = user ? getPrimaryAddress(user.id) : undefined
@@ -521,10 +521,44 @@ export default function HomePage() {
                   const store = sortedStores.find(s => s.id === product.storeId)
                   const originalPrice = product.originalPrice || (product.price * 1.25)
                   const offerEndDate = product.offerEndDate ? new Date(product.offerEndDate) : new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+                  const quantity = getItemQuantity(product.id)
+
+                  const handleAddToCart = (e: React.MouseEvent) => {
+                    e.preventDefault()
+                    e.stopPropagation()
+                    addItem({
+                      productId: product.id,
+                      storeId: product.storeId,
+                      vendorId: product.vendorId,
+                      name: product.name,
+                      price: product.price,
+                      unit: product.unit || 'each',
+                      image: product.image,
+                      quantity: 1,
+                      stock: product.stock,
+                    })
+                  }
+
+                  const handleIncrement = (e: React.MouseEvent) => {
+                    e.preventDefault()
+                    e.stopPropagation()
+                    updateQuantity(product.id, quantity + 1)
+                  }
+
+                  const handleDecrement = (e: React.MouseEvent) => {
+                    e.preventDefault()
+                    e.stopPropagation()
+                    if (quantity > 1) {
+                      updateQuantity(product.id, quantity - 1)
+                    } else {
+                      removeItem(product.id)
+                    }
+                  }
 
                   return (
-                    <div
+                    <Link
                       key={product.id}
+                      href={`/products/${product.id}`}
                       className="flex-shrink-0 w-44 bg-cream border border-gray-200 rounded-xl overflow-hidden hover:shadow-lg transition-shadow"
                     >
                       {/* Store badge */}
@@ -560,12 +594,28 @@ export default function HomePage() {
                             <p className="text-sm font-bold text-gray-900">£{product.price.toFixed(2)}</p>
                             <p className="text-[10px] text-gray-500">£{product.price.toFixed(2)}/each</p>
                           </div>
-                          <Link href={`/products/${product.id}`}>
-                            <Button size="sm" className="text-xs px-3 py-1">Add</Button>
-                          </Link>
+                          {quantity > 0 ? (
+                            <div className="flex items-center gap-1">
+                              <button
+                                onClick={handleDecrement}
+                                className="w-7 h-7 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 transition-colors"
+                              >
+                                <Minus className="h-3 w-3" />
+                              </button>
+                              <span className="w-6 text-center text-sm font-medium">{quantity}</span>
+                              <button
+                                onClick={handleIncrement}
+                                className="w-7 h-7 flex items-center justify-center rounded-full bg-primary text-white hover:bg-primary-dark transition-colors"
+                              >
+                                <Plus className="h-3 w-3" />
+                              </button>
+                            </div>
+                          ) : (
+                            <Button size="sm" className="text-xs px-3 py-1" onClick={handleAddToCart}>Add</Button>
+                          )}
                         </div>
                       </div>
-                    </div>
+                    </Link>
                   )
                 })}
               </div>
@@ -625,10 +675,44 @@ export default function HomePage() {
               <div ref={trendingRef} className="flex gap-3 overflow-x-auto scrollbar-hide py-2 px-2 -mx-2">
                 {trendingProducts.map((product) => {
                   const store = sortedStores.find(s => s.id === product.storeId)
+                  const quantity = getItemQuantity(product.id)
+
+                  const handleAddToCart = (e: React.MouseEvent) => {
+                    e.preventDefault()
+                    e.stopPropagation()
+                    addItem({
+                      productId: product.id,
+                      storeId: product.storeId,
+                      vendorId: product.vendorId,
+                      name: product.name,
+                      price: product.price,
+                      unit: product.unit || 'each',
+                      image: product.image,
+                      quantity: 1,
+                      stock: product.stock,
+                    })
+                  }
+
+                  const handleIncrement = (e: React.MouseEvent) => {
+                    e.preventDefault()
+                    e.stopPropagation()
+                    updateQuantity(product.id, quantity + 1)
+                  }
+
+                  const handleDecrement = (e: React.MouseEvent) => {
+                    e.preventDefault()
+                    e.stopPropagation()
+                    if (quantity > 1) {
+                      updateQuantity(product.id, quantity - 1)
+                    } else {
+                      removeItem(product.id)
+                    }
+                  }
 
                   return (
-                    <div
+                    <Link
                       key={product.id}
+                      href={`/products/${product.id}`}
                       className="flex-shrink-0 w-44 bg-cream border border-gray-200 rounded-xl overflow-hidden hover:shadow-lg transition-shadow"
                     >
                       {/* Store badge */}
@@ -661,12 +745,28 @@ export default function HomePage() {
                             <p className="text-sm font-bold text-gray-900">£{product.price.toFixed(2)}</p>
                             <p className="text-[10px] text-gray-500">£{product.price.toFixed(2)}/{product.unit || 'each'}</p>
                           </div>
-                          <Link href={`/products/${product.id}`}>
-                            <Button size="sm" className="text-xs px-3 py-1">Add</Button>
-                          </Link>
+                          {quantity > 0 ? (
+                            <div className="flex items-center gap-1">
+                              <button
+                                onClick={handleDecrement}
+                                className="w-7 h-7 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 transition-colors"
+                              >
+                                <Minus className="h-3 w-3" />
+                              </button>
+                              <span className="w-6 text-center text-sm font-medium">{quantity}</span>
+                              <button
+                                onClick={handleIncrement}
+                                className="w-7 h-7 flex items-center justify-center rounded-full bg-primary text-white hover:bg-primary-dark transition-colors"
+                              >
+                                <Plus className="h-3 w-3" />
+                              </button>
+                            </div>
+                          ) : (
+                            <Button size="sm" className="text-xs px-3 py-1" onClick={handleAddToCart}>Add</Button>
+                          )}
                         </div>
                       </div>
-                    </div>
+                    </Link>
                   )
                 })}
               </div>
