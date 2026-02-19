@@ -9,31 +9,25 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // Primary orange
+        // New primary blue (matching logo)
         primary: {
-          DEFAULT: '#FF5F1F',
-          light: '#FF8347',
-          dark: '#CC4C19',
+          DEFAULT: '#1E4D8C',
+          light: '#2E6AB8',
+          dark: '#153A6B',
         },
-        // Accent green (neon)
-        accent: {
-          DEFAULT: '#39FF14',
-          light: '#6FFF4D',
-          dark: '#2DCC10',
-        },
-        // Legacy colors kept for compatibility
+        // Keep terracotta for accents/legacy
         terracotta: {
-          DEFAULT: '#FF5F1F',
-          light: '#FF8347',
-          dark: '#CC4C19',
+          DEFAULT: '#E85D04',
+          light: '#F28A3D',
+          dark: '#B84803',
         },
         forest: {
-          DEFAULT: '#39FF14',
-          light: '#6FFF4D',
-          dark: '#2DCC10',
+          DEFAULT: '#2D6A4F',
+          light: '#40916C',
+          dark: '#1B4332',
         },
-        cream: '#F5F5F5',
-        sand: '#E8E8E8',
+        cream: '#FDF8F3',
+        sand: '#E6DCD2',
         brown: '#6B4423',
       },
       fontFamily: {

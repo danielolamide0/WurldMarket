@@ -296,7 +296,7 @@ export default function HomePage() {
   }, [offerProducts.length, updateScrollState])
 
   return (
-    <div className="min-h-screen bg-cream">
+    <div className="min-h-screen bg-white">
       {/* Categories Row */}
       <section className="border-b border-gray-100">
         <div className="max-w-7xl mx-auto px-4 py-3 md:py-6">
@@ -305,7 +305,7 @@ export default function HomePage() {
             {categoriesScroll.canScrollLeft && (
               <button
                 onClick={() => handleScroll(categoriesRef, 'left')}
-                className="hidden lg:flex absolute left-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 items-center justify-center rounded-full bg-cream/80 backdrop-blur-md shadow-lg border border-gray-200 hover:bg-cream transition-all"
+                className="hidden lg:flex absolute left-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 items-center justify-center rounded-full bg-white/80 backdrop-blur-md shadow-lg border border-gray-200 hover:bg-white transition-all"
               >
                 <ChevronLeft className="h-5 w-5 text-primary" />
               </button>
@@ -314,7 +314,7 @@ export default function HomePage() {
             {categoriesScroll.canScrollRight && (
               <button
                 onClick={() => handleScroll(categoriesRef, 'right')}
-                className="hidden lg:flex absolute right-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 items-center justify-center rounded-full bg-cream/80 backdrop-blur-md shadow-lg border border-gray-200 hover:bg-cream transition-all"
+                className="hidden lg:flex absolute right-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 items-center justify-center rounded-full bg-white/80 backdrop-blur-md shadow-lg border border-gray-200 hover:bg-white transition-all"
               >
                 <ChevronRight className="h-5 w-5 text-primary" />
               </button>
@@ -345,7 +345,7 @@ export default function HomePage() {
                 onClick={() => handleScroll(categoriesRef, 'left')}
                 disabled={!categoriesScroll.canScrollLeft}
                 className={`w-9 h-9 flex items-center justify-center rounded-full border border-gray-200 transition-all ${
-                  categoriesScroll.canScrollLeft ? 'bg-cream shadow-md text-primary' : 'bg-gray-100 text-gray-300'
+                  categoriesScroll.canScrollLeft ? 'bg-white shadow-md text-primary' : 'bg-gray-100 text-gray-300'
                 }`}
               >
                 <ChevronLeft className="h-5 w-5" />
@@ -354,7 +354,7 @@ export default function HomePage() {
                 onClick={() => handleScroll(categoriesRef, 'right')}
                 disabled={!categoriesScroll.canScrollRight}
                 className={`w-9 h-9 flex items-center justify-center rounded-full border border-gray-200 transition-all ${
-                  categoriesScroll.canScrollRight ? 'bg-cream shadow-md text-primary' : 'bg-gray-100 text-gray-300'
+                  categoriesScroll.canScrollRight ? 'bg-white shadow-md text-primary' : 'bg-gray-100 text-gray-300'
                 }`}
               >
                 <ChevronRight className="h-5 w-5" />
@@ -439,7 +439,7 @@ export default function HomePage() {
             {storesScroll.canScrollLeft && (
               <button
                 onClick={() => handleScroll(storesRef, 'left')}
-                className="hidden lg:flex absolute left-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 items-center justify-center rounded-full bg-cream/80 backdrop-blur-md shadow-lg border border-gray-200 hover:bg-cream transition-all"
+                className="hidden lg:flex absolute left-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 items-center justify-center rounded-full bg-white/80 backdrop-blur-md shadow-lg border border-gray-200 hover:bg-white transition-all"
               >
                 <ChevronLeft className="h-5 w-5 text-primary" />
               </button>
@@ -448,7 +448,7 @@ export default function HomePage() {
             {storesScroll.canScrollRight && (
               <button
                 onClick={() => handleScroll(storesRef, 'right')}
-                className="hidden lg:flex absolute right-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 items-center justify-center rounded-full bg-cream/80 backdrop-blur-md shadow-lg border border-gray-200 hover:bg-cream transition-all"
+                className="hidden lg:flex absolute right-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 items-center justify-center rounded-full bg-white/80 backdrop-blur-md shadow-lg border border-gray-200 hover:bg-white transition-all"
               >
                 <ChevronRight className="h-5 w-5 text-primary" />
               </button>
@@ -474,7 +474,7 @@ export default function HomePage() {
                     className="flex-shrink-0 w-20 md:w-[100px] md:flex-1 md:max-w-[140px] hover:scale-110 transition-transform duration-200"
                   >
                     <div className="flex flex-col items-center">
-                      <div className="w-16 h-16 md:w-24 md:h-24 bg-cream border border-gray-200 rounded-xl md:rounded-2xl mb-1 md:mb-2 overflow-hidden flex items-center justify-center hover:border-primary hover:shadow-lg transition-all">
+                      <div className="w-16 h-16 md:w-24 md:h-24 bg-white border border-gray-200 rounded-xl md:rounded-2xl mb-1 md:mb-2 overflow-hidden flex items-center justify-center hover:border-primary hover:shadow-lg transition-all">
                         {store.image ? (
                         <img
                           src={store.image}
@@ -500,7 +500,7 @@ export default function HomePage() {
                 onClick={() => handleScroll(storesRef, 'left')}
                 disabled={!storesScroll.canScrollLeft}
                 className={`w-9 h-9 flex items-center justify-center rounded-full border border-gray-200 transition-all ${
-                  storesScroll.canScrollLeft ? 'bg-cream shadow-md text-primary' : 'bg-gray-100 text-gray-300'
+                  storesScroll.canScrollLeft ? 'bg-white shadow-md text-primary' : 'bg-gray-100 text-gray-300'
                 }`}
               >
                 <ChevronLeft className="h-5 w-5" />
@@ -509,7 +509,7 @@ export default function HomePage() {
                 onClick={() => handleScroll(storesRef, 'right')}
                 disabled={!storesScroll.canScrollRight}
                 className={`w-9 h-9 flex items-center justify-center rounded-full border border-gray-200 transition-all ${
-                  storesScroll.canScrollRight ? 'bg-cream shadow-md text-primary' : 'bg-gray-100 text-gray-300'
+                  storesScroll.canScrollRight ? 'bg-white shadow-md text-primary' : 'bg-gray-100 text-gray-300'
                 }`}
               >
                 <ChevronRight className="h-5 w-5" />
@@ -568,7 +568,7 @@ export default function HomePage() {
               {offersScroll.canScrollLeft && (
                 <button
                   onClick={() => handleScroll(offersRef, 'left')}
-                  className="hidden lg:flex absolute left-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 items-center justify-center rounded-full bg-cream/80 backdrop-blur-md shadow-lg border border-gray-200 hover:bg-cream transition-all"
+                  className="hidden lg:flex absolute left-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 items-center justify-center rounded-full bg-white/80 backdrop-blur-md shadow-lg border border-gray-200 hover:bg-white transition-all"
                 >
                   <ChevronLeft className="h-5 w-5 text-primary" />
                 </button>
@@ -577,7 +577,7 @@ export default function HomePage() {
               {offersScroll.canScrollRight && (
                 <button
                   onClick={() => handleScroll(offersRef, 'right')}
-                  className="hidden lg:flex absolute right-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 items-center justify-center rounded-full bg-cream/80 backdrop-blur-md shadow-lg border border-gray-200 hover:bg-cream transition-all"
+                  className="hidden lg:flex absolute right-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 items-center justify-center rounded-full bg-white/80 backdrop-blur-md shadow-lg border border-gray-200 hover:bg-white transition-all"
                 >
                   <ChevronRight className="h-5 w-5 text-primary" />
                 </button>
@@ -591,7 +591,7 @@ export default function HomePage() {
                   return (
                     <div
                       key={product.id}
-                      className="flex-shrink-0 w-44 bg-cream border border-gray-200 rounded-xl overflow-hidden hover:shadow-lg transition-shadow"
+                      className="flex-shrink-0 w-44 bg-white border border-gray-200 rounded-xl overflow-hidden hover:shadow-lg transition-shadow"
                     >
                       {/* Store badge */}
                       <div className="px-2 py-1 bg-gray-100 text-xs text-gray-600">
@@ -599,7 +599,7 @@ export default function HomePage() {
                       </div>
 
                       {/* Product image */}
-                      <div className="h-28 bg-cream flex items-center justify-center p-2">
+                      <div className="h-28 bg-white flex items-center justify-center p-2">
                         <img
                           src={product.image}
                           alt={product.name}
@@ -641,7 +641,7 @@ export default function HomePage() {
                   onClick={() => handleScroll(offersRef, 'left')}
                   disabled={!offersScroll.canScrollLeft}
                   className={`w-9 h-9 flex items-center justify-center rounded-full border border-gray-200 transition-all ${
-                    offersScroll.canScrollLeft ? 'bg-cream shadow-md text-primary' : 'bg-gray-100 text-gray-300'
+                    offersScroll.canScrollLeft ? 'bg-white shadow-md text-primary' : 'bg-gray-100 text-gray-300'
                   }`}
                 >
                   <ChevronLeft className="h-5 w-5" />
@@ -650,7 +650,7 @@ export default function HomePage() {
                   onClick={() => handleScroll(offersRef, 'right')}
                   disabled={!offersScroll.canScrollRight}
                   className={`w-9 h-9 flex items-center justify-center rounded-full border border-gray-200 transition-all ${
-                    offersScroll.canScrollRight ? 'bg-cream shadow-md text-primary' : 'bg-gray-100 text-gray-300'
+                    offersScroll.canScrollRight ? 'bg-white shadow-md text-primary' : 'bg-gray-100 text-gray-300'
                   }`}
                 >
                   <ChevronRight className="h-5 w-5" />

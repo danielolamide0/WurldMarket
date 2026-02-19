@@ -75,7 +75,7 @@ export default function VendorOrdersPage() {
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="px-4 py-2.5 rounded-xl border border-gray-300 bg-cream focus:outline-none focus:ring-2 focus:ring-primary"
+            className="px-4 py-2.5 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-primary"
           >
             <option value="all">All Statuses</option>
             {statusOptions.map((status) => (
@@ -161,7 +161,7 @@ export default function VendorOrdersPage() {
                             </p>
                           )}
                           {order.notes && (
-                            <div className="mt-3 p-3 bg-cream rounded-lg">
+                            <div className="mt-3 p-3 bg-white rounded-lg">
                               <p className="text-xs text-gray-500 mb-1">Notes:</p>
                               <p className="text-gray-700">{order.notes}</p>
                             </div>
@@ -176,7 +176,7 @@ export default function VendorOrdersPage() {
                           {order.items.map((item) => (
                             <div
                               key={item.productId}
-                              className="flex items-center justify-between text-sm bg-cream p-2 rounded-lg"
+                              className="flex items-center justify-between text-sm bg-white p-2 rounded-lg"
                             >
                               <div>
                                 <p className="font-medium">{item.productName}</p>

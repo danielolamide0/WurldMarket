@@ -303,7 +303,7 @@ export function OrbitingGlobe() {
                 }}
               >
                 <div className="flex flex-col items-center gap-0.5" style={{ touchAction: 'none' }}>
-                  <div className="w-14 h-14 rounded-full overflow-hidden border-2 border-gray-200 bg-cream shadow-lg">
+                  <div className="w-14 h-14 rounded-full overflow-hidden border-2 border-gray-200 bg-white shadow-lg">
                     <img
                       src={cuisine.image}
                       alt={cuisine.name}

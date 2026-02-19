@@ -224,7 +224,7 @@ export function Header() {
 
   // Popular Searches Component
   const PopularSearchesDropdown = ({ isMobile = false }: { isMobile?: boolean }) => (
-    <div className={`${isMobile ? '' : 'absolute top-full left-0 right-0 mt-2 rounded-xl shadow-lg border border-gray-100'} bg-cream overflow-hidden z-50`}>
+    <div className={`${isMobile ? '' : 'absolute top-full left-0 right-0 mt-2 rounded-xl shadow-lg border border-gray-100'} bg-white overflow-hidden z-50`}>
       <div className="px-4 py-2 bg-gray-50 text-xs font-semibold text-gray-500 uppercase tracking-wide">
         Popular Searches
       </div>
@@ -245,7 +245,7 @@ export function Header() {
 
   // Search Results Component (shared between mobile and desktop)
   const SearchResultsDropdown = ({ isMobile = false }: { isMobile?: boolean }) => (
-    <div className={`${isMobile ? 'border-t border-gray-100' : 'absolute top-full left-0 right-0 mt-2 rounded-xl shadow-lg border border-gray-100'} bg-cream overflow-hidden z-50 max-h-80 overflow-y-auto`}>
+    <div className={`${isMobile ? 'border-t border-gray-100' : 'absolute top-full left-0 right-0 mt-2 rounded-xl shadow-lg border border-gray-100'} bg-white overflow-hidden z-50 max-h-80 overflow-y-auto`}>
       {!hasResults ? (
         <div className="p-4 text-center text-gray-500">
           No results found for &ldquo;{searchQuery}&rdquo;
@@ -324,7 +324,7 @@ export function Header() {
 
   return (
     <>
-      <header className="sticky top-0 z-40 bg-cream border-b border-gray-100 shadow-sm">
+      <header className="sticky top-0 z-40 bg-white border-b border-gray-100 shadow-sm">
         <div className="max-w-7xl mx-auto px-4">
           {/* Main Header Row */}
           <div className="flex items-center justify-between h-16">
@@ -402,7 +402,7 @@ export function Header() {
                       setIsSearchOpen(true)
                     }}
                     onFocus={() => setIsSearchOpen(true)}
-                    className={`w-full pl-11 pr-4 py-3 border-2 border-primary bg-cream focus:outline-none ${
+                    className={`w-full pl-11 pr-4 py-3 border-2 border-primary bg-white focus:outline-none ${
                       isAuthenticated && userAddresses.length > 0 ? 'rounded-l-full border-r-0' : 'rounded-full'
                     }`}
                   />
@@ -422,7 +422,7 @@ export function Header() {
 
                     {/* Address Dropdown */}
                     {isAddressDropdownOpen && (
-                      <div className="absolute top-full right-0 mt-2 w-64 bg-cream rounded-xl shadow-lg border border-gray-100 overflow-hidden z-50">
+                      <div className="absolute top-full right-0 mt-2 w-64 bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden z-50">
                         <div className="px-4 py-2 bg-gray-50 text-xs font-semibold text-gray-500 uppercase tracking-wide">
                           Deliver to
                         </div>
@@ -498,7 +498,7 @@ export function Header() {
                       setIsSearchOpen(true)
                     }}
                     onFocus={() => setIsSearchOpen(true)}
-                    className={`w-full pl-11 pr-4 py-3 border-2 border-primary bg-cream focus:outline-none ${
+                    className={`w-full pl-11 pr-4 py-3 border-2 border-primary bg-white focus:outline-none ${
                       isAuthenticated && userAddresses.length > 0 ? 'rounded-l-full border-r-0' : 'rounded-full'
                     }`}
                   />
@@ -527,7 +527,7 @@ export function Header() {
 
               {/* Mobile Address Dropdown */}
               {isAddressDropdownOpen && isAuthenticated && userAddresses.length > 0 && (
-                <div ref={mobileAddressDropdownRef} className="absolute top-full left-0 right-0 mt-2 bg-cream rounded-xl shadow-lg border border-gray-100 overflow-hidden z-50">
+                <div ref={mobileAddressDropdownRef} className="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden z-50">
                   <div className="px-4 py-2 bg-gray-50 text-xs font-semibold text-gray-500 uppercase tracking-wide">
                     Deliver to
                   </div>
@@ -563,14 +563,14 @@ export function Header() {
 
               {/* Mobile Popular Searches Dropdown */}
               {showPopularSearches && (
-                <div className="absolute top-full left-0 right-0 mt-2 bg-cream rounded-xl shadow-lg border border-gray-100 overflow-hidden z-50">
+                <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden z-50">
                   <PopularSearchesDropdown isMobile />
                 </div>
               )}
 
               {/* Mobile Search Results Dropdown */}
               {isSearchOpen && searchQuery.length >= 2 && (
-                <div className="absolute top-full left-0 right-0 mt-2 bg-cream rounded-xl shadow-lg border border-gray-100 overflow-hidden z-50 max-h-80 overflow-y-auto">
+                <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden z-50 max-h-80 overflow-y-auto">
                   <SearchResultsDropdown isMobile />
                 </div>
               )}
@@ -586,7 +586,7 @@ export function Header() {
             className="fixed inset-0 bg-black/50 z-50"
             onClick={() => setIsMobileMenuOpen(false)}
           />
-          <div className="fixed top-0 left-0 bottom-0 w-72 bg-cream z-50 shadow-xl overflow-y-auto">
+          <div className="fixed top-0 left-0 bottom-0 w-72 bg-white z-50 shadow-xl overflow-y-auto">
             {/* Menu Header */}
             <div className="p-4 border-b border-gray-100">
               <div className="flex items-center justify-between mb-4">

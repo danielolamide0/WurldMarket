@@ -49,7 +49,7 @@ export default function CategoryPage() {
         </Link>
         {/* Products Grid */}
         {products.length === 0 ? (
-          <div className="bg-cream rounded-2xl p-12 text-center">
+          <div className="bg-white rounded-2xl p-12 text-center">
             <p className="text-gray-500 mb-4">No products found in this category.</p>
             <Link href="/" className="text-primary font-medium hover:underline">
               Browse all products

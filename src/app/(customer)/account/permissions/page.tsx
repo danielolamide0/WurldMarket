@@ -68,7 +68,7 @@ export default function PermissionsPage() {
                 }`}
               >
                 <span
-                  className={`inline-block h-4 w-4 transform rounded-full bg-cream transition-transform ${
+                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
                     notifications.email ? 'translate-x-6' : 'translate-x-1'
                   }`}
                 />
@@ -91,7 +91,7 @@ export default function PermissionsPage() {
                 }`}
               >
                 <span
-                  className={`inline-block h-4 w-4 transform rounded-full bg-cream transition-transform ${
+                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
                     notifications.sms ? 'translate-x-6' : 'translate-x-1'
                   }`}
                 />
@@ -114,7 +114,7 @@ export default function PermissionsPage() {
                 }`}
               >
                 <span
-                  className={`inline-block h-4 w-4 transform rounded-full bg-cream transition-transform ${
+                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
                     notifications.push ? 'translate-x-6' : 'translate-x-1'
                   }`}
                 />
@@ -134,7 +134,7 @@ export default function PermissionsPage() {
                 }`}
               >
                 <span
-                  className={`inline-block h-4 w-4 transform rounded-full bg-cream transition-transform ${
+                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
                     notifications.orderUpdates ? 'translate-x-6' : 'translate-x-1'
                   }`}
                 />
@@ -154,7 +154,7 @@ export default function PermissionsPage() {
                 }`}
               >
                 <span
-                  className={`inline-block h-4 w-4 transform rounded-full bg-cream transition-transform ${
+                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
                     notifications.promotions ? 'translate-x-6' : 'translate-x-1'
                   }`}
                 />
@@ -174,7 +174,7 @@ export default function PermissionsPage() {
                 }`}
               >
                 <span
-                  className={`inline-block h-4 w-4 transform rounded-full bg-cream transition-transform ${
+                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
                     notifications.newsletters ? 'translate-x-6' : 'translate-x-1'
                   }`}
                 />

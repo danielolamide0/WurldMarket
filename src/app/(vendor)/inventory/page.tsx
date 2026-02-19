@@ -90,7 +90,7 @@ export default function InventoryPage() {
           <select
             value={selectedStore}
             onChange={(e) => setSelectedStore(e.target.value)}
-            className="px-4 py-2.5 rounded-xl border border-gray-300 bg-cream focus:outline-none focus:ring-2 focus:ring-primary"
+            className="px-4 py-2.5 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-primary"
           >
             <option value="all">All Stores</option>
             {vendorStores.map((store) => (

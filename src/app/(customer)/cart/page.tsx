@@ -35,7 +35,7 @@ export default function CartPage() {
   return (
     <div className="min-h-screen">
       {/* Header */}
-      <div className="bg-cream border-b border-gray-100">
+      <div className="bg-white border-b border-gray-100">
         <div className="max-w-3xl mx-auto px-4 py-6">
           <Link
             href="/"
@@ -93,7 +93,7 @@ export default function CartPage() {
                     <div className="flex items-center gap-2 bg-gray-100 rounded-xl p-1">
                       <button
                         onClick={() => updateQuantity(item.productId, item.quantity - 1)}
-                        className="p-2 rounded-lg hover:bg-cream transition-colors"
+                        className="p-2 rounded-lg hover:bg-white transition-colors"
                       >
                         <Minus className="h-4 w-4" />
                       </button>
@@ -101,7 +101,7 @@ export default function CartPage() {
                       <button
                         onClick={() => updateQuantity(item.productId, item.quantity + 1)}
                         disabled={item.quantity >= item.stock}
-                        className="p-2 rounded-lg hover:bg-cream transition-colors disabled:opacity-50"
+                        className="p-2 rounded-lg hover:bg-white transition-colors disabled:opacity-50"
                       >
                         <Plus className="h-4 w-4" />
                       </button>

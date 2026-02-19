@@ -5,20 +5,17 @@
 @tailwind utilities;
 
 :root {
-  --color-primary: #FF5F1F;
-  --color-primary-light: #FF8347;
-  --color-primary-dark: #CC4C19;
-  --color-accent: #39FF14;
-  --color-accent-light: #6FFF4D;
-  --color-accent-dark: #2DCC10;
-  --color-terracotta: #FF5F1F;
-  --color-terracotta-light: #FF8347;
-  --color-terracotta-dark: #CC4C19;
-  --color-forest: #39FF14;
-  --color-forest-light: #6FFF4D;
-  --color-forest-dark: #2DCC10;
-  --color-cream: #F5F5F5;
-  --color-sand: #E8E8E8;
+  --color-primary: #1E4D8C;
+  --color-primary-light: #2E6AB8;
+  --color-primary-dark: #153A6B;
+  --color-terracotta: #E85D04;
+  --color-terracotta-light: #F28A3D;
+  --color-terracotta-dark: #B84803;
+  --color-forest: #2D6A4F;
+  --color-forest-light: #40916C;
+  --color-forest-dark: #1B4332;
+  --color-cream: #FDF8F3;
+  --color-sand: #E6DCD2;
   --color-brown: #6B4423;
 }
 
@@ -36,7 +33,7 @@ body {
 }
 
 body {
-  background-color: #F5F5F5;
+  background-color: #ffffff;
   color: #1a1a1a;
 }
 

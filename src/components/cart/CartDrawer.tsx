@@ -41,7 +41,7 @@ export function CartDrawer() {
       />
 
       {/* Drawer */}
-      <div className="fixed top-0 right-0 h-full w-full max-w-md bg-cream z-50 shadow-xl flex flex-col animate-slideUp">
+      <div className="fixed top-0 right-0 h-full w-full max-w-md bg-white z-50 shadow-xl flex flex-col animate-slideUp">
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-gray-100">
           <div className="flex items-center gap-2">
@@ -111,7 +111,7 @@ export function CartDrawer() {
                       <Trash2 className="h-4 w-4" />
                     </button>
 
-                    <div className="flex items-center gap-2 bg-cream rounded-lg border border-gray-200">
+                    <div className="flex items-center gap-2 bg-white rounded-lg border border-gray-200">
                       <button
                         onClick={() => updateQuantity(item.productId, item.quantity - 1)}
                         className="p-1.5 hover:bg-gray-100 transition-colors"

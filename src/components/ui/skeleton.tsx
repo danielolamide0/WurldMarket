@@ -25,7 +25,7 @@ export function Skeleton({ className, variant = 'default', ...props }: SkeletonP
 
 export function ProductCardSkeleton() {
   return (
-    <div className="bg-cream rounded-2xl overflow-hidden">
+    <div className="bg-white rounded-2xl overflow-hidden">
       <Skeleton className="h-40 w-full rounded-none" />
       <div className="p-4 space-y-3">
         <Skeleton variant="text" className="w-3/4" />
@@ -41,7 +41,7 @@ export function ProductCardSkeleton() {
 
 export function StoreCardSkeleton() {
   return (
-    <div className="bg-cream rounded-2xl overflow-hidden">
+    <div className="bg-white rounded-2xl overflow-hidden">
       <Skeleton className="h-32 w-full rounded-none" />
       <div className="p-4 space-y-3">
         <Skeleton variant="text" className="w-3/4" />

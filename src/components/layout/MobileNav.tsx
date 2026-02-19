@@ -35,7 +35,7 @@ export function MobileNav() {
                 href={href}
                 className={cn(
                   'flex flex-col items-center justify-center relative px-2 py-1 rounded-xl transition-all',
-                  isActive ? 'bg-cream/20' : ''
+                  isActive ? 'bg-white/20' : ''
                 )}
               >
                 <Icon className={cn(
