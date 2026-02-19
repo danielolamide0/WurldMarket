@@ -311,7 +311,7 @@ export function OrbitingGlobe() {
                       draggable={false}
                     />
                   </div>
-                  <span className="text-xs font-medium text-gray-700 whitespace-nowrap pointer-events-none" style={{ fontFamily: 'CCFrostbite, sans-serif' }}>
+                  <span className="text-xs font-medium whitespace-nowrap pointer-events-none" style={{ fontFamily: 'CCFrostbite, sans-serif', color: '#ffbf00' }}>
                     {cuisine.name}
                   </span>
                 </div>
