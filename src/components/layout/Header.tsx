@@ -236,7 +236,7 @@ export function Header() {
     setSearchResults({ products: matchedProducts, stores: matchedStores })
   }, [searchQuery, products, stores, activeLocation.coordinates])
 
-  // Close search dropdown when clicking outside
+  // Close search dropdown when clicking outside or scrolling
   useEffect(() => {
     if (!isSearchOpen) return
 
@@ -256,8 +256,18 @@ export function Header() {
       }
     }
 
+    const handleScroll = () => {
+      setIsSearchOpen(false)
+      setSearchQuery('')
+      setSearchResults({ products: [], stores: [] })
+    }
+
     document.addEventListener('mousedown', handleClickOutside)
-    return () => document.removeEventListener('mousedown', handleClickOutside)
+    window.addEventListener('scroll', handleScroll, true) // Use capture phase to catch all scrolls
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+      window.removeEventListener('scroll', handleScroll, true)
+    }
   }, [isSearchOpen])
 
   const handleSearchSelect = (type: 'product' | 'store', id: string) => {
