@@ -207,7 +207,7 @@ export function OrbitingGlobe() {
             <img
               src="/find-your-flavour.png"
               alt="Find Your Flavour"
-              className="h-4"
+              className="h-4 flavour-green-tint"
               draggable={false}
             />
           </div>
