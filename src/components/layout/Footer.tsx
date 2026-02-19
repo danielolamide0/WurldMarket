@@ -25,7 +25,7 @@ export function Footer() {
   return (
     <footer className="bg-gray-50">
       {/* Expandable Sections */}
-      <div className="border-t border-gray-200 bg-white">
+      <div className="border-t border-gray-200 bg-cream">
         <div className="max-w-7xl mx-auto px-4 py-4">
           <div className="space-y-0">
             {/* How can we help */}
@@ -149,7 +149,7 @@ export function Footer() {
         <div className="max-w-7xl mx-auto px-4">
           <button
             onClick={scrollToTop}
-            className="flex items-center gap-2 mx-auto px-4 py-2 border border-gray-300 rounded bg-white hover:bg-gray-50 transition-colors text-gray-700 font-semibold text-sm"
+            className="flex items-center gap-2 mx-auto px-4 py-2 border border-gray-300 rounded bg-cream hover:bg-gray-50 transition-colors text-gray-700 font-semibold text-sm"
           >
             Back To Top
             <ChevronUp className="h-4 w-4" />
@@ -158,7 +158,7 @@ export function Footer() {
       </div>
 
       {/* Logo, Tagline, and Social Media */}
-      <div className="border-t border-gray-200 py-6 bg-white">
+      <div className="border-t border-gray-200 py-6 bg-cream">
         <div className="max-w-7xl mx-auto px-4">
           <div className="flex flex-col items-center gap-4">
             {/* Logo and Text */}
@@ -237,7 +237,7 @@ export function Footer() {
           </div>
 
       {/* Legal Links */}
-      <div className="border-t border-gray-200 py-4 bg-white">
+      <div className="border-t border-gray-200 py-4 bg-cream">
         <div className="max-w-7xl mx-auto px-4">
           <div className="flex flex-wrap gap-4 text-sm text-gray-600 mb-4">
             <Link href="/modern-slavery" className="hover:text-gray-900 transition-colors">Modern Slavery Statement</Link>
@@ -253,12 +253,12 @@ export function Footer() {
       </div>
 
       {/* Payment Methods */}
-      <div className="border-t border-gray-200 py-4 pb-24 md:pb-8 bg-white">
+      <div className="border-t border-gray-200 py-4 pb-24 md:pb-8 bg-cream">
         <div className="max-w-7xl mx-auto px-4">
           <h4 className="text-sm font-semibold text-gray-900 mb-3">Payment Methods</h4>
           <div className="flex flex-wrap items-center gap-4">
             {/* Visa */}
-            <div className="h-10 w-16 flex items-center justify-center bg-white border border-gray-200 rounded">
+            <div className="h-10 w-16 flex items-center justify-center bg-cream border border-gray-200 rounded">
               <svg viewBox="0 0 100 32" className="h-6 w-full">
                 <rect width="100" height="32" fill="#1434CB" rx="2"/>
                 <text x="50" y="22" fontSize="14" fill="white" fontWeight="bold" textAnchor="middle" fontFamily="Arial, sans-serif">VISA</text>
@@ -266,7 +266,7 @@ export function Footer() {
             </div>
             
             {/* Mastercard */}
-            <div className="h-10 w-16 flex items-center justify-center bg-white border border-gray-200 rounded">
+            <div className="h-10 w-16 flex items-center justify-center bg-cream border border-gray-200 rounded">
               <svg viewBox="0 0 100 32" className="h-6 w-full">
                 <circle cx="30" cy="16" r="12" fill="#EB001B"/>
                 <circle cx="70" cy="16" r="12" fill="#F79E1B"/>
@@ -274,7 +274,7 @@ export function Footer() {
         </div>
 
             {/* American Express */}
-            <div className="h-10 w-16 flex items-center justify-center bg-white border border-gray-200 rounded">
+            <div className="h-10 w-16 flex items-center justify-center bg-cream border border-gray-200 rounded">
               <svg viewBox="0 0 100 32" className="h-6 w-full">
                 <rect width="100" height="32" fill="#006FCF" rx="2"/>
                 <text x="50" y="20" fontSize="9" fill="white" fontWeight="bold" textAnchor="middle" fontFamily="Arial, sans-serif">AMEX</text>

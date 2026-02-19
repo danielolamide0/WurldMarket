@@ -82,7 +82,7 @@ export function ProductCard({ product, showStoreName }: ProductCardProps) {
 
   return (
     <Link href={`/products/${product.id}`}>
-      <div className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-200 group">
+      <div className="bg-cream rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-200 group">
         {/* Image */}
         <div className="relative h-40 bg-gray-100 overflow-hidden">
           <img
@@ -96,7 +96,7 @@ export function ProductCard({ product, showStoreName }: ProductCardProps) {
             className={`absolute top-2 right-2 p-2 rounded-full transition-all ${
               isFav
                 ? 'bg-primary text-white'
-                : 'bg-white/90 text-gray-400 hover:bg-white hover:text-primary'
+                : 'bg-cream/90 text-gray-400 hover:bg-cream hover:text-primary'
             }`}
             title={isFav ? 'Remove from favourites' : 'Add to favourites'}
           >

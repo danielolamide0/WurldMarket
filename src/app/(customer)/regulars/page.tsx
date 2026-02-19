@@ -143,7 +143,7 @@ function RegularsContent() {
   return (
     <div className="min-h-screen bg-gray-50 pb-20">
       {/* Tabs */}
-      <div className="bg-white border-b border-gray-100 sticky top-16 z-30">
+      <div className="bg-cream border-b border-gray-100 sticky top-16 z-30">
         <div className="max-w-7xl mx-auto px-4">
           <div className="flex gap-2 py-4 overflow-x-auto">
             {tabs.map((tab) => {
@@ -156,7 +156,7 @@ function RegularsContent() {
                   className={`flex-shrink-0 flex flex-col items-center justify-center px-6 py-4 rounded-2xl border-2 transition-all min-w-[120px] ${
                     isActive
                       ? 'bg-primary text-white border-primary'
-                      : 'bg-white text-gray-700 border-gray-200 hover:border-primary hover:text-primary'
+                      : 'bg-cream text-gray-700 border-gray-200 hover:border-primary hover:text-primary'
                   }`}
                 >
                   <Icon className={`h-6 w-6 mb-1 ${isActive ? 'text-white' : ''}`} />

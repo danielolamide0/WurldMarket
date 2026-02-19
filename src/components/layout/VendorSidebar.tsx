@@ -109,7 +109,7 @@ export function VendorSidebar() {
   return (
     <>
       {/* Mobile Header */}
-      <div className="lg:hidden fixed top-0 left-0 right-0 z-40 bg-white border-b border-gray-100 px-4 py-3">
+      <div className="lg:hidden fixed top-0 left-0 right-0 z-40 bg-cream border-b border-gray-100 px-4 py-3">
         <div className="flex items-center justify-between">
           <Link href="/dashboard" className="flex items-center gap-2">
             <img
@@ -139,14 +139,14 @@ export function VendorSidebar() {
             className="lg:hidden fixed inset-0 bg-black/50 z-40"
             onClick={() => setIsMobileOpen(false)}
           />
-          <div className="lg:hidden fixed top-0 left-0 bottom-0 w-64 bg-white z-50 flex flex-col">
+          <div className="lg:hidden fixed top-0 left-0 bottom-0 w-64 bg-cream z-50 flex flex-col">
             <NavContent />
           </div>
         </>
       )}
 
       {/* Desktop Sidebar */}
-      <aside className="hidden lg:flex fixed top-0 left-0 bottom-0 w-64 bg-white border-r border-gray-100 flex-col z-30">
+      <aside className="hidden lg:flex fixed top-0 left-0 bottom-0 w-64 bg-cream border-r border-gray-100 flex-col z-30">
         <NavContent />
       </aside>
     </>

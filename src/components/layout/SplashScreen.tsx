@@ -49,7 +49,7 @@ export function SplashScreen({ onComplete }: SplashScreenProps) {
 
       {/* Logo Container with glassmorphism effect */}
       <div className="relative z-10 flex flex-col items-center">
-        <div className="bg-white/20 backdrop-blur-lg rounded-3xl p-8 shadow-2xl border border-white/30 flex items-center gap-4">
+        <div className="bg-cream/20 backdrop-blur-lg rounded-3xl p-8 shadow-2xl border border-white/30 flex items-center gap-4">
           <img
             src="/WurldBAsketLogo.png"
             alt="WurldBasket"
@@ -63,9 +63,9 @@ export function SplashScreen({ onComplete }: SplashScreenProps) {
         </div>
         {/* Loading indicator */}
         <div className="flex gap-1.5 mt-6">
-          <div className="w-2.5 h-2.5 bg-white rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-          <div className="w-2.5 h-2.5 bg-white rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-          <div className="w-2.5 h-2.5 bg-white rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+          <div className="w-2.5 h-2.5 bg-cream rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+          <div className="w-2.5 h-2.5 bg-cream rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+          <div className="w-2.5 h-2.5 bg-cream rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
         </div>
       </div>
     </div>

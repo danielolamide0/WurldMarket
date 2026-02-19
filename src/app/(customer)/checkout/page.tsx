@@ -258,7 +258,7 @@ export default function CheckoutPage() {
   return (
     <div className="min-h-screen pb-32">
       {/* Header */}
-      <div className="bg-white border-b border-gray-100">
+      <div className="bg-cream border-b border-gray-100">
         <div className="max-w-3xl mx-auto px-4 py-6">
           <Link
             href="/cart"
@@ -625,7 +625,7 @@ export default function CheckoutPage() {
       </div>
 
       {/* Fixed Bottom Button */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 p-4 md:hidden z-[60]">
+      <div className="fixed bottom-0 left-0 right-0 bg-cream border-t border-gray-100 p-4 md:hidden z-[60]">
         <Button
           onClick={handleSubmitOrder}
           isLoading={isProcessing}

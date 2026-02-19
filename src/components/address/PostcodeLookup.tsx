@@ -213,7 +213,7 @@ export function PostcodeLookup({ onAddressSelect, onManualEntry }: PostcodeLooku
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Select your address ({addresses.length} found)
           </label>
-          <div className="border border-gray-300 rounded-xl overflow-hidden bg-white shadow-lg max-h-64 overflow-y-auto">
+          <div className="border border-gray-300 rounded-xl overflow-hidden bg-cream shadow-lg max-h-64 overflow-y-auto">
             {addresses.map((address, index) => (
               <button
                 key={index}
