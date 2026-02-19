@@ -181,7 +181,7 @@ body {
   filter: sepia(100%) saturate(500%) brightness(40%) hue-rotate(30deg);
 }
 
-/* Golden tint for find your flavour (#C68E17) */
+/* Brown tint for find your flavour (#753A10) */
 .brown-tint {
-  filter: brightness(0) saturate(100%) invert(55%) sepia(90%) saturate(500%) hue-rotate(15deg) brightness(95%);
+  filter: brightness(0) saturate(100%) invert(22%) sepia(70%) saturate(900%) hue-rotate(10deg) brightness(95%);
 }
