@@ -4,6 +4,13 @@
 @tailwind components;
 @tailwind utilities;
 
+@font-face {
+  font-family: 'CCFrostbite';
+  src: url('/fonts/CCFrostbiteMedium.ttf') format('truetype');
+  font-weight: 500;
+  font-style: normal;
+}
+
 :root {
   --color-primary: #636B2F;
   --color-primary-light: #BAC095;
