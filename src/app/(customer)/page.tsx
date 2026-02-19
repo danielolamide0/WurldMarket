@@ -17,6 +17,7 @@ import { Card } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { calculateDistance } from '@/lib/utils'
 import { OrbitingGlobe } from '@/components/home/OrbitingGlobe'
+import { BannerCarousel } from '@/components/home/BannerCarousel'
 
 // Icon mapping for categories
 const iconMap: { [key: string]: React.ComponentType<{ className?: string }> } = {
@@ -387,6 +388,114 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* Desktop: Banner + Trending Side by Side */}
+      <section className="hidden md:block py-6">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="grid grid-cols-2 gap-6">
+            {/* Banner Carousel - Left */}
+            <div>
+              <BannerCarousel className="h-64" />
+            </div>
+
+            {/* Trending Now - Right */}
+            <div className="flex flex-col">
+              <div className="flex items-center justify-between mb-3">
+                <h2 className="text-lg font-bold text-primary">
+                  {isAuthenticated ? 'Trending in your area' : 'Trending now'}
+                </h2>
+              </div>
+              <div className="flex-1 overflow-hidden rounded-xl border border-gray-200 bg-cream">
+                <div className="flex gap-3 overflow-x-auto scrollbar-hide p-3 h-full">
+                  {trendingProducts.slice(0, 4).map((product) => {
+                    const store = sortedStores.find(s => s.id === product.storeId)
+                    const quantity = getItemQuantity(product.id)
+
+                    const handleAddToCart = (e: React.MouseEvent) => {
+                      e.preventDefault()
+                      e.stopPropagation()
+                      addItem({
+                        productId: product.id,
+                        storeId: product.storeId,
+                        vendorId: product.vendorId,
+                        name: product.name,
+                        price: product.price,
+                        unit: product.unit || 'each',
+                        image: product.image,
+                        quantity: 1,
+                        stock: product.stock,
+                      })
+                    }
+
+                    const handleIncrement = (e: React.MouseEvent) => {
+                      e.preventDefault()
+                      e.stopPropagation()
+                      updateQuantity(product.id, quantity + 1)
+                    }
+
+                    const handleDecrement = (e: React.MouseEvent) => {
+                      e.preventDefault()
+                      e.stopPropagation()
+                      if (quantity > 1) {
+                        updateQuantity(product.id, quantity - 1)
+                      } else {
+                        removeItem(product.id)
+                      }
+                    }
+
+                    return (
+                      <Link
+                        key={product.id}
+                        href={`/products/${product.id}`}
+                        className="flex-shrink-0 w-36 bg-white border border-gray-100 rounded-lg overflow-hidden hover:shadow-md transition-shadow"
+                      >
+                        <div className="h-20 bg-gray-50 flex items-center justify-center p-2">
+                          <img
+                            src={product.image}
+                            alt={product.name}
+                            className="max-h-full max-w-full object-contain"
+                          />
+                        </div>
+                        <div className="p-2">
+                          <p className="text-xs font-medium text-gray-900 line-clamp-1">{product.name}</p>
+                          <p className="text-[10px] text-gray-500 mb-1">{store?.name || 'Marketplace'}</p>
+                          <div className="flex items-center justify-between">
+                            <p className="text-sm font-bold text-gray-900">£{product.price.toFixed(2)}</p>
+                            {quantity > 0 ? (
+                              <div className="flex items-center gap-0.5">
+                                <button
+                                  onClick={handleDecrement}
+                                  className="w-5 h-5 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200"
+                                >
+                                  <Minus className="h-2.5 w-2.5" />
+                                </button>
+                                <span className="w-4 text-center text-xs font-medium">{quantity}</span>
+                                <button
+                                  onClick={handleIncrement}
+                                  className="w-5 h-5 flex items-center justify-center rounded-full bg-primary text-white"
+                                >
+                                  <Plus className="h-2.5 w-2.5" />
+                                </button>
+                              </div>
+                            ) : (
+                              <button
+                                onClick={handleAddToCart}
+                                className="w-5 h-5 flex items-center justify-center rounded-full bg-primary text-white"
+                              >
+                                <Plus className="h-3 w-3" />
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      </Link>
+                    )
+                  })}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Find Your Flavour - Orbiting Globe (Mobile only) */}
       <OrbitingGlobe />
 
@@ -645,9 +754,16 @@ export default function HomePage() {
         </section>
       )}
 
-      {/* Trending Section */}
+      {/* Mobile: Banner Carousel - Between Offers and Trending */}
+      <section className="md:hidden py-4">
+        <div className="max-w-7xl mx-auto px-4">
+          <BannerCarousel />
+        </div>
+      </section>
+
+      {/* Trending Section - Mobile only (desktop shows in side-by-side layout) */}
       {trendingProducts.length > 0 && (
-        <section className="py-4">
+        <section className="py-4 md:hidden">
           <div className="max-w-7xl mx-auto px-4">
             <h2 className="text-lg font-bold text-primary mb-1">
               {isAuthenticated ? 'Trending in your area' : 'Trending now'}
