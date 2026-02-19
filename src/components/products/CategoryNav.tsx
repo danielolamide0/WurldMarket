@@ -70,7 +70,7 @@ export function CategoryNav() {
                 'flex flex-col items-center gap-2 p-3 rounded-2xl min-w-[80px] transition-all',
                 isActive
                   ? 'bg-primary text-white'
-                  : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-100'
+                  : 'bg-cream text-gray-700 hover:bg-gray-50 border border-gray-100'
               )}
             >
               <Icon className="h-6 w-6" />

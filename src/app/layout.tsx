@@ -16,7 +16,7 @@ export const viewport: Viewport = {
   initialScale: 1,
   maximumScale: 1,
   userScalable: false,
-  themeColor: '#1E4D8C',
+  themeColor: '#636B2F',
 }
 
 export default function RootLayout({
@@ -26,7 +26,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={`${inter.variable} font-sans bg-white`}>
+      <body className={`${inter.variable} font-sans bg-cream`}>
         <Providers>
           {children}
         </Providers>

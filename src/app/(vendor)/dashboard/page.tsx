@@ -222,7 +222,7 @@ export default function VendorDashboardPage() {
                   className={`flex items-center gap-3 p-3 rounded-xl transition-colors ${
                     step.completed
                       ? 'bg-green-50'
-                      : 'bg-white hover:bg-gray-50 border border-gray-200'
+                      : 'bg-cream hover:bg-gray-50 border border-gray-200'
                   }`}
                 >
                   {step.completed ? (

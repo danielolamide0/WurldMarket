@@ -23,7 +23,7 @@ export function FloatingCart() {
       <div className="relative">
         <ShoppingCart className="h-6 w-6" />
         {totalItems > 0 && (
-          <span className="absolute -top-2 -right-2 w-5 h-5 bg-white text-primary text-xs font-bold rounded-full flex items-center justify-center">
+          <span className="absolute -top-2 -right-2 w-5 h-5 bg-cream text-primary text-xs font-bold rounded-full flex items-center justify-center">
             {totalItems}
           </span>
         )}

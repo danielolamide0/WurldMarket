@@ -5,18 +5,18 @@
 @tailwind utilities;
 
 :root {
-  --color-primary: #1E4D8C;
-  --color-primary-light: #2E6AB8;
-  --color-primary-dark: #153A6B;
-  --color-terracotta: #E85D04;
-  --color-terracotta-light: #F28A3D;
-  --color-terracotta-dark: #B84803;
-  --color-forest: #2D6A4F;
-  --color-forest-light: #40916C;
-  --color-forest-dark: #1B4332;
-  --color-cream: #FDF8F3;
-  --color-sand: #E6DCD2;
-  --color-brown: #6B4423;
+  --color-primary: #636B2F;
+  --color-primary-light: #BAC095;
+  --color-primary-dark: #3D4127;
+  --color-terracotta: #636B2F;
+  --color-terracotta-light: #BAC095;
+  --color-terracotta-dark: #3D4127;
+  --color-forest: #636B2F;
+  --color-forest-light: #BAC095;
+  --color-forest-dark: #3D4127;
+  --color-cream: #D4D395;
+  --color-sand: #BAC095;
+  --color-brown: #3D4127;
 }
 
 * {
@@ -33,7 +33,7 @@ body {
 }
 
 body {
-  background-color: #ffffff;
+  background-color: #D4D395;
   color: #1a1a1a;
 }
 
@@ -162,4 +162,9 @@ body {
   a:active {
     transform: scale(0.98);
   }
+}
+
+/* Olive tint filter for logo and globe images */
+.olive-tint {
+  filter: sepia(100%) saturate(300%) brightness(70%) hue-rotate(30deg);
 }

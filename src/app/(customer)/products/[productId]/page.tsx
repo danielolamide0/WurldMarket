@@ -82,7 +82,7 @@ export default function ProductDetailPage() {
         )}
         <button
           onClick={() => router.back()}
-          className="absolute top-4 left-4 p-2 bg-white/90 rounded-xl hover:bg-white transition-colors"
+          className="absolute top-4 left-4 p-2 bg-cream/90 rounded-xl hover:bg-cream transition-colors"
         >
           <ArrowLeft className="h-5 w-5" />
         </button>
@@ -142,7 +142,7 @@ export default function ProductDetailPage() {
               <button
                 onClick={() => setQuantity(Math.max(1, quantity - 1))}
                 disabled={quantity <= 1}
-                className="p-2 rounded-lg hover:bg-white transition-colors disabled:opacity-50"
+                className="p-2 rounded-lg hover:bg-cream transition-colors disabled:opacity-50"
               >
                 <Minus className="h-4 w-4" />
               </button>
@@ -150,7 +150,7 @@ export default function ProductDetailPage() {
               <button
                 onClick={() => setQuantity(Math.min(maxQuantity, quantity + 1))}
                 disabled={quantity >= maxQuantity}
-                className="p-2 rounded-lg hover:bg-white transition-colors disabled:opacity-50"
+                className="p-2 rounded-lg hover:bg-cream transition-colors disabled:opacity-50"
               >
                 <Plus className="h-4 w-4" />
               </button>

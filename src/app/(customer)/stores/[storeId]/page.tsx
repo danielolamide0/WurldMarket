@@ -68,7 +68,7 @@ export default function StoreDetailPage() {
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
         <Link
           href="/"
-          className="absolute top-4 left-4 p-2 bg-white/90 rounded-xl hover:bg-white transition-colors"
+          className="absolute top-4 left-4 p-2 bg-cream/90 rounded-xl hover:bg-cream transition-colors"
         >
           <ArrowLeft className="h-5 w-5" />
         </Link>
@@ -76,7 +76,7 @@ export default function StoreDetailPage() {
 
       {/* Store Info */}
       <div className="max-w-7xl mx-auto px-4 -mt-16 relative z-10">
-        <div className="bg-white rounded-2xl shadow-lg p-6 mb-6">
+        <div className="bg-cream rounded-2xl shadow-lg p-6 mb-6">
           <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
             <div>
               <Badge variant="success" size="sm" className="mb-2">Open Now</Badge>
@@ -123,7 +123,7 @@ export default function StoreDetailPage() {
                 className={`px-4 py-2 rounded-xl text-sm font-medium transition-colors whitespace-nowrap ${
                   selectedCategory === null
                     ? 'bg-primary text-white'
-                    : 'bg-white text-gray-700 hover:bg-primary hover:text-white'
+                    : 'bg-cream text-gray-700 hover:bg-primary hover:text-white'
                 }`}
               >
                 All
@@ -135,7 +135,7 @@ export default function StoreDetailPage() {
                   className={`px-4 py-2 rounded-xl text-sm font-medium transition-colors whitespace-nowrap ${
                     selectedCategory === category.id
                       ? 'bg-primary text-white'
-                      : 'bg-white text-gray-700 hover:bg-primary hover:text-white'
+                      : 'bg-cream text-gray-700 hover:bg-primary hover:text-white'
                   }`}
                 >
                   {category.name}
@@ -152,7 +152,7 @@ export default function StoreDetailPage() {
           </h2>
 
           {products.length === 0 ? (
-            <div className="bg-white rounded-2xl p-8 text-center">
+            <div className="bg-cream rounded-2xl p-8 text-center">
               <p className="text-gray-500">No products available at this store yet.</p>
             </div>
           ) : (
