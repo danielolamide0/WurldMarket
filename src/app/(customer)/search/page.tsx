@@ -82,27 +82,9 @@ function SearchResults() {
     )
   }
 
-  // Search stores
-  let matchedStores = availableStores.filter(
-    (s) =>
-      s.name.toLowerCase().includes(searchQuery) ||
-      s.address.toLowerCase().includes(searchQuery) ||
-      s.city.toLowerCase().includes(searchQuery) ||
-      s.postcode.toLowerCase().includes(searchQuery)
-  )
-
-  // If searching by cuisine, filter stores that have products in that cuisine
-  if (matchedCuisine) {
-    const productsInCuisine = products.filter((p) => 
-      p.cuisines && p.cuisines.includes(matchedCuisine as any)
-    )
-    const storeIdsWithCuisine = new Set(productsInCuisine.map(p => p.storeId))
-    matchedStores = matchedStores.filter(s => storeIdsWithCuisine.has(s.id))
-  }
-
-  // Sort stores by proximity if user has location
+  // Sort availableStores by proximity for the filter dropdown
   if (activeLocation.coordinates) {
-    matchedStores = matchedStores.sort((a, b) => {
+    availableStores = availableStores.sort((a, b) => {
       const distA = a.coordinates
         ? calculateDistance(
             activeLocation.coordinates!.lat,
@@ -121,6 +103,24 @@ function SearchResults() {
         : Infinity
       return distA - distB
     })
+  }
+
+  // Search stores (for the Stores tab display)
+  let matchedStores = availableStores.filter(
+    (s) =>
+      s.name.toLowerCase().includes(searchQuery) ||
+      s.address.toLowerCase().includes(searchQuery) ||
+      s.city.toLowerCase().includes(searchQuery) ||
+      s.postcode.toLowerCase().includes(searchQuery)
+  )
+
+  // If searching by cuisine, filter stores that have products in that cuisine
+  if (matchedCuisine) {
+    const productsInCuisine = products.filter((p) => 
+      p.cuisines && p.cuisines.includes(matchedCuisine as any)
+    )
+    const storeIdsWithCuisine = new Set(productsInCuisine.map(p => p.storeId))
+    matchedStores = matchedStores.filter(s => storeIdsWithCuisine.has(s.id))
   }
 
   // Search products
@@ -284,7 +284,7 @@ function SearchResults() {
                       All Stores
                     </span>
                   </button>
-                  {matchedStores.map((store) => {
+                  {availableStores.map((store) => {
                     const isSelected = selectedStoreIds.includes(store.id)
                     return (
                       <button
