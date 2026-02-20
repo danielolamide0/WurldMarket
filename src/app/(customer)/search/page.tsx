@@ -52,9 +52,12 @@ function SearchResults() {
     'east asian': 'east-asian',
     'chinese': 'east-asian',
     'middle eastern': 'middle-eastern',
+    'middle-eastern': 'middle-eastern', // Handle both formats
     'eastern european': 'eastern-european',
+    'eastern-european': 'eastern-european', // Handle both formats
   }
-  const matchedCuisine = cuisineMap[searchQuery.replace(/\+/g, ' ')]
+  const normalizedQuery = searchQuery.replace(/\+/g, ' ').trim()
+  const matchedCuisine = cuisineMap[normalizedQuery]
 
   // Fetch data on mount and when cuisine changes
   useEffect(() => {
@@ -106,21 +109,47 @@ function SearchResults() {
   }
 
   // Search stores (for the Stores tab display)
-  let matchedStores = availableStores.filter(
-    (s) =>
-      s.name.toLowerCase().includes(searchQuery) ||
-      s.address.toLowerCase().includes(searchQuery) ||
-      s.city.toLowerCase().includes(searchQuery) ||
-      s.postcode.toLowerCase().includes(searchQuery)
-  )
+  let matchedStores = availableStores
 
-  // If searching by cuisine, filter stores that have products in that cuisine
+  // If searching by cuisine, show stores that have products in that cuisine
   if (matchedCuisine) {
     const productsInCuisine = products.filter((p) => 
       p.cuisines && p.cuisines.includes(matchedCuisine as any)
     )
     const storeIdsWithCuisine = new Set(productsInCuisine.map(p => p.storeId))
-    matchedStores = matchedStores.filter(s => storeIdsWithCuisine.has(s.id))
+    matchedStores = availableStores.filter(s => storeIdsWithCuisine.has(s.id))
+  } else {
+    // If not searching by cuisine, filter by text search
+    matchedStores = availableStores.filter(
+      (s) =>
+        s.name.toLowerCase().includes(searchQuery) ||
+        s.address.toLowerCase().includes(searchQuery) ||
+        s.city.toLowerCase().includes(searchQuery) ||
+        s.postcode.toLowerCase().includes(searchQuery)
+    )
+  }
+
+  // Sort matchedStores by proximity if user has location
+  if (activeLocation.coordinates) {
+    matchedStores = matchedStores.sort((a, b) => {
+      const distA = a.coordinates
+        ? calculateDistance(
+            activeLocation.coordinates!.lat,
+            activeLocation.coordinates!.lng,
+            a.coordinates.lat,
+            a.coordinates.lng
+          )
+        : Infinity
+      const distB = b.coordinates
+        ? calculateDistance(
+            activeLocation.coordinates!.lat,
+            activeLocation.coordinates!.lng,
+            b.coordinates.lat,
+            b.coordinates.lng
+          )
+        : Infinity
+      return distA - distB
+    })
   }
 
   // Search products
@@ -192,12 +221,12 @@ function SearchResults() {
         {/* Back Arrow + Filter Tabs + Store Filter Row */}
         <div className="flex items-center justify-between gap-3 mb-4">
           <div className="flex items-center gap-3 flex-1 min-w-0">
-            <Link
-              href="/"
+          <Link
+            href="/"
               className="p-2 -ml-2 rounded-xl hover:bg-gray-100 transition-colors flex-shrink-0"
-            >
+          >
               <ArrowLeft className="h-5 w-5 text-primary" />
-            </Link>
+          </Link>
 
             {/* Filter Tabs */}
             {totalResults > 0 && (
@@ -323,7 +352,7 @@ function SearchResults() {
               )}
             </div>
           )}
-        </div>
+      </div>
 
         {totalResults === 0 ? (
           <Card className="p-12 text-center">

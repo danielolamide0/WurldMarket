@@ -32,7 +32,10 @@ const CUISINE_KEYWORDS: Record<string, string[]> = {
     'tahini', 'za\'atar', 'sumac', 'pomegranate', 'mint', 'parsley', 'coriander',
     'cumin', 'cardamom', 'cinnamon', 'allspice', 'baharat', 'ras el hanout',
     'harissa', 'labneh', 'halloumi', 'feta', 'pita', 'flatbread', 'hummus',
-    'baba ganoush', 'falafel', 'shawarma', 'kebab', 'kofta', 'dolma', 'baklava'
+    'baba ganoush', 'falafel', 'shawarma', 'kebab', 'kofta', 'dolma', 'baklava',
+    'lebanese', 'turkish', 'persian', 'iranian', 'arab', 'syrian', 'israeli',
+    'palestinian', 'jordanian', 'egyptian', 'moroccan', 'tunisian', 'algerian',
+    'olive oil', 'dates', 'figs', 'almonds', 'pistachios', 'rose water', 'orange blossom'
   ],
   'eastern-european': [
     'buckwheat', 'sauerkraut', 'pierogi', 'kielbasa', 'sausage', 'cabbage',
