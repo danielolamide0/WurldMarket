@@ -48,7 +48,7 @@ export async function GET(request: NextRequest) {
     if (category) query.category = category
     const cuisine = searchParams.get('cuisine')
     if (cuisine) {
-      query.cuisines = cuisine
+      query.cuisines = { $in: [cuisine] }
     }
     if (search) {
       query.$or = [
