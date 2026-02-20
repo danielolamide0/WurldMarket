@@ -118,15 +118,18 @@ function SearchResults() {
     )
     const storeIdsWithCuisine = new Set(productsInCuisine.map(p => p.storeId))
     matchedStores = availableStores.filter(s => storeIdsWithCuisine.has(s.id))
-  } else {
-    // If not searching by cuisine, filter by text search
-    matchedStores = availableStores.filter(
-      (s) =>
-        s.name.toLowerCase().includes(searchQuery) ||
-        s.address.toLowerCase().includes(searchQuery) ||
-        s.city.toLowerCase().includes(searchQuery) ||
-        s.postcode.toLowerCase().includes(searchQuery)
+  } else if (searchQuery) {
+    // If searching by text, show stores that have products matching the search
+    const matchingProducts = products.filter((p) =>
+      p.name.toLowerCase().includes(searchQuery) ||
+      p.description.toLowerCase().includes(searchQuery) ||
+      p.category.toLowerCase().includes(searchQuery)
     )
+    const storeIdsWithMatchingProducts = new Set(matchingProducts.map(p => p.storeId))
+    matchedStores = availableStores.filter(s => storeIdsWithMatchingProducts.has(s.id))
+  } else {
+    // If no search query, show all stores
+    matchedStores = availableStores
   }
 
   // Sort matchedStores by proximity if user has location

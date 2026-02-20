@@ -3,7 +3,7 @@
 import { useEffect, useState, useRef } from 'react'
 import { useParams } from 'next/navigation'
 import Link from 'next/link'
-import { ArrowLeft, Filter, X, Check } from 'lucide-react'
+import { ArrowLeft, Filter, X, Check, Store, Package, MapPin } from 'lucide-react'
 import { useProductStore } from '@/stores/productStore'
 import { useVendorStore } from '@/stores/vendorStore'
 import { useAuthStore } from '@/stores/authStore'
@@ -18,6 +18,7 @@ export default function CategoryPage() {
   const params = useParams()
   const slug = params.slug as string
   const category = CATEGORIES.find((c) => c.slug === slug)
+  const [filter, setFilter] = useState<'stores' | 'products'>('products')
   const [selectedStoreIds, setSelectedStoreIds] = useState<string[]>([])
   const [isStoreFilterOpen, setIsStoreFilterOpen] = useState(false)
   const storeFilterRef = useRef<HTMLDivElement>(null)
@@ -104,6 +105,34 @@ export default function CategoryPage() {
       })
   }
 
+  // Get stores that have products in this category
+  const storeIdsWithCategoryProducts = new Set(products.map(p => p.storeId))
+  const storesWithCategoryProducts = availableStores.filter(s => storeIdsWithCategoryProducts.has(s.id))
+
+  // Sort stores by proximity if user has location
+  let sortedStores = storesWithCategoryProducts
+  if (activeLocation.coordinates) {
+    sortedStores = storesWithCategoryProducts.sort((a, b) => {
+      const distA = a.coordinates
+        ? calculateDistance(
+            activeLocation.coordinates!.lat,
+            activeLocation.coordinates!.lng,
+            a.coordinates.lat,
+            a.coordinates.lng
+          )
+        : Infinity
+      const distB = b.coordinates
+        ? calculateDistance(
+            activeLocation.coordinates!.lat,
+            activeLocation.coordinates!.lng,
+            b.coordinates.lat,
+            b.coordinates.lng
+          )
+        : Infinity
+      return distA - distB
+    })
+  }
+
   if (!category) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -120,17 +149,46 @@ export default function CategoryPage() {
   return (
     <div className="min-h-screen">
       <div className="max-w-7xl mx-auto px-4 py-6">
-        {/* Back Arrow + Store Filter Row */}
+        {/* Back Arrow + Filter Tabs + Store Filter Row */}
         <div className="flex items-center justify-between gap-3 mb-4">
-          <Link
-            href="/"
-            className="inline-flex items-center gap-2 text-primary hover:text-primary-dark flex-shrink-0"
-          >
-            <ArrowLeft className="h-5 w-5" />
-          </Link>
+          <div className="flex items-center gap-3 flex-1 min-w-0">
+            <Link
+              href="/"
+              className="inline-flex items-center gap-2 text-primary hover:text-primary-dark flex-shrink-0"
+            >
+              <ArrowLeft className="h-5 w-5" />
+            </Link>
 
-          {/* Store Filter Button */}
-          <div className="relative flex-shrink-0" ref={storeFilterRef}>
+            {/* Filter Tabs */}
+            <div className="flex gap-2 overflow-x-auto scrollbar-hide">
+              <button
+                onClick={() => setFilter('stores')}
+                className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all whitespace-nowrap ${
+                  filter === 'stores'
+                    ? 'bg-primary text-white'
+                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                }`}
+              >
+                <Store className="h-4 w-4" />
+                Stores
+              </button>
+              <button
+                onClick={() => setFilter('products')}
+                className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all whitespace-nowrap ${
+                  filter === 'products'
+                    ? 'bg-primary text-white'
+                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                }`}
+              >
+                <Package className="h-4 w-4" />
+                Products
+              </button>
+            </div>
+          </div>
+
+          {/* Store Filter Button (only show on Products tab) */}
+          {filter === 'products' && (
+            <div className="relative flex-shrink-0" ref={storeFilterRef}>
             <button
               onClick={() => setIsStoreFilterOpen(!isStoreFilterOpen)}
               className={`flex items-center gap-2 px-3 py-2 rounded-full text-sm font-medium transition-all ${
@@ -221,10 +279,53 @@ export default function CategoryPage() {
                 )}
               </div>
             )}
-          </div>
+            </div>
+          )}
         </div>
-        {/* Products Grid */}
-        {products.length === 0 ? (
+
+        {/* Stores Section */}
+        {filter === 'stores' && sortedStores.length > 0 && (
+          <section>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {sortedStores.map((store) => (
+                <Link key={store.id} href={`/stores/${store.id}`}>
+                  <div className="bg-white rounded-xl overflow-hidden hover:shadow-lg hover:scale-[1.02] transition-all cursor-pointer border border-gray-100">
+                    <div className="h-32 bg-gray-100">
+                      <img
+                        src={store.image}
+                        alt={store.name}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    <div className="p-4">
+                      <div className="flex items-start justify-between gap-2 mb-2">
+                        <h3 className="font-semibold text-gray-900">{store.name}</h3>
+                        <span className="px-2 py-1 bg-green-100 text-green-800 text-xs font-medium rounded-full">Open</span>
+                      </div>
+                      <p className="text-sm text-gray-500 flex items-center gap-1">
+                        <MapPin className="h-3 w-3" />
+                        {store.address}, {store.city}
+                      </p>
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {filter === 'stores' && sortedStores.length === 0 && (
+          <div className="bg-cream rounded-2xl p-12 text-center">
+            <Store className="h-12 w-12 text-gray-300 mx-auto mb-4" />
+            <p className="text-gray-500 mb-4">No stores found with products in this category.</p>
+            <Link href="/" className="text-primary font-medium hover:underline">
+              Browse all stores
+            </Link>
+          </div>
+        )}
+
+        {/* Products Section */}
+        {filter === 'products' && products.length === 0 ? (
           <div className="bg-cream rounded-2xl p-12 text-center">
             <p className="text-gray-500 mb-4">No products found in this category.</p>
             <Link href="/" className="text-primary font-medium hover:underline">
@@ -232,13 +333,13 @@ export default function CategoryPage() {
             </Link>
           </div>
         ) : (
-          <>
+          filter === 'products' && (
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
               {products.map((product) => (
                 <ProductCard key={product.id} product={product} />
               ))}
             </div>
-          </>
+          )
         )}
       </div>
     </div>
