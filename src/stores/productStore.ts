@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import { Product, Cuisine } from '@/types'
+import { Product, CuisineType } from '@/types'
 
 interface ProductState {
   products: Product[]
@@ -14,7 +14,7 @@ interface ProductState {
   getProductsByStore: (storeId: string) => Product[]
   getProductsByVendor: (vendorId: string) => Product[]
   getProductsByCategory: (category: string) => Product[]
-  getProductsByCuisine: (cuisine: Cuisine) => Product[]
+  getProductsByCuisine: (cuisine: CuisineType) => Product[]
   getLowStockProducts: (vendorId: string, threshold?: number) => Product[]
 }
 
