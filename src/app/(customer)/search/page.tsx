@@ -41,6 +41,21 @@ function SearchResults() {
     primaryAddress ? { city: primaryAddress.city, coordinates: primaryAddress.coordinates } : null
   )
 
+  const searchQuery = query.toLowerCase()
+
+  // Check if search query matches a cuisine
+  const cuisineMap: Record<string, string> = {
+    'african': 'african',
+    'caribbean': 'caribbean',
+    'south asian': 'south-asian',
+    'indian': 'south-asian',
+    'east asian': 'east-asian',
+    'chinese': 'east-asian',
+    'middle eastern': 'middle-eastern',
+    'eastern european': 'eastern-european',
+  }
+  const matchedCuisine = cuisineMap[searchQuery.replace(/\+/g, ' ')]
+
   // Fetch data on mount and when cuisine changes
   useEffect(() => {
     const cuisineParam = matchedCuisine || undefined
@@ -58,21 +73,6 @@ function SearchResults() {
     document.addEventListener('mousedown', handleClickOutside)
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [])
-
-  const searchQuery = query.toLowerCase()
-
-  // Check if search query matches a cuisine
-  const cuisineMap: Record<string, string> = {
-    'african': 'african',
-    'caribbean': 'caribbean',
-    'south asian': 'south-asian',
-    'indian': 'south-asian',
-    'east asian': 'east-asian',
-    'chinese': 'east-asian',
-    'middle eastern': 'middle-eastern',
-    'eastern european': 'eastern-european',
-  }
-  const matchedCuisine = cuisineMap[searchQuery.replace(/\+/g, ' ')]
 
   // Filter stores by city if user has location
   let availableStores = stores
