@@ -222,7 +222,9 @@ export default function CategoryPage() {
             {isStoreFilterOpen && (
               <div className="absolute top-full right-0 mt-2 w-64 bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden z-50 max-h-80 overflow-y-auto">
                 <div className="px-4 py-2 bg-gray-50 text-xs font-semibold text-gray-500 uppercase tracking-wide border-b border-gray-100">
-                  {activeLocation.city ? `Stores in ${activeLocation.city}` : 'All Stores'}
+                  {activeLocation.city 
+                    ? `Stores in ${activeLocation.city} with ${category.name}`
+                    : `Stores with ${category.name}`}
                 </div>
                 <button
                   onClick={() => {
@@ -242,7 +244,7 @@ export default function CategoryPage() {
                     All Stores
                   </span>
                 </button>
-                {availableStores.map((store) => {
+                {sortedStores.map((store) => {
                   const isSelected = selectedStoreIds.includes(store.id)
                   return (
                     <button
@@ -272,9 +274,9 @@ export default function CategoryPage() {
                     </button>
                   )
                 })}
-                {availableStores.length === 0 && (
+                {sortedStores.length === 0 && (
                   <div className="px-4 py-3 text-sm text-gray-500 text-center">
-                    No stores found
+                    No stores found with products in this category
                   </div>
                 )}
               </div>

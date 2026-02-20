@@ -316,7 +316,7 @@ function SearchResults() {
                       All Stores
                     </span>
                   </button>
-                  {availableStores.map((store) => {
+                  {matchedStores.map((store) => {
                     const isSelected = selectedStoreIds.includes(store.id)
                     return (
                       <button
@@ -346,9 +346,9 @@ function SearchResults() {
                       </button>
                     )
                   })}
-                  {availableStores.length === 0 && (
+                  {matchedStores.length === 0 && (
                     <div className="px-4 py-3 text-sm text-gray-500 text-center">
-                      No stores found in {activeLocation.city || 'your area'}
+                      No stores found with products matching your search
                     </div>
                   )}
                 </div>
