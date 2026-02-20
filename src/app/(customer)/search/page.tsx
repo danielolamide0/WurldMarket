@@ -314,9 +314,9 @@ function SearchResults() {
                       </button>
                     )
                   })}
-                  {matchedStores.length === 0 && (
+                  {availableStores.length === 0 && (
                     <div className="px-4 py-3 text-sm text-gray-500 text-center">
-                      No stores found
+                      No stores found in {activeLocation.city || 'your area'}
                     </div>
                   )}
                 </div>
