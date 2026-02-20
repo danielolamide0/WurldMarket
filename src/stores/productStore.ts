@@ -5,7 +5,7 @@ import { Product } from '@/types'
 interface ProductState {
   products: Product[]
   isLoading: boolean
-  fetchProducts: (params?: { storeId?: string; vendorId?: string; category?: string }) => Promise<void>
+  fetchProducts: (params?: { storeId?: string; vendorId?: string; category?: string; cuisine?: string }) => Promise<void>
   addProduct: (product: Omit<Product, 'id' | 'createdAt' | 'updatedAt'>) => Promise<Product | null>
   updateProduct: (id: string, updates: Partial<Product>) => Promise<void>
   deleteProduct: (id: string) => Promise<void>
@@ -30,6 +30,7 @@ export const useProductStore = create<ProductState>()(
           if (params?.storeId) searchParams.set('storeId', params.storeId)
           if (params?.vendorId) searchParams.set('vendorId', params.vendorId)
           if (params?.category) searchParams.set('category', params.category)
+          if (params?.cuisine) searchParams.set('cuisine', params.cuisine)
 
           const url = `/api/products${searchParams.toString() ? `?${searchParams}` : ''}`
           const response = await fetch(url)

@@ -12,7 +12,8 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Select } from '@/components/ui/select'
 import { CATEGORIES } from '@/lib/constants'
-import { ProductCategory } from '@/types'
+import { ProductCategory, CuisineType } from '@/types'
+import { Check } from 'lucide-react'
 
 export default function EditProductPage() {
   const router = useRouter()
@@ -37,6 +38,7 @@ export default function EditProductPage() {
     name: '',
     description: '',
     category: 'grains-rice' as ProductCategory,
+    cuisines: [] as CuisineType[],
     price: '',
     unit: '',
     stock: '',
@@ -49,12 +51,31 @@ export default function EditProductPage() {
   })
   const [isSubmitting, setIsSubmitting] = useState(false)
 
+  const CUISINES: { value: CuisineType; label: string }[] = [
+    { value: 'african', label: 'African' },
+    { value: 'caribbean', label: 'Caribbean' },
+    { value: 'south-asian', label: 'South Asian' },
+    { value: 'east-asian', label: 'East Asian' },
+    { value: 'middle-eastern', label: 'Middle Eastern' },
+    { value: 'eastern-european', label: 'Eastern European' },
+  ]
+
+  const toggleCuisine = (cuisine: CuisineType) => {
+    setFormData((prev) => ({
+      ...prev,
+      cuisines: prev.cuisines.includes(cuisine)
+        ? prev.cuisines.filter((c) => c !== cuisine)
+        : [...prev.cuisines, cuisine],
+    }))
+  }
+
   useEffect(() => {
     if (product) {
       setFormData({
         name: product.name,
         description: product.description,
         category: product.category,
+        cuisines: product.cuisines || [],
         price: product.price.toString(),
         unit: product.unit,
         stock: product.stock.toString(),
@@ -84,7 +105,7 @@ export default function EditProductPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
-    if (!formData.name || !formData.price || !formData.unit || !formData.stock) {
+    if (!formData.name || !formData.price || !formData.unit || !formData.stock || formData.cuisines.length === 0) {
       return
     }
 
@@ -97,6 +118,7 @@ export default function EditProductPage() {
       name: formData.name,
       description: formData.description,
       category: formData.category,
+      cuisines: formData.cuisines,
       price: parseFloat(formData.price),
       unit: formData.unit,
       stock: parseInt(formData.stock),
@@ -174,6 +196,43 @@ export default function EditProductPage() {
                 }))}
                 required
               />
+            </div>
+
+            {/* Cuisines Selection */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Find Your Flavour (Cuisines) * <span className="text-gray-500 text-xs">(Select at least one, can select multiple)</span>
+              </label>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-3 p-4 bg-gray-50 rounded-xl border border-gray-200">
+                {CUISINES.map((cuisine) => {
+                  const isSelected = formData.cuisines.includes(cuisine.value)
+                  return (
+                    <button
+                      key={cuisine.value}
+                      type="button"
+                      onClick={() => toggleCuisine(cuisine.value)}
+                      className={`flex items-center gap-2 px-4 py-2.5 rounded-lg border-2 transition-all text-left ${
+                        isSelected
+                          ? 'border-primary bg-primary/5 text-primary'
+                          : 'border-gray-200 bg-white text-gray-700 hover:border-gray-300'
+                      }`}
+                    >
+                      <div className={`w-5 h-5 rounded border-2 flex items-center justify-center flex-shrink-0 ${
+                        isSelected ? 'border-primary bg-primary' : 'border-gray-300'
+                      }`}>
+                        {isSelected && <Check className="h-3 w-3 text-white" />}
+                      </div>
+                      <span className="font-medium">{cuisine.label}</span>
+                    </button>
+                  )
+                })}
+              </div>
+              {formData.cuisines.length === 0 && (
+                <p className="text-sm text-red-500 mt-1">Please select at least one cuisine</p>
+              )}
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 
               <Input
                 label="Price (GBP) *"

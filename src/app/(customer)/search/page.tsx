@@ -60,6 +60,19 @@ function SearchResults() {
 
   const searchQuery = query.toLowerCase()
 
+  // Check if search query matches a cuisine
+  const cuisineMap: Record<string, string> = {
+    'african': 'african',
+    'caribbean': 'caribbean',
+    'south asian': 'south-asian',
+    'indian': 'south-asian',
+    'east asian': 'east-asian',
+    'chinese': 'east-asian',
+    'middle eastern': 'middle-eastern',
+    'eastern european': 'eastern-european',
+  }
+  const matchedCuisine = cuisineMap[searchQuery.replace(/\+/g, ' ')]
+
   // Filter stores by city if user has location
   let availableStores = stores
   if (activeLocation.city) {
@@ -76,6 +89,15 @@ function SearchResults() {
       s.city.toLowerCase().includes(searchQuery) ||
       s.postcode.toLowerCase().includes(searchQuery)
   )
+
+  // If searching by cuisine, filter stores that have products in that cuisine
+  if (matchedCuisine) {
+    const productsInCuisine = products.filter((p) => 
+      p.cuisines && p.cuisines.includes(matchedCuisine as any)
+    )
+    const storeIdsWithCuisine = new Set(productsInCuisine.map(p => p.storeId))
+    matchedStores = matchedStores.filter(s => storeIdsWithCuisine.has(s.id))
+  }
 
   // Sort stores by proximity if user has location
   if (activeLocation.coordinates) {
@@ -103,10 +125,19 @@ function SearchResults() {
   // Search products
   let matchedProducts = products
     .filter(
-      (p) =>
-        p.name.toLowerCase().includes(searchQuery) ||
-        p.description.toLowerCase().includes(searchQuery) ||
-        p.category.toLowerCase().includes(searchQuery)
+      (p) => {
+        const matchesText = 
+          p.name.toLowerCase().includes(searchQuery) ||
+          p.description.toLowerCase().includes(searchQuery) ||
+          p.category.toLowerCase().includes(searchQuery)
+        
+        // If searching by cuisine, also check cuisines
+        if (matchedCuisine) {
+          return matchesText && p.cuisines && p.cuisines.includes(matchedCuisine as any)
+        }
+        
+        return matchesText
+      }
     )
     .map((product) => {
       const store = stores.find((s) => s.id === product.storeId)

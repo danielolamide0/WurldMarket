@@ -77,6 +77,8 @@ export type ProductCategory =
   | 'snacks'
   | 'beverages'
 
+export type CuisineType = 'african' | 'caribbean' | 'south-asian' | 'east-asian' | 'middle-eastern' | 'eastern-european'
+
 export interface Product {
   id: string
   vendorId: string
@@ -84,6 +86,7 @@ export interface Product {
   name: string
   description: string
   category: ProductCategory
+  cuisines?: CuisineType[]
   price: number
   unit: string
   image: string
