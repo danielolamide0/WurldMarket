@@ -105,11 +105,15 @@ function SearchResults() {
     'african': 'african',
     'caribbean': 'caribbean',
     'south asian': 'south-asian',
+    'south-asian': 'south-asian',
     'indian': 'south-asian',
     'east asian': 'east-asian',
+    'east-asian': 'east-asian',
     'chinese': 'east-asian',
     'middle eastern': 'middle-eastern',
+    'middle-eastern': 'middle-eastern',
     'eastern european': 'eastern-european',
+    'eastern-european': 'eastern-european',
   }
   const matchedCuisine = cuisineMap[searchQuery.replace('+', ' ')]
 
@@ -127,6 +131,15 @@ function SearchResults() {
       const store = stores.find((s) => s.id === product.storeId)
       return { ...product, storeName: store?.name, storeCoordinates: store?.coordinates }
     })
+
+  // If searching for a cuisine, find stores that have products in that cuisine
+  // Get unique store IDs from matched products
+  const storeIdsWithMatchingProducts = [...new Set(matchedProducts.map(p => p.storeId))]
+
+  // For cuisine searches, show stores that sell products in that cuisine
+  if (matchedCuisine) {
+    matchedStores = availableStores.filter(s => storeIdsWithMatchingProducts.includes(s.id))
+  }
 
   // Filter products by city if user has location
   if (activeLocation.city) {
