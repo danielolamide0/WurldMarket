@@ -41,11 +41,12 @@ function SearchResults() {
     primaryAddress ? { city: primaryAddress.city, coordinates: primaryAddress.coordinates } : null
   )
 
-  // Fetch data on mount
+  // Fetch data on mount and when cuisine changes
   useEffect(() => {
-    fetchProducts({})
+    const cuisineParam = matchedCuisine || undefined
+    fetchProducts(cuisineParam ? { cuisine: cuisineParam } : {})
     fetchStores()
-  }, [fetchProducts, fetchStores])
+  }, [fetchProducts, fetchStores, matchedCuisine])
 
   // Close store filter when clicking outside
   useEffect(() => {
@@ -126,15 +127,16 @@ function SearchResults() {
   let matchedProducts = products
     .filter(
       (p) => {
+        // If searching by cuisine, only check cuisines (don't require text match)
+        if (matchedCuisine) {
+          return p.cuisines && p.cuisines.includes(matchedCuisine as any)
+        }
+        
+        // Otherwise, search by text
         const matchesText = 
           p.name.toLowerCase().includes(searchQuery) ||
           p.description.toLowerCase().includes(searchQuery) ||
           p.category.toLowerCase().includes(searchQuery)
-        
-        // If searching by cuisine, also check cuisines
-        if (matchedCuisine) {
-          return matchesText && p.cuisines && p.cuisines.includes(matchedCuisine as any)
-        }
         
         return matchesText
       }
