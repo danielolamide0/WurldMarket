@@ -72,7 +72,36 @@ export default function CategoryPage() {
     })
   }
 
-  // Filter products by selected stores
+  // Get stores that have products in this category (BEFORE filtering by selectedStoreIds)
+  // This ensures all stores remain visible in the filter dropdown
+  const storeIdsWithCategoryProducts = new Set(products.map(p => p.storeId))
+  const storesWithCategoryProducts = availableStores.filter(s => storeIdsWithCategoryProducts.has(s.id))
+
+  // Sort stores by proximity if user has location
+  let sortedStores = storesWithCategoryProducts
+  if (activeLocation.coordinates) {
+    sortedStores = storesWithCategoryProducts.sort((a, b) => {
+      const distA = a.coordinates
+        ? calculateDistance(
+            activeLocation.coordinates!.lat,
+            activeLocation.coordinates!.lng,
+            a.coordinates.lat,
+            a.coordinates.lng
+          )
+        : Infinity
+      const distB = b.coordinates
+        ? calculateDistance(
+            activeLocation.coordinates!.lat,
+            activeLocation.coordinates!.lng,
+            b.coordinates.lat,
+            b.coordinates.lng
+          )
+        : Infinity
+      return distA - distB
+    })
+  }
+
+  // Filter products by selected stores (AFTER calculating sortedStores)
   if (selectedStoreIds.length > 0) {
     products = products.filter((p) => selectedStoreIds.includes(p.storeId))
   }
@@ -103,34 +132,6 @@ export default function CategoryPage() {
           : Infinity
         return distA - distB
       })
-  }
-
-  // Get stores that have products in this category
-  const storeIdsWithCategoryProducts = new Set(products.map(p => p.storeId))
-  const storesWithCategoryProducts = availableStores.filter(s => storeIdsWithCategoryProducts.has(s.id))
-
-  // Sort stores by proximity if user has location
-  let sortedStores = storesWithCategoryProducts
-  if (activeLocation.coordinates) {
-    sortedStores = storesWithCategoryProducts.sort((a, b) => {
-      const distA = a.coordinates
-        ? calculateDistance(
-            activeLocation.coordinates!.lat,
-            activeLocation.coordinates!.lng,
-            a.coordinates.lat,
-            a.coordinates.lng
-          )
-        : Infinity
-      const distB = b.coordinates
-        ? calculateDistance(
-            activeLocation.coordinates!.lat,
-            activeLocation.coordinates!.lng,
-            b.coordinates.lat,
-            b.coordinates.lng
-          )
-        : Infinity
-      return distA - distB
-    })
   }
 
   if (!category) {
