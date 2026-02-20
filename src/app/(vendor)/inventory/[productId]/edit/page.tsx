@@ -11,8 +11,8 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Select } from '@/components/ui/select'
-import { CATEGORIES } from '@/lib/constants'
-import { ProductCategory } from '@/types'
+import { CATEGORIES, CUISINES } from '@/lib/constants'
+import { ProductCategory, Cuisine } from '@/types'
 
 export default function EditProductPage() {
   const router = useRouter()
@@ -36,7 +36,8 @@ export default function EditProductPage() {
   const [formData, setFormData] = useState({
     name: '',
     description: '',
-    category: 'grains-rice' as ProductCategory,
+    category: 'rice-grains' as ProductCategory,
+    cuisines: ['african'] as Cuisine[],
     price: '',
     unit: '',
     stock: '',
@@ -55,6 +56,7 @@ export default function EditProductPage() {
         name: product.name,
         description: product.description,
         category: product.category,
+        cuisines: product.cuisines || ['african'],
         price: product.price.toString(),
         unit: product.unit,
         stock: product.stock.toString(),
@@ -67,6 +69,16 @@ export default function EditProductPage() {
       })
     }
   }, [product])
+
+  const handleCuisineToggle = (cuisineId: Cuisine) => {
+    setFormData((prev) => {
+      const newCuisines = prev.cuisines.includes(cuisineId)
+        ? prev.cuisines.filter((c) => c !== cuisineId)
+        : [...prev.cuisines, cuisineId]
+      // Ensure at least one cuisine is selected
+      return { ...prev, cuisines: newCuisines.length > 0 ? newCuisines : prev.cuisines }
+    })
+  }
 
   if (!product) {
     return (
@@ -97,6 +109,7 @@ export default function EditProductPage() {
       name: formData.name,
       description: formData.description,
       category: formData.category,
+      cuisines: formData.cuisines,
       price: parseFloat(formData.price),
       unit: formData.unit,
       stock: parseInt(formData.stock),
@@ -163,7 +176,7 @@ export default function EditProductPage() {
               />
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <Select
                 label="Category *"
                 value={formData.category}
@@ -175,6 +188,35 @@ export default function EditProductPage() {
                 required
               />
 
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                  Find Your Flavour (Cuisines) *
+                </label>
+                <p className="text-xs text-gray-500 mb-2">Select all cuisines this product fits</p>
+                <div className="grid grid-cols-2 gap-2">
+                  {CUISINES.map((cuisine) => (
+                    <label
+                      key={cuisine.id}
+                      className={`flex items-center gap-2 p-2 rounded-lg border cursor-pointer transition-all ${
+                        formData.cuisines.includes(cuisine.id)
+                          ? 'border-primary bg-primary/5'
+                          : 'border-gray-200 hover:border-gray-300'
+                      }`}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={formData.cuisines.includes(cuisine.id)}
+                        onChange={() => handleCuisineToggle(cuisine.id)}
+                        className="w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary"
+                      />
+                      <span className="text-sm text-gray-700">{cuisine.name}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <Input
                 label="Price (GBP) *"
                 type="number"

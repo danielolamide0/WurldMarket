@@ -1,4 +1,4 @@
-import { Category, ProductCategory } from '@/types'
+import { Category, ProductCategory, Cuisine } from '@/types'
 
 export const APP_NAME = 'WurldBasket'
 export const APP_DESCRIPTION = 'Your Global Food Marketplace'
@@ -173,6 +173,69 @@ export const CATEGORIES: Category[] = [
     image: 'https://images.unsplash.com/photo-1583947215259-38e31be8751f?w=400',
   },
 ]
+
+// Cuisine options for "Find Your Flavour"
+export interface CuisineOption {
+  id: Cuisine
+  name: string
+  slug: string
+  description: string
+  image: string
+}
+
+export const CUISINES: CuisineOption[] = [
+  {
+    id: 'african',
+    name: 'African',
+    slug: 'african',
+    description: 'West African, East African, and North African cuisines',
+    image: 'https://images.unsplash.com/photo-1604329760661-e71dc83f8f26?w=400',
+  },
+  {
+    id: 'caribbean',
+    name: 'Caribbean',
+    slug: 'caribbean',
+    description: 'Jamaican, Trinidadian, and island cuisines',
+    image: 'https://images.unsplash.com/photo-1593759608136-45eb2ad9507d?w=400',
+  },
+  {
+    id: 'south-asian',
+    name: 'South Asian',
+    slug: 'south-asian',
+    description: 'Indian, Pakistani, Bangladeshi, and Sri Lankan cuisines',
+    image: 'https://images.unsplash.com/photo-1585937421612-70a008356fbe?w=400',
+  },
+  {
+    id: 'east-asian',
+    name: 'East Asian',
+    slug: 'east-asian',
+    description: 'Chinese, Japanese, Korean, and Vietnamese cuisines',
+    image: 'https://images.unsplash.com/photo-1563245372-f21724e3856d?w=400',
+  },
+  {
+    id: 'middle-eastern',
+    name: 'Middle Eastern',
+    slug: 'middle-eastern',
+    description: 'Lebanese, Turkish, Persian, and Arab cuisines',
+    image: 'https://images.unsplash.com/photo-1511690743698-d9d85f2fbf38?w=400',
+  },
+  {
+    id: 'eastern-european',
+    name: 'Eastern European',
+    slug: 'eastern-european',
+    description: 'Polish, Russian, Ukrainian, and Balkan cuisines',
+    image: 'https://images.unsplash.com/photo-1565557623262-b51c2513a641?w=400',
+  },
+]
+
+export const CUISINE_MAP: Record<Cuisine, string> = {
+  'african': 'African',
+  'caribbean': 'Caribbean',
+  'south-asian': 'South Asian',
+  'east-asian': 'East Asian',
+  'middle-eastern': 'Middle Eastern',
+  'eastern-european': 'Eastern European',
+}
 
 export const CATEGORY_MAP: Record<ProductCategory, string> = {
   'fresh-produce': 'Fresh Produce',

@@ -11,6 +11,7 @@ export async function GET(request: NextRequest) {
     const vendorId = searchParams.get('vendorId')
     const storeId = searchParams.get('storeId')
     const category = searchParams.get('category')
+    const cuisine = searchParams.get('cuisine')
     const search = searchParams.get('search')
 
     if (productId) {
@@ -26,6 +27,7 @@ export async function GET(request: NextRequest) {
           name: product.name,
           description: product.description,
           category: product.category,
+          cuisines: product.cuisines || ['african'],
           price: product.price,
           unit: product.unit,
           image: product.image,
@@ -45,6 +47,7 @@ export async function GET(request: NextRequest) {
     if (vendorId) query.vendorId = vendorId
     if (storeId) query.storeId = storeId
     if (category) query.category = category
+    if (cuisine) query.cuisines = cuisine
     if (search) {
       query.$or = [
         { name: { $regex: search, $options: 'i' } },
@@ -62,6 +65,7 @@ export async function GET(request: NextRequest) {
         name: p.name,
         description: p.description,
         category: p.category,
+        cuisines: p.cuisines || ['african'],
         price: p.price,
         unit: p.unit,
         image: p.image,
@@ -86,9 +90,9 @@ export async function POST(request: NextRequest) {
     await dbConnect()
 
     const body = await request.json()
-    const { vendorId, storeId, name, description, category, price, unit, image, stock } = body
+    const { vendorId, storeId, name, description, category, cuisines, price, unit, image, stock } = body
 
-    if (!vendorId || !storeId || !name || !category || price === undefined || !image) {
+    if (!vendorId || !storeId || !name || !category || !cuisines || !cuisines.length || price === undefined || !image) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
     }
 
@@ -100,6 +104,7 @@ export async function POST(request: NextRequest) {
       name,
       description: description || '',
       category,
+      cuisines,
       price,
       unit: unit || 'each',
       image,
@@ -117,13 +122,14 @@ export async function POST(request: NextRequest) {
         name: product.name,
         description: product.description,
         category: product.category,
+        cuisines: product.cuisines || ['african'],
         price: product.price,
         unit: product.unit,
         image: product.image,
         stock: product.stock,
         isActive: product.isActive,
         isOnOffer: product.isOnOffer || false,
-          isTrending: product.isTrending || false,
+        isTrending: product.isTrending || false,
         originalPrice: product.originalPrice,
         offerEndDate: product.offerEndDate?.toISOString(),
         createdAt: product.createdAt.toISOString(),
@@ -160,13 +166,14 @@ export async function PUT(request: NextRequest) {
         name: product.name,
         description: product.description,
         category: product.category,
+        cuisines: product.cuisines || ['african'],
         price: product.price,
         unit: product.unit,
         image: product.image,
         stock: product.stock,
         isActive: product.isActive,
         isOnOffer: product.isOnOffer || false,
-          isTrending: product.isTrending || false,
+        isTrending: product.isTrending || false,
         originalPrice: product.originalPrice,
         offerEndDate: product.offerEndDate?.toISOString(),
         createdAt: product.createdAt.toISOString(),

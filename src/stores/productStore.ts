@@ -1,11 +1,11 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import { Product } from '@/types'
+import { Product, Cuisine } from '@/types'
 
 interface ProductState {
   products: Product[]
   isLoading: boolean
-  fetchProducts: (params?: { storeId?: string; vendorId?: string; category?: string }) => Promise<void>
+  fetchProducts: (params?: { storeId?: string; vendorId?: string; category?: string; cuisine?: string }) => Promise<void>
   addProduct: (product: Omit<Product, 'id' | 'createdAt' | 'updatedAt'>) => Promise<Product | null>
   updateProduct: (id: string, updates: Partial<Product>) => Promise<void>
   deleteProduct: (id: string) => Promise<void>
@@ -14,6 +14,7 @@ interface ProductState {
   getProductsByStore: (storeId: string) => Product[]
   getProductsByVendor: (vendorId: string) => Product[]
   getProductsByCategory: (category: string) => Product[]
+  getProductsByCuisine: (cuisine: Cuisine) => Product[]
   getLowStockProducts: (vendorId: string, threshold?: number) => Product[]
 }
 
@@ -30,6 +31,7 @@ export const useProductStore = create<ProductState>()(
           if (params?.storeId) searchParams.set('storeId', params.storeId)
           if (params?.vendorId) searchParams.set('vendorId', params.vendorId)
           if (params?.category) searchParams.set('category', params.category)
+          if (params?.cuisine) searchParams.set('cuisine', params.cuisine)
 
           const url = `/api/products${searchParams.toString() ? `?${searchParams}` : ''}`
           const response = await fetch(url)
@@ -159,6 +161,10 @@ export const useProductStore = create<ProductState>()(
 
       getProductsByCategory: (category) => {
         return get().products.filter((p) => p.category === category && p.isActive)
+      },
+
+      getProductsByCuisine: (cuisine) => {
+        return get().products.filter((p) => p.cuisines?.includes(cuisine) && p.isActive)
       },
 
       getLowStockProducts: (vendorId, threshold = 10) => {

@@ -100,13 +100,28 @@ function SearchResults() {
     })
   }
 
-  // Search products
+  // Check if search query matches a cuisine
+  const cuisineMap: Record<string, string> = {
+    'african': 'african',
+    'caribbean': 'caribbean',
+    'south asian': 'south-asian',
+    'indian': 'south-asian',
+    'east asian': 'east-asian',
+    'chinese': 'east-asian',
+    'middle eastern': 'middle-eastern',
+    'eastern european': 'eastern-european',
+  }
+  const matchedCuisine = cuisineMap[searchQuery.replace('+', ' ')]
+
+  // Search products - also match by cuisines array
   let matchedProducts = products
     .filter(
       (p) =>
         p.name.toLowerCase().includes(searchQuery) ||
         p.description.toLowerCase().includes(searchQuery) ||
-        p.category.toLowerCase().includes(searchQuery)
+        p.category.toLowerCase().includes(searchQuery) ||
+        (p.cuisines && p.cuisines.some(c => c.toLowerCase().includes(searchQuery.replace('+', '-')))) ||
+        (matchedCuisine && p.cuisines?.includes(matchedCuisine as any))
     )
     .map((product) => {
       const store = stores.find((s) => s.id === product.storeId)
