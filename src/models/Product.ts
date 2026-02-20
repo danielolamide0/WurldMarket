@@ -1,13 +1,5 @@
 import mongoose, { Schema, Document, Model } from 'mongoose'
 
-export type Cuisine =
-  | 'african'
-  | 'caribbean'
-  | 'south-asian'
-  | 'east-asian'
-  | 'middle-eastern'
-  | 'eastern-european'
-
 export type ProductCategory =
   | 'fresh-produce'
   | 'tubers-roots'
@@ -37,6 +29,8 @@ export type ProductCategory =
   | 'snacks'
   | 'beverages'
 
+export type CuisineType = 'african' | 'caribbean' | 'south-asian' | 'east-asian' | 'middle-eastern' | 'eastern-european'
+
 export interface IProduct extends Document {
   _id: mongoose.Types.ObjectId
   vendorId: mongoose.Types.ObjectId
@@ -44,7 +38,7 @@ export interface IProduct extends Document {
   name: string
   description: string
   category: ProductCategory
-  cuisines: Cuisine[]
+  cuisines?: CuisineType[]
   price: number
   unit: string
   image: string
@@ -114,16 +108,8 @@ const ProductSchema = new Schema<IProduct>(
     },
     cuisines: {
       type: [String],
-      enum: [
-        'african',
-        'caribbean',
-        'south-asian',
-        'east-asian',
-        'middle-eastern',
-        'eastern-european',
-      ],
-      required: true,
-      default: ['african'],
+      enum: ['african', 'caribbean', 'south-asian', 'east-asian', 'middle-eastern', 'eastern-european'],
+      default: [],
     },
     price: {
       type: Number,
@@ -169,7 +155,6 @@ const ProductSchema = new Schema<IProduct>(
 ProductSchema.index({ vendorId: 1 })
 ProductSchema.index({ storeId: 1 })
 ProductSchema.index({ category: 1 })
-ProductSchema.index({ cuisines: 1 })
 ProductSchema.index({ isActive: 1 })
 ProductSchema.index({ name: 'text', description: 'text' })
 

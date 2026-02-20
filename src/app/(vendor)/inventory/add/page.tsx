@@ -11,8 +11,9 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Select } from '@/components/ui/select'
-import { CATEGORIES, CUISINES } from '@/lib/constants'
-import { ProductCategory, Cuisine } from '@/types'
+import { CATEGORIES } from '@/lib/constants'
+import { ProductCategory, CuisineType } from '@/types'
+import { Check } from 'lucide-react'
 
 export default function AddProductPage() {
   const router = useRouter()
@@ -25,8 +26,8 @@ export default function AddProductPage() {
   const [formData, setFormData] = useState({
     name: '',
     description: '',
-    category: 'rice-grains' as ProductCategory,
-    cuisines: ['african'] as Cuisine[],
+    category: 'grains-rice' as ProductCategory,
+    cuisines: [] as CuisineType[],
     price: '',
     unit: '',
     stock: '',
@@ -37,6 +38,24 @@ export default function AddProductPage() {
     offerEndDate: '',
   })
   const [isSubmitting, setIsSubmitting] = useState(false)
+
+  const CUISINES: { value: CuisineType; label: string }[] = [
+    { value: 'african', label: 'African' },
+    { value: 'caribbean', label: 'Caribbean' },
+    { value: 'south-asian', label: 'South Asian' },
+    { value: 'east-asian', label: 'East Asian' },
+    { value: 'middle-eastern', label: 'Middle Eastern' },
+    { value: 'eastern-european', label: 'Eastern European' },
+  ]
+
+  const toggleCuisine = (cuisine: CuisineType) => {
+    setFormData((prev) => ({
+      ...prev,
+      cuisines: prev.cuisines.includes(cuisine)
+        ? prev.cuisines.filter((c) => c !== cuisine)
+        : [...prev.cuisines, cuisine],
+    }))
+  }
 
   // Fetch stores on mount and set default storeId
   useEffect(() => {
@@ -51,16 +70,6 @@ export default function AddProductPage() {
       setFormData((prev) => ({ ...prev, storeId: vendorStores[0].id }))
     }
   }, [vendorStores, formData.storeId])
-
-  const handleCuisineToggle = (cuisineId: Cuisine) => {
-    setFormData((prev) => {
-      const newCuisines = prev.cuisines.includes(cuisineId)
-        ? prev.cuisines.filter((c) => c !== cuisineId)
-        : [...prev.cuisines, cuisineId]
-      // Ensure at least one cuisine is selected
-      return { ...prev, cuisines: newCuisines.length > 0 ? newCuisines : prev.cuisines }
-    })
-  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -147,7 +156,7 @@ export default function AddProductPage() {
               />
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <Select
                 label="Category *"
                 value={formData.category}
@@ -158,36 +167,44 @@ export default function AddProductPage() {
                 }))}
                 required
               />
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                  Find Your Flavour (Cuisines) *
-                </label>
-                <p className="text-xs text-gray-500 mb-2">Select all cuisines this product fits</p>
-                <div className="grid grid-cols-2 gap-2">
-                  {CUISINES.map((cuisine) => (
-                    <label
-                      key={cuisine.id}
-                      className={`flex items-center gap-2 p-2 rounded-lg border cursor-pointer transition-all ${
-                        formData.cuisines.includes(cuisine.id)
-                          ? 'border-primary bg-primary/5'
-                          : 'border-gray-200 hover:border-gray-300'
-                      }`}
-                    >
-                      <input
-                        type="checkbox"
-                        checked={formData.cuisines.includes(cuisine.id)}
-                        onChange={() => handleCuisineToggle(cuisine.id)}
-                        className="w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary"
-                      />
-                      <span className="text-sm text-gray-700">{cuisine.name}</span>
-                    </label>
-                  ))}
-                </div>
-              </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {/* Cuisines Selection */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Find Your Flavour (Cuisines) * <span className="text-gray-500 text-xs">(Select at least one, can select multiple)</span>
+              </label>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-3 p-4 bg-gray-50 rounded-xl border border-gray-200">
+                {CUISINES.map((cuisine) => {
+                  const isSelected = formData.cuisines.includes(cuisine.value)
+                  return (
+                    <button
+                      key={cuisine.value}
+                      type="button"
+                      onClick={() => toggleCuisine(cuisine.value)}
+                      className={`flex items-center gap-2 px-4 py-2.5 rounded-lg border-2 transition-all text-left ${
+                        isSelected
+                          ? 'border-primary bg-primary/5 text-primary'
+                          : 'border-gray-200 bg-white text-gray-700 hover:border-gray-300'
+                      }`}
+                    >
+                      <div className={`w-5 h-5 rounded border-2 flex items-center justify-center flex-shrink-0 ${
+                        isSelected ? 'border-primary bg-primary' : 'border-gray-300'
+                      }`}>
+                        {isSelected && <Check className="h-3 w-3 text-white" />}
+                      </div>
+                      <span className="font-medium">{cuisine.label}</span>
+                    </button>
+                  )
+                })}
+              </div>
+              {formData.cuisines.length === 0 && (
+                <p className="text-sm text-red-500 mt-1">Please select at least one cuisine</p>
+              )}
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+
               <Input
                 label="Price (GBP) *"
                 type="number"

@@ -11,7 +11,6 @@ export async function GET(request: NextRequest) {
     const vendorId = searchParams.get('vendorId')
     const storeId = searchParams.get('storeId')
     const category = searchParams.get('category')
-    const cuisine = searchParams.get('cuisine')
     const search = searchParams.get('search')
 
     if (productId) {
@@ -27,7 +26,7 @@ export async function GET(request: NextRequest) {
           name: product.name,
           description: product.description,
           category: product.category,
-          cuisines: product.cuisines || ['african'],
+          cuisines: product.cuisines || [],
           price: product.price,
           unit: product.unit,
           image: product.image,
@@ -47,7 +46,10 @@ export async function GET(request: NextRequest) {
     if (vendorId) query.vendorId = vendorId
     if (storeId) query.storeId = storeId
     if (category) query.category = category
-    if (cuisine) query.cuisines = cuisine
+    const cuisine = searchParams.get('cuisine')
+    if (cuisine) {
+      query.cuisines = cuisine
+    }
     if (search) {
       query.$or = [
         { name: { $regex: search, $options: 'i' } },
@@ -65,7 +67,7 @@ export async function GET(request: NextRequest) {
         name: p.name,
         description: p.description,
         category: p.category,
-        cuisines: p.cuisines || ['african'],
+        cuisines: p.cuisines || [],
         price: p.price,
         unit: p.unit,
         image: p.image,
@@ -92,8 +94,12 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     const { vendorId, storeId, name, description, category, cuisines, price, unit, image, stock } = body
 
-    if (!vendorId || !storeId || !name || !category || !cuisines || !cuisines.length || price === undefined || !image) {
+    if (!vendorId || !storeId || !name || !category || price === undefined || !image) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
+    }
+
+    if (!cuisines || !Array.isArray(cuisines) || cuisines.length === 0) {
+      return NextResponse.json({ error: 'At least one cuisine must be selected' }, { status: 400 })
     }
 
     const { isOnOffer, originalPrice, offerEndDate } = body
@@ -104,7 +110,7 @@ export async function POST(request: NextRequest) {
       name,
       description: description || '',
       category,
-      cuisines,
+      cuisines: cuisines || [],
       price,
       unit: unit || 'each',
       image,
@@ -114,28 +120,28 @@ export async function POST(request: NextRequest) {
       offerEndDate: isOnOffer && offerEndDate ? new Date(offerEndDate) : undefined,
     })
 
-    return NextResponse.json({
-      product: {
-        id: product._id.toString(),
-        vendorId: product.vendorId.toString(),
-        storeId: product.storeId.toString(),
-        name: product.name,
-        description: product.description,
-        category: product.category,
-        cuisines: product.cuisines || ['african'],
-        price: product.price,
-        unit: product.unit,
-        image: product.image,
-        stock: product.stock,
-        isActive: product.isActive,
-        isOnOffer: product.isOnOffer || false,
-        isTrending: product.isTrending || false,
-        originalPrice: product.originalPrice,
-        offerEndDate: product.offerEndDate?.toISOString(),
-        createdAt: product.createdAt.toISOString(),
-        updatedAt: product.updatedAt.toISOString(),
-      },
-    }, { status: 201 })
+      return NextResponse.json({
+        product: {
+          id: product._id.toString(),
+          vendorId: product.vendorId.toString(),
+          storeId: product.storeId.toString(),
+          name: product.name,
+          description: product.description,
+          category: product.category,
+          cuisines: product.cuisines || [],
+          price: product.price,
+          unit: product.unit,
+          image: product.image,
+          stock: product.stock,
+          isActive: product.isActive,
+          isOnOffer: product.isOnOffer || false,
+          isTrending: product.isTrending || false,
+          originalPrice: product.originalPrice,
+          offerEndDate: product.offerEndDate?.toISOString(),
+          createdAt: product.createdAt.toISOString(),
+          updatedAt: product.updatedAt.toISOString(),
+        },
+      }, { status: 201 })
   } catch (error) {
     console.error('Create product error:', error)
     return NextResponse.json({ error: 'Failed to create product' }, { status: 500 })
@@ -158,28 +164,28 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: 'Product not found' }, { status: 404 })
     }
 
-    return NextResponse.json({
-      product: {
-        id: product._id.toString(),
-        vendorId: product.vendorId.toString(),
-        storeId: product.storeId.toString(),
-        name: product.name,
-        description: product.description,
-        category: product.category,
-        cuisines: product.cuisines || ['african'],
-        price: product.price,
-        unit: product.unit,
-        image: product.image,
-        stock: product.stock,
-        isActive: product.isActive,
-        isOnOffer: product.isOnOffer || false,
-        isTrending: product.isTrending || false,
-        originalPrice: product.originalPrice,
-        offerEndDate: product.offerEndDate?.toISOString(),
-        createdAt: product.createdAt.toISOString(),
-        updatedAt: product.updatedAt.toISOString(),
-      },
-    })
+      return NextResponse.json({
+        product: {
+          id: product._id.toString(),
+          vendorId: product.vendorId.toString(),
+          storeId: product.storeId.toString(),
+          name: product.name,
+          description: product.description,
+          category: product.category,
+          cuisines: product.cuisines || [],
+          price: product.price,
+          unit: product.unit,
+          image: product.image,
+          stock: product.stock,
+          isActive: product.isActive,
+          isOnOffer: product.isOnOffer || false,
+          isTrending: product.isTrending || false,
+          originalPrice: product.originalPrice,
+          offerEndDate: product.offerEndDate?.toISOString(),
+          createdAt: product.createdAt.toISOString(),
+          updatedAt: product.updatedAt.toISOString(),
+        },
+      })
   } catch (error) {
     console.error('Update product error:', error)
     return NextResponse.json({ error: 'Failed to update product' }, { status: 500 })

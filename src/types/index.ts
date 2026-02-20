@@ -47,15 +47,6 @@ export interface StoreLocation {
   image?: string
 }
 
-// Cuisine Types (Find Your Flavour)
-export type Cuisine =
-  | 'african'
-  | 'caribbean'
-  | 'south-asian'
-  | 'east-asian'
-  | 'middle-eastern'
-  | 'eastern-european'
-
 // Product Types
 export type ProductCategory =
   | 'fresh-produce'
@@ -86,6 +77,8 @@ export type ProductCategory =
   | 'snacks'
   | 'beverages'
 
+export type CuisineType = 'african' | 'caribbean' | 'south-asian' | 'east-asian' | 'middle-eastern' | 'eastern-european'
+
 export interface Product {
   id: string
   vendorId: string
@@ -93,7 +86,7 @@ export interface Product {
   name: string
   description: string
   category: ProductCategory
-  cuisines: Cuisine[]
+  cuisines?: CuisineType[]
   price: number
   unit: string
   image: string

@@ -60,6 +60,19 @@ function SearchResults() {
 
   const searchQuery = query.toLowerCase()
 
+  // Check if search query matches a cuisine
+  const cuisineMap: Record<string, string> = {
+    'african': 'african',
+    'caribbean': 'caribbean',
+    'south asian': 'south-asian',
+    'indian': 'south-asian',
+    'east asian': 'east-asian',
+    'chinese': 'east-asian',
+    'middle eastern': 'middle-eastern',
+    'eastern european': 'eastern-european',
+  }
+  const matchedCuisine = cuisineMap[searchQuery.replace(/\+/g, ' ')]
+
   // Filter stores by city if user has location
   let availableStores = stores
   if (activeLocation.city) {
@@ -76,6 +89,15 @@ function SearchResults() {
       s.city.toLowerCase().includes(searchQuery) ||
       s.postcode.toLowerCase().includes(searchQuery)
   )
+
+  // If searching by cuisine, filter stores that have products in that cuisine
+  if (matchedCuisine) {
+    const productsInCuisine = products.filter((p) => 
+      p.cuisines && p.cuisines.includes(matchedCuisine as any)
+    )
+    const storeIdsWithCuisine = new Set(productsInCuisine.map(p => p.storeId))
+    matchedStores = matchedStores.filter(s => storeIdsWithCuisine.has(s.id))
+  }
 
   // Sort stores by proximity if user has location
   if (activeLocation.coordinates) {
@@ -98,51 +120,24 @@ function SearchResults() {
         : Infinity
       return distA - distB
     })
-    
-    // Also sort availableStores for the filter dropdown
-    availableStores = availableStores.sort((a, b) => {
-      const distA = a.coordinates
-        ? calculateDistance(
-            activeLocation.coordinates!.lat,
-            activeLocation.coordinates!.lng,
-            a.coordinates.lat,
-            a.coordinates.lng
-          )
-        : Infinity
-      const distB = b.coordinates
-        ? calculateDistance(
-            activeLocation.coordinates!.lat,
-            activeLocation.coordinates!.lng,
-            b.coordinates.lat,
-            b.coordinates.lng
-          )
-        : Infinity
-      return distA - distB
-    })
   }
 
-  // Check if search query matches a cuisine
-  const cuisineMap: Record<string, string> = {
-    'african': 'african',
-    'caribbean': 'caribbean',
-    'south asian': 'south-asian',
-    'indian': 'south-asian',
-    'east asian': 'east-asian',
-    'chinese': 'east-asian',
-    'middle eastern': 'middle-eastern',
-    'eastern european': 'eastern-european',
-  }
-  const matchedCuisine = cuisineMap[searchQuery.replace('+', ' ')]
-
-  // Search products - also match by cuisines array
+  // Search products
   let matchedProducts = products
     .filter(
-      (p) =>
-        p.name.toLowerCase().includes(searchQuery) ||
-        p.description.toLowerCase().includes(searchQuery) ||
-        p.category.toLowerCase().includes(searchQuery) ||
-        (p.cuisines && p.cuisines.some(c => c.toLowerCase().includes(searchQuery.replace('+', '-')))) ||
-        (matchedCuisine && p.cuisines?.includes(matchedCuisine as any))
+      (p) => {
+        const matchesText = 
+          p.name.toLowerCase().includes(searchQuery) ||
+          p.description.toLowerCase().includes(searchQuery) ||
+          p.category.toLowerCase().includes(searchQuery)
+        
+        // If searching by cuisine, also check cuisines
+        if (matchedCuisine) {
+          return matchesText && p.cuisines && p.cuisines.includes(matchedCuisine as any)
+        }
+        
+        return matchesText
+      }
     )
     .map((product) => {
       const store = stores.find((s) => s.id === product.storeId)
@@ -287,7 +282,7 @@ function SearchResults() {
                       All Stores
                     </span>
                   </button>
-                  {availableStores.map((store) => {
+                  {matchedStores.map((store) => {
                     const isSelected = selectedStoreIds.includes(store.id)
                     return (
                       <button
@@ -317,7 +312,7 @@ function SearchResults() {
                       </button>
                     )
                   })}
-                  {availableStores.length === 0 && (
+                  {matchedStores.length === 0 && (
                     <div className="px-4 py-3 text-sm text-gray-500 text-center">
                       No stores found
                     </div>
