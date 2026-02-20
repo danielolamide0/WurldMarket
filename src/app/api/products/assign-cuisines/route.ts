@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import dbConnect from '@/lib/mongodb'
-import Product from '@/models/Product'
+import Product, { CuisineType } from '@/models/Product'
 
 // Mapping of product keywords to cuisines
 const CUISINE_KEYWORDS: Record<string, string[]> = {
@@ -42,13 +42,13 @@ const CUISINE_KEYWORDS: Record<string, string[]> = {
   ],
 }
 
-function assignCuisinesToProduct(productName: string, description: string, category: string): string[] {
+function assignCuisinesToProduct(productName: string, description: string, category: string): CuisineType[] {
   const text = `${productName} ${description} ${category}`.toLowerCase()
-  const assignedCuisines: string[] = []
+  const assignedCuisines: CuisineType[] = []
 
   for (const [cuisine, keywords] of Object.entries(CUISINE_KEYWORDS)) {
     if (keywords.some(keyword => text.includes(keyword))) {
-      assignedCuisines.push(cuisine)
+      assignedCuisines.push(cuisine as CuisineType)
     }
   }
 
