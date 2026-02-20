@@ -1,4 +1,4 @@
-import { Category, ProductCategory, Cuisine } from '@/types'
+import { Category, ProductCategory } from '@/types'
 
 export const APP_NAME = 'WurldBasket'
 export const APP_DESCRIPTION = 'Your Global Food Marketplace'
