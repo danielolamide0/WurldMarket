@@ -98,6 +98,27 @@ function SearchResults() {
         : Infinity
       return distA - distB
     })
+    
+    // Also sort availableStores for the filter dropdown
+    availableStores = availableStores.sort((a, b) => {
+      const distA = a.coordinates
+        ? calculateDistance(
+            activeLocation.coordinates!.lat,
+            activeLocation.coordinates!.lng,
+            a.coordinates.lat,
+            a.coordinates.lng
+          )
+        : Infinity
+      const distB = b.coordinates
+        ? calculateDistance(
+            activeLocation.coordinates!.lat,
+            activeLocation.coordinates!.lng,
+            b.coordinates.lat,
+            b.coordinates.lng
+          )
+        : Infinity
+      return distA - distB
+    })
   }
 
   // Check if search query matches a cuisine
@@ -266,7 +287,7 @@ function SearchResults() {
                       All Stores
                     </span>
                   </button>
-                  {matchedStores.map((store) => {
+                  {availableStores.map((store) => {
                     const isSelected = selectedStoreIds.includes(store.id)
                     return (
                       <button
@@ -296,7 +317,7 @@ function SearchResults() {
                       </button>
                     )
                   })}
-                  {matchedStores.length === 0 && (
+                  {availableStores.length === 0 && (
                     <div className="px-4 py-3 text-sm text-gray-500 text-center">
                       No stores found
                     </div>
