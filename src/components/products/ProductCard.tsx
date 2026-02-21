@@ -7,6 +7,7 @@ import { Product } from '@/types'
 import { useCartStore } from '@/stores/cartStore'
 import { useCustomerStore } from '@/stores/customerStore'
 import { useVendorStore } from '@/stores/vendorStore'
+import { useAuthStore } from '@/stores/authStore'
 import { formatPrice } from '@/lib/utils'
 import { CATEGORY_MAP } from '@/lib/constants'
 import { Badge } from '@/components/ui/badge'
@@ -18,6 +19,7 @@ interface ProductCardProps {
 
 export function ProductCard({ product, showStoreName }: ProductCardProps) {
   const pathname = usePathname()
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated)
   const { addItem, updateQuantity, removeItem, getItemQuantity } = useCartStore()
   const { isFavourite, toggleFavourite } = useCustomerStore()
   const { stores } = useVendorStore()
@@ -90,18 +92,20 @@ export function ProductCard({ product, showStoreName }: ProductCardProps) {
             alt={product.name}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
           />
-          {/* Favourite Button */}
-          <button
-            onClick={handleToggleFavourite}
-            className={`absolute top-2 right-2 p-2 rounded-full transition-all ${
-              isFav
-                ? 'bg-primary text-white'
-                : 'bg-cream/90 text-gray-400 hover:bg-cream hover:text-primary'
-            }`}
-            title={isFav ? 'Remove from favourites' : 'Add to favourites'}
-          >
-            <Heart className={`h-4 w-4 ${isFav ? 'fill-current' : ''}`} />
-          </button>
+          {/* Favourite Button - only when signed in */}
+          {isAuthenticated && (
+            <button
+              onClick={handleToggleFavourite}
+              className={`absolute top-2 right-2 p-2 rounded-full transition-all ${
+                isFav
+                  ? 'bg-primary text-white'
+                  : 'bg-cream/90 text-gray-400 hover:bg-cream hover:text-primary'
+              }`}
+              title={isFav ? 'Remove from favourites' : 'Add to favourites'}
+            >
+              <Heart className={`h-4 w-4 ${isFav ? 'fill-current' : ''}`} />
+            </button>
+          )}
           {isOutOfStock && (
             <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
               <Badge variant="error">Out of Stock</Badge>

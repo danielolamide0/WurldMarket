@@ -1,7 +1,7 @@
 'use client'
 
-import { useEffect, useState, useRef } from 'react'
-import { useParams } from 'next/navigation'
+import { useEffect, useState, useRef, useCallback } from 'react'
+import { useParams, useSearchParams, useRouter, usePathname } from 'next/navigation'
 import Link from 'next/link'
 import { ArrowLeft, Filter, X, Check, Store, Package, MapPin } from 'lucide-react'
 import { useProductStore } from '@/stores/productStore'
@@ -16,12 +16,62 @@ import { calculateDistance, getEffectiveCityForStores } from '@/lib/utils'
 
 export default function CategoryPage() {
   const params = useParams()
+  const searchParams = useSearchParams()
+  const router = useRouter()
+  const pathname = usePathname()
   const slug = params.slug as string
   const category = CATEGORIES.find((c) => c.slug === slug)
-  const [filter, setFilter] = useState<'stores' | 'products'>('products')
-  const [selectedStoreIds, setSelectedStoreIds] = useState<string[]>([])
+
+  const viewParam = searchParams.get('view')
+  const storesParam = searchParams.get('stores')
+  const initialView: 'stores' | 'products' = viewParam === 'stores' || viewParam === 'products' ? viewParam : 'products'
+  const initialStores = storesParam ? storesParam.split(',').filter(Boolean) : []
+
+  const [filter, setFilterState] = useState<'stores' | 'products'>(initialView)
+  const [selectedStoreIds, setSelectedStoreIdsState] = useState<string[]>(initialStores)
   const [isStoreFilterOpen, setIsStoreFilterOpen] = useState(false)
   const storeFilterRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const v = searchParams.get('view')
+    const s = searchParams.get('stores')
+    setFilterState(v === 'stores' || v === 'products' ? v : 'products')
+    setSelectedStoreIdsState(s ? s.split(',').filter(Boolean) : [])
+  }, [searchParams])
+
+  const updateUrl = useCallback(
+    (view: 'stores' | 'products', storeIds: string[]) => {
+      const params = new URLSearchParams(searchParams.toString())
+      params.set('view', view)
+      if (storeIds.length > 0) params.set('stores', storeIds.join(','))
+      else params.delete('stores')
+      const qs = params.toString()
+      router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false })
+    },
+    [pathname, router, searchParams]
+  )
+
+  const setFilter = useCallback(
+    (value: 'stores' | 'products') => {
+      setFilterState(value)
+      setSelectedStoreIdsState((prev) => {
+        updateUrl(value, prev)
+        return prev
+      })
+    },
+    [updateUrl]
+  )
+
+  const setSelectedStoreIds = useCallback(
+    (value: string[] | ((prev: string[]) => string[])) => {
+      setSelectedStoreIdsState((prev) => {
+        const next = typeof value === 'function' ? value(prev) : value
+        updateUrl(filter, next)
+        return next
+      })
+    },
+    [filter, updateUrl]
+  )
 
   const { user, isAuthenticated } = useAuthStore()
   const { getPrimaryAddress } = useAddressStore()
