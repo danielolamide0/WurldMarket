@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import Link from 'next/link'
 import {
   MapPin,
   Clock,
@@ -9,6 +10,7 @@ import {
   Plus,
   Trash2,
   X,
+  ArrowLeft,
 } from 'lucide-react'
 import { useAuthStore } from '@/stores/authStore'
 import { useProductStore } from '@/stores/productStore'
@@ -109,11 +111,9 @@ export default function VendorStoresPage() {
 
   return (
     <div className="p-4 lg:p-8">
-      {/* Header */}
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">My Stores</h1>
-        <p className="text-gray-600">Manage your store locations</p>
-      </div>
+      <Link href="/dashboard" className="inline-flex items-center text-gray-600 hover:text-gray-900 mb-6">
+        <ArrowLeft className="h-5 w-5 text-primary" />
+      </Link>
 
       {/* Store Locations Section */}
       <div className="flex items-center justify-between mb-4">

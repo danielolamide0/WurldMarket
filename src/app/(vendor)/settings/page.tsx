@@ -1,7 +1,8 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Building2, Mail, Phone, FileText, Save } from 'lucide-react'
+import Link from 'next/link'
+import { Building2, Mail, Phone, Save, ArrowLeft } from 'lucide-react'
 import { useAuthStore } from '@/stores/authStore'
 import { useVendorStore } from '@/stores/vendorStore'
 import { Card, CardContent } from '@/components/ui/card'
@@ -50,10 +51,9 @@ export default function VendorSettingsPage() {
 
   return (
     <div className="p-4 lg:p-8">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Settings</h1>
-        <p className="text-gray-600">Business profile, contact email and phone</p>
-      </div>
+      <Link href="/dashboard" className="inline-flex items-center text-gray-600 hover:text-gray-900 mb-6">
+        <ArrowLeft className="h-5 w-5 text-primary" />
+      </Link>
 
       <Card>
         <CardContent className="p-6">

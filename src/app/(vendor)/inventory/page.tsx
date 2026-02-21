@@ -3,7 +3,7 @@
 import { useState, useEffect, Suspense } from 'react'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
-import { Plus, Search, Edit, Trash2, Package, AlertTriangle } from 'lucide-react'
+import { Plus, Search, Edit, Trash2, Package, AlertTriangle, ArrowLeft } from 'lucide-react'
 import { useAuthStore } from '@/stores/authStore'
 import { useProductStore } from '@/stores/productStore'
 import { useVendorStore } from '@/stores/vendorStore'
@@ -71,14 +71,10 @@ function InventoryContent() {
 
   return (
     <div className="p-4 lg:p-8">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">{filterLowStock ? 'Low stock alert' : 'Inventory'}</h1>
-          <p className="text-gray-600">
-            {products.length} {filterLowStock ? 'products at or below threshold' : 'products total'}
-          </p>
-        </div>
+      <div className="flex items-center justify-between mb-6">
+        <Link href="/dashboard" className="inline-flex items-center text-gray-600 hover:text-gray-900">
+          <ArrowLeft className="h-5 w-5 text-primary" />
+        </Link>
         <Link href="/inventory/add">
           <Button>
             <Plus className="h-4 w-4 mr-2" />

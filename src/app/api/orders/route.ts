@@ -66,7 +66,7 @@ export async function POST(request: NextRequest) {
       status: 'pending', orderType, deliveryAddress, notes,
     })
 
-    // Decrement stock and check low-stock alerts
+    // Decrement stock and check low-stock alerts (don't let email break the order)
     for (const item of items) {
       const product = await Product.findById(item.productId)
       if (!product) continue
@@ -75,11 +75,13 @@ export async function POST(request: NextRequest) {
       const newStock = previousStock - item.quantity
       const alert = product.lowStockAlert ?? 0
       if (alert > 0 && newStock <= alert) {
-        const vendor = await Vendor.findById(product.vendorId)
-        if (vendor?.contactEmail) {
-          sendLowStockEmail(vendor.contactEmail, product.name, newStock, alert).catch((err) =>
-            console.error('Low stock email failed:', err)
-          )
+        try {
+          const vendor = await Vendor.findById(product.vendorId)
+          if (vendor?.contactEmail) {
+            await sendLowStockEmail(vendor.contactEmail, product.name, newStock, alert)
+          }
+        } catch (err) {
+          console.error('Low stock email failed:', err)
         }
       }
     }

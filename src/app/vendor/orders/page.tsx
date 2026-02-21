@@ -1,7 +1,8 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Search, Package, ChevronDown, ChevronUp, Phone, MapPin, Clock } from 'lucide-react'
+import Link from 'next/link'
+import { Search, Package, ChevronDown, ChevronUp, Phone, MapPin, Clock, ArrowLeft } from 'lucide-react'
 import { useAuthStore } from '@/stores/authStore'
 import { useOrderStore } from '@/stores/orderStore'
 import { Card } from '@/components/ui/card'
@@ -55,11 +56,9 @@ export default function VendorOrdersPage() {
 
   return (
     <div className="p-4 lg:p-8">
-      {/* Header */}
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Orders</h1>
-        <p className="text-gray-600">{orders.length} total orders</p>
-      </div>
+      <Link href="/dashboard" className="inline-flex items-center text-gray-600 hover:text-gray-900 mb-6">
+        <ArrowLeft className="h-5 w-5 text-primary" />
+      </Link>
 
       {/* Filters */}
       <Card className="p-4 mb-6">

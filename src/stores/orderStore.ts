@@ -79,7 +79,7 @@ export const useOrderStore = create<OrderState>()(
           quantity: item.quantity,
           unitPrice: item.price,
           totalPrice: item.price * item.quantity,
-          unit: item.unit,
+          unit: item.unit || 'each',
         }))
 
         const subtotal = orderItems.reduce((sum, item) => sum + item.totalPrice, 0)
