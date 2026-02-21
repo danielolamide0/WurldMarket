@@ -158,6 +158,10 @@ export interface Order {
   orderType: OrderType
   deliveryAddress?: string
   notes?: string
+  /** Customer rating 0–5 after order is completed */
+  rating?: number
+  /** Customer review text after order is completed */
+  review?: string
   createdAt: string
   updatedAt: string
 }

@@ -16,6 +16,7 @@ interface OrderState {
     notes?: string
   ) => Promise<Order | null>
   updateOrderStatus: (orderId: string, status: OrderStatus, options?: { restoreInventory?: boolean }) => Promise<void>
+  submitOrderReview: (orderId: string, customerId: string, rating: number, review: string) => Promise<boolean>
   getOrderById: (orderId: string) => Order | undefined
   getOrdersByVendor: (vendorId: string) => Order[]
   getOrdersByCustomer: (customerId: string) => Order[]
@@ -149,6 +150,25 @@ export const useOrderStore = create<OrderState>()(
         } catch {
           // Revert on error
           set({ orders: originalOrders })
+        }
+      },
+
+      submitOrderReview: async (orderId, customerId, rating, review) => {
+        try {
+          const response = await fetch(`/api/orders/${orderId}`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ customerId, rating, review }),
+          })
+          const data = await response.json()
+          if (!response.ok) return false
+          const updated = data.order
+          set((state) => ({
+            orders: state.orders.map((o) => (o.id === orderId ? { ...o, rating: updated.rating, review: updated.review } : o)),
+          }))
+          return true
+        } catch {
+          return false
         }
       },
 

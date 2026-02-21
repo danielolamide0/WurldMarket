@@ -1,8 +1,9 @@
 'use client'
 
+import { useState, useEffect } from 'react'
 import { useParams } from 'next/navigation'
 import Link from 'next/link'
-import { ArrowLeft, Package, MapPin, Clock, Phone } from 'lucide-react'
+import { ArrowLeft, Package, MapPin, Star } from 'lucide-react'
 import { useAuthStore } from '@/stores/authStore'
 import { useOrderStore } from '@/stores/orderStore'
 import { Card } from '@/components/ui/card'
@@ -14,10 +15,19 @@ import { ORDER_STATUS_LABELS, ORDER_STATUS_COLORS } from '@/lib/constants'
 export default function OrderDetailPage() {
   const params = useParams()
   const orderId = params.orderId as string
-  const { isAuthenticated } = useAuthStore()
-  const { getOrderById } = useOrderStore()
-
+  const { user, isAuthenticated } = useAuthStore()
+  const { getOrderById, submitOrderReview, fetchOrders } = useOrderStore()
   const order = getOrderById(orderId)
+
+  const [reviewRating, setReviewRating] = useState(0)
+  const [reviewText, setReviewText] = useState('')
+  const [reviewSubmitting, setReviewSubmitting] = useState(false)
+
+  useEffect(() => {
+    if (isAuthenticated && user?.id && orderId) {
+      fetchOrders({ customerId: user.id })
+    }
+  }, [isAuthenticated, user?.id, orderId, fetchOrders])
 
   if (!isAuthenticated) {
     return (
@@ -149,6 +159,69 @@ export default function OrderDetailPage() {
           <Card className="p-4">
             <h2 className="font-semibold text-gray-900 mb-3">Order Notes</h2>
             <p className="text-gray-700">{order.notes}</p>
+          </Card>
+        )}
+
+        {/* Review: only for completed orders, only for order owner */}
+        {order.status === 'completed' && user?.id === order.customerId && (
+          <Card className="p-4">
+            <h2 className="font-semibold text-gray-900 mb-3">Your review</h2>
+            {order.rating != null || (order.review && order.review.length > 0) ? (
+              <div className="space-y-2">
+                {order.rating != null && (
+                  <div className="flex items-center gap-1">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <Star
+                        key={star}
+                        className={`h-5 w-5 ${star <= (order.rating ?? 0) ? 'text-amber-400 fill-amber-400' : 'text-gray-300'}`}
+                      />
+                    ))}
+                    <span className="text-sm text-gray-500 ml-1">({order.rating}/5)</span>
+                  </div>
+                )}
+                {order.review && <p className="text-gray-700">{order.review}</p>}
+              </div>
+            ) : (
+              <div className="space-y-3">
+                <p className="text-sm text-gray-600">Rate your experience (0–5 stars)</p>
+                <div className="flex items-center gap-1">
+                  {[0, 1, 2, 3, 4, 5].map((value) => (
+                    <button
+                      key={value}
+                      type="button"
+                      onClick={() => setReviewRating(value)}
+                      className="p-1 rounded hover:bg-gray-100 transition-colors"
+                    >
+                      <Star
+                        className={`h-8 w-8 ${value <= reviewRating ? 'text-amber-400 fill-amber-400' : 'text-gray-300'}`}
+                      />
+                    </button>
+                  ))}
+                </div>
+                <textarea
+                  placeholder="Write a review (optional)"
+                  value={reviewText}
+                  onChange={(e) => setReviewText(e.target.value)}
+                  rows={3}
+                  className="w-full px-3 py-2 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary"
+                />
+                <Button
+                  onClick={async () => {
+                    if (reviewRating < 0 || reviewRating > 5) return
+                    setReviewSubmitting(true)
+                    const ok = await submitOrderReview(orderId, user!.id, reviewRating, reviewText)
+                    setReviewSubmitting(false)
+                    if (ok) {
+                      setReviewRating(0)
+                      setReviewText('')
+                    }
+                  }}
+                  disabled={reviewSubmitting}
+                >
+                  {reviewSubmitting ? 'Submitting…' : 'Submit review'}
+                </Button>
+              </div>
+            )}
           </Card>
         )}
 

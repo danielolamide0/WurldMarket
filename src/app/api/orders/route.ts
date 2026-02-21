@@ -166,7 +166,7 @@ export async function PUT(request: NextRequest) {
   }
 }
 
-function formatOrder(order: InstanceType<typeof Order>) {
+export function formatOrder(order: InstanceType<typeof Order>) {
   return {
     id: order._id.toString(),
     customerId: order.customerId.toString(),
@@ -191,6 +191,8 @@ function formatOrder(order: InstanceType<typeof Order>) {
     deliveryAddress: order.deliveryAddress,
     notes: order.notes,
     isGuestOrder: !!order.isGuestOrder,
+    rating: order.rating,
+    review: order.review,
     createdAt: order.createdAt.toISOString(),
     updatedAt: order.updatedAt.toISOString(),
   }

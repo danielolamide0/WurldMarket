@@ -29,11 +29,12 @@ export default function VendorStoresPage() {
   const [vendorStores, setVendorStores] = useState<StoreLocation[]>([])
   const [isAddingStore, setIsAddingStore] = useState(false)
 
-  // New store fields
+  // New store fields: name, postcode (via lookup), image
   const [newStoreName, setNewStoreName] = useState('')
   const [newStoreAddress, setNewStoreAddress] = useState('')
   const [newStoreCity, setNewStoreCity] = useState('')
   const [newStorePostcode, setNewStorePostcode] = useState('')
+  const [newStoreImage, setNewStoreImage] = useState('')
   const [storeAddressSelected, setStoreAddressSelected] = useState(false)
 
   const handleStoreAddressSelect = (addr: { line1: string; city: string; postcode: string }) => {
@@ -69,7 +70,7 @@ export default function VendorStoresPage() {
 
   const handleAddStore = async () => {
     if (!user?.vendorId) return
-    if (!newStoreName || !newStoreAddress || !newStoreCity || !newStorePostcode) {
+    if (!newStoreName || !newStoreAddress || !newStoreCity || !newStorePostcode || !newStoreImage.trim()) {
       return
     }
 
@@ -88,7 +89,7 @@ export default function VendorStoresPage() {
         saturday: { open: '10:00', close: '17:00' },
         sunday: 'closed',
       },
-      image: 'https://images.unsplash.com/photo-1604719312566-8912e9227c6a?w=800',
+      image: newStoreImage.trim(),
     })
 
     if (!newStore) {
@@ -101,6 +102,7 @@ export default function VendorStoresPage() {
     setNewStoreAddress('')
     setNewStoreCity('')
     setNewStorePostcode('')
+    setNewStoreImage('')
     setStoreAddressSelected(false)
   }
 
@@ -133,6 +135,7 @@ export default function VendorStoresPage() {
         <Card className="mb-6 border-2 border-dashed border-primary/30">
           <CardContent className="p-4">
             <h3 className="font-medium text-gray-900 mb-4">Add New Store Location</h3>
+            <p className="text-sm text-gray-500 mb-4">Enter store name, postcode, and image.</p>
             <div className="space-y-4">
               <Input
                 label="Store Name"
@@ -175,8 +178,20 @@ export default function VendorStoresPage() {
                 </div>
               )}
 
+              <Input
+                label="Store Image URL"
+                value={newStoreImage}
+                onChange={(e) => setNewStoreImage(e.target.value)}
+                placeholder="https://example.com/store-image.jpg"
+              />
+              {newStoreImage && (
+                <div className="h-24 rounded-xl overflow-hidden bg-gray-100">
+                  <img src={newStoreImage} alt="Preview" className="w-full h-full object-cover" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }} />
+                </div>
+              )}
+
               <div className="flex gap-3">
-                <Button onClick={handleAddStore} disabled={!storeAddressSelected}>
+                <Button onClick={handleAddStore} disabled={!storeAddressSelected || !newStoreName.trim() || !newStoreImage.trim()}>
                   <Plus className="h-4 w-4 mr-2" />
                   Add Store
                 </Button>
@@ -187,6 +202,7 @@ export default function VendorStoresPage() {
                   setNewStoreAddress('')
                   setNewStoreCity('')
                   setNewStorePostcode('')
+                  setNewStoreImage('')
                 }}>
                   Cancel
                 </Button>

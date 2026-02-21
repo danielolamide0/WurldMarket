@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { Search, Package, ChevronDown, ChevronUp, Phone, MapPin, Clock, ArrowLeft, RotateCcw } from 'lucide-react'
+import { Search, Package, ChevronDown, ChevronUp, Phone, MapPin, Clock, ArrowLeft, RotateCcw, Star } from 'lucide-react'
 import { useAuthStore } from '@/stores/authStore'
 import { useOrderStore } from '@/stores/orderStore'
 import { Card } from '@/components/ui/card'
@@ -177,6 +177,23 @@ export default function VendorOrdersPage() {
                             <div className="mt-3 p-3 bg-cream rounded-lg">
                               <p className="text-xs text-gray-500 mb-1">Notes:</p>
                               <p className="text-gray-700">{order.notes}</p>
+                            </div>
+                          )}
+                          {(order.rating != null || (order.review && order.review.length > 0)) && (
+                            <div className="mt-3 p-3 bg-amber-50 rounded-lg border border-amber-100">
+                              <p className="text-xs text-gray-500 mb-1">Customer review</p>
+                              {order.rating != null && (
+                                <div className="flex items-center gap-1 mb-1">
+                                  {[1, 2, 3, 4, 5].map((star) => (
+                                    <Star
+                                      key={star}
+                                      className={`h-4 w-4 ${star <= (order.rating ?? 0) ? 'text-amber-400 fill-amber-400' : 'text-gray-300'}`}
+                                    />
+                                  ))}
+                                  <span className="text-sm text-gray-600 ml-1">({order.rating}/5)</span>
+                                </div>
+                              )}
+                              {order.review && <p className="text-gray-700 text-sm">{order.review}</p>}
                             </div>
                           )}
                         </div>

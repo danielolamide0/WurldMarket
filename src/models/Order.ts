@@ -30,6 +30,10 @@ export interface IOrder extends Document {
   notes?: string
   /** True when order was placed as guest (no account); use for analytics and filtering. */
   isGuestOrder?: boolean
+  /** Customer rating 0–5 after order is completed */
+  rating?: number
+  /** Customer review text after order is completed */
+  review?: string
   createdAt: Date
   updatedAt: Date
 }
@@ -67,6 +71,8 @@ const OrderSchema = new Schema<IOrder>(
     deliveryAddress: { type: String, trim: true },
     notes: { type: String, trim: true },
     isGuestOrder: { type: Boolean, default: false },
+    rating: { type: Number, min: 0, max: 5 },
+    review: { type: String, trim: true },
   },
   { timestamps: true }
 )
