@@ -10,6 +10,7 @@ import { Card } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 
 type EmailChangeStep = 'enter' | 'verify'
+type DeleteStep = 'idle' | 'send_code' | 'verify'
 
 export default function SettingsPage() {
   const router = useRouter()
@@ -22,7 +23,12 @@ export default function SettingsPage() {
   const [isEditingPhone, setIsEditingPhone] = useState(false)
   const [emailValue, setEmailValue] = useState(user?.email || '')
   const [phoneValue, setPhoneValue] = useState(user?.phone || '')
-  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
+  const [deleteStep, setDeleteStep] = useState<DeleteStep>('idle')
+  const [deleteCode, setDeleteCode] = useState(['', '', '', '', '', ''])
+  const [deleteError, setDeleteError] = useState('')
+  const [isSendingDeleteCode, setIsSendingDeleteCode] = useState(false)
+  const [isDeleting, setIsDeleting] = useState(false)
+  const deleteCodeRefs = useRef<(HTMLInputElement | null)[]>([])
 
   useEffect(() => {
     if (user) {
@@ -101,13 +107,59 @@ export default function SettingsPage() {
     setIsEditingPhone(false)
   }
 
-  const handleDeleteAccount = async () => {
-    const success = await deleteAccount(user.id)
-    if (success) {
-      logout()
-      router.push('/')
+  const handleSendDeleteCode = async () => {
+    if (!user?.id) return
+    setDeleteError('')
+    setIsSendingDeleteCode(true)
+    try {
+      const res = await fetch('/api/auth/send-code', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ type: 'delete-customer-account', userId: user.id }),
+      })
+      const data = await res.json()
+      if (!res.ok) {
+        setDeleteError(data.error || 'Failed to send code')
+        return
+      }
+      setDeleteStep('verify')
+      setDeleteCode(['', '', '', '', '', ''])
+    } finally {
+      setIsSendingDeleteCode(false)
     }
-    setShowDeleteConfirm(false)
+  }
+
+  const getDeleteCode = () => deleteCode.join('')
+
+  const handleDeleteCodeChange = (index: number, value: string) => {
+    if (!/^\d*$/.test(value)) return
+    if (value.length === 6 && /^\d{6}$/.test(value)) {
+      setDeleteCode(value.split(''))
+      deleteCodeRefs.current[5]?.focus()
+      return
+    }
+    const next = [...deleteCode]
+    next[index] = value.slice(-1)
+    setDeleteCode(next)
+    if (value && index < 5) deleteCodeRefs.current[index + 1]?.focus()
+  }
+
+  const handleConfirmDelete = async () => {
+    if (!user?.id) return
+    const code = getDeleteCode()
+    if (code.length !== 6) return
+    setDeleteError('')
+    setIsDeleting(true)
+    try {
+      const success = await deleteAccount(user.id, code)
+      if (success) {
+        logout()
+        router.push('/')
+        return
+      }
+    } finally {
+      setIsDeleting(false)
+    }
   }
 
   return (
@@ -264,39 +316,76 @@ export default function SettingsPage() {
               </div>
             </div>
 
-            {!showDeleteConfirm ? (
+            {deleteStep === 'idle' ? (
               <Button
                 variant="outline"
                 className="w-full border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700"
-                onClick={() => setShowDeleteConfirm(true)}
+                onClick={() => setDeleteStep('send_code')}
               >
                 <Trash2 className="h-4 w-4 mr-2" />
                 Delete Account
               </Button>
-            ) : (
+            ) : deleteStep === 'send_code' ? (
               <div className="space-y-3">
-                <div className="p-3 bg-red-50 border border-red-200 rounded-xl">
-                  <p className="text-sm text-red-700 font-medium mb-2">
-                    Are you sure you want to delete your account?
-                  </p>
-                  <p className="text-xs text-red-600">
-                    This will permanently delete your account, orders, and all associated data.
-                  </p>
-                </div>
+                <p className="text-sm text-gray-600">
+                  We’ll send a 6-digit verification code to <strong>{user?.email}</strong>. Enter it below to continue.
+                </p>
+                {deleteError && <p className="text-sm text-red-600 bg-red-50 p-3 rounded-xl">{deleteError}</p>}
                 <div className="flex gap-2">
                   <Button
-                    onClick={handleDeleteAccount}
-                    className="flex-1 bg-red-600 hover:bg-red-700 text-white"
+                    onClick={handleSendDeleteCode}
+                    size="sm"
+                    className="flex-1"
+                    disabled={isSendingDeleteCode}
                   >
-                    <Trash2 className="h-4 w-4 mr-2" />
-                    Confirm Delete
+                    {isSendingDeleteCode ? 'Sending…' : 'Send verification code'}
                   </Button>
                   <Button
-                    onClick={() => setShowDeleteConfirm(false)}
                     variant="outline"
+                    size="sm"
                     className="flex-1"
+                    onClick={() => { setDeleteStep('idle'); setDeleteError(''); }}
                   >
                     Cancel
+                  </Button>
+                </div>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                <p className="text-sm text-gray-600">
+                  Enter the 6-digit code we sent to <strong>{user?.email}</strong>, then confirm to delete your account.
+                </p>
+                <div className="flex justify-center gap-2">
+                  {[0, 1, 2, 3, 4, 5].map((i) => (
+                    <input
+                      key={i}
+                      ref={(el) => { deleteCodeRefs.current[i] = el }}
+                      type="text"
+                      inputMode="numeric"
+                      maxLength={i === 0 ? 6 : 1}
+                      value={deleteCode[i]}
+                      onChange={(e) => handleDeleteCodeChange(i, e.target.value)}
+                      className="w-10 h-12 text-center text-lg font-semibold border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary"
+                    />
+                  ))}
+                </div>
+                {deleteError && <p className="text-sm text-red-600 bg-red-50 p-3 rounded-xl">{deleteError}</p>}
+                {error && <p className="text-sm text-red-600 bg-red-50 p-3 rounded-xl">{error}</p>}
+                <div className="flex flex-wrap gap-2">
+                  <Button
+                    onClick={handleConfirmDelete}
+                    className="flex-1 bg-red-600 hover:bg-red-700 text-white"
+                    disabled={getDeleteCode().length !== 6 || isDeleting}
+                  >
+                    <Trash2 className="h-4 w-4 mr-2" />
+                    {isDeleting ? 'Deleting…' : 'Confirm Delete'}
+                  </Button>
+                  <Button
+                    variant="outline"
+                    className="flex-1"
+                    onClick={() => { setDeleteStep('send_code'); setDeleteCode(['', '', '', '', '', '']); setDeleteError(''); clearError?.(); }}
+                  >
+                    Back
                   </Button>
                 </div>
               </div>

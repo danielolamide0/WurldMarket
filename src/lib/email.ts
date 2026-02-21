@@ -18,7 +18,7 @@ function getResendClient(): Resend {
 export async function sendVerificationEmail(
   email: string,
   code: string,
-  type: 'signup' | 'password-reset' | 'email-change' | 'delete-vendor-account'
+  type: 'signup' | 'password-reset' | 'email-change' | 'delete-vendor-account' | 'delete-customer-account'
 ): Promise<{ success: boolean; error?: string }> {
   const subject =
     type === 'signup'
@@ -27,7 +27,9 @@ export async function sendVerificationEmail(
         ? 'Reset your WurldBasket password'
         : type === 'email-change'
           ? 'Confirm your new email address'
-          : 'Confirm delete vendor account'
+          : type === 'delete-vendor-account'
+            ? 'Confirm delete vendor account'
+            : 'Confirm delete account'
 
   const heading =
     type === 'signup'
@@ -36,7 +38,9 @@ export async function sendVerificationEmail(
         ? 'Password Reset Request'
         : type === 'email-change'
           ? 'Confirm New Email'
-          : 'Delete Vendor Account'
+          : type === 'delete-vendor-account'
+            ? 'Delete Vendor Account'
+            : 'Delete Account'
 
   const message =
     type === 'signup'
@@ -45,7 +49,9 @@ export async function sendVerificationEmail(
         ? 'Use the code below to reset your password. If you did not request this, please ignore this email.'
         : type === 'email-change'
           ? 'Use the code below to confirm your new email address. If you did not request this change, please ignore this email.'
-          : 'Use the code below to permanently delete your vendor account and all associated data (stores, products, orders). This cannot be undone.'
+          : type === 'delete-vendor-account'
+            ? 'Use the code below to permanently delete your vendor account and all associated data (stores, products, orders). This cannot be undone.'
+            : 'Use the code below to permanently delete your account and all associated data. This cannot be undone.'
 
   try {
     const client = getResendClient()

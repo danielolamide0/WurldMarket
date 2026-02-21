@@ -67,7 +67,7 @@ export default function StoreDetailPage() {
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
         <Link
-          href="/"
+          href="/stores"
           className="absolute top-4 left-4 p-2 bg-cream/90 rounded-xl hover:bg-cream transition-colors"
         >
           <ArrowLeft className="h-5 w-5" />

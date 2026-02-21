@@ -42,7 +42,7 @@ interface AuthState {
   checkEmailExists: (email: string) => Promise<boolean>
   // User management
   updateUser: (updates: Partial<User>) => Promise<boolean>
-  deleteAccount: (userId: string) => Promise<boolean>
+  deleteAccount: (userId: string, code?: string) => Promise<boolean>
   logout: () => void
   clearError: () => void
 }
@@ -336,14 +336,14 @@ export const useAuthStore = create<AuthState>()(
         }
       },
 
-      deleteAccount: async (userId: string) => {
+      deleteAccount: async (userId: string, code?: string) => {
         set({ isLoading: true, error: null })
 
         try {
           const response = await fetch('/api/auth/delete-account', {
             method: 'DELETE',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ userId }),
+            body: JSON.stringify({ userId, ...(code && { code }) }),
           })
 
           if (!response.ok) {

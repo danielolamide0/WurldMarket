@@ -22,7 +22,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    if (!['signup', 'password-reset', 'email-change', 'delete-vendor-account'].includes(type)) {
+    if (!['signup', 'password-reset', 'email-change', 'delete-vendor-account', 'delete-customer-account'].includes(type)) {
       return NextResponse.json(
         { error: 'Invalid verification type' },
         { status: 400 }
@@ -31,7 +31,7 @@ export async function POST(request: NextRequest) {
 
     let normalizedEmail: string
 
-    if (type === 'email-change' || type === 'delete-vendor-account') {
+    if (type === 'email-change' || type === 'delete-vendor-account' || type === 'delete-customer-account') {
       // Code is sent to the user's CURRENT email to confirm they own the account
       const userId = body.userId
       if (!userId) {
@@ -54,6 +54,9 @@ export async function POST(request: NextRequest) {
       if (type === 'delete-vendor-account' && currentUser.role !== 'vendor') {
         return NextResponse.json({ error: 'Only vendors can request this' }, { status: 403 })
       }
+      if (type === 'delete-customer-account' && currentUser.role !== 'customer') {
+        return NextResponse.json({ error: 'Only customer accounts can use this' }, { status: 403 })
+      }
       normalizedEmail = currentEmail
     } else {
       if (!email) {
@@ -73,7 +76,7 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    if (type !== 'email-change' && type !== 'delete-vendor-account') {
+    if (type !== 'email-change' && type !== 'delete-vendor-account' && type !== 'delete-customer-account') {
       const existingUser = await User.findOne({ email: normalizedEmail })
       if (type === 'signup') {
         if (existingUser) {
