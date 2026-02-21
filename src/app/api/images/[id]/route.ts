@@ -16,7 +16,8 @@ export async function GET(
     if (!doc) {
       return new NextResponse('Not Found', { status: 404 })
     }
-    return new NextResponse(doc.data, {
+    const body = new Uint8Array(doc.data)
+    return new NextResponse(body, {
       status: 200,
       headers: {
         'Content-Type': doc.contentType,
