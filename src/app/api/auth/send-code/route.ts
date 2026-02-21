@@ -67,6 +67,7 @@ export async function POST(request: NextRequest) {
           { error: 'Invalid email format' },
           { status: 400 }
         )
+      }
     }
 
     if (type !== 'email-change') {
