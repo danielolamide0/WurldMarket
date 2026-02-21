@@ -2,15 +2,6 @@ import { User, Vendor } from '@/types'
 
 export const users: User[] = [
   {
-    id: 'cust-001',
-    username: 'customer',
-    password: 'customer',
-    role: 'customer',
-    name: 'John Customer',
-    email: 'customer@example.com',
-    createdAt: '2024-01-01T00:00:00Z',
-  },
-  {
     id: 'vendor-001',
     username: 'abubakr',
     password: 'abubakr',

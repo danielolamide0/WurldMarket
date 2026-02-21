@@ -4,7 +4,6 @@ import User from '@/models/User'
 import Vendor from '@/models/Vendor'
 import Store from '@/models/Store'
 import Product from '@/models/Product'
-import CustomerData from '@/models/CustomerData'
 
 export async function POST() {
   try {
@@ -104,15 +103,7 @@ export async function POST() {
 
     console.log('✅ Stores created')
 
-    // 3. Create Users
-    const customerUser = await User.create({
-      username: 'customer',
-      password: 'customer',
-      role: 'customer',
-      name: 'John Customer',
-      email: 'customer@example.com',
-    })
-
+    // 3. Create Users (vendor accounts only; no default customer account)
     await User.create({
       username: 'abubakr',
       password: 'abubakr',
@@ -133,17 +124,7 @@ export async function POST() {
 
     console.log('✅ Users created')
 
-    // 4. Create CustomerData for customer
-    await CustomerData.create({
-      userId: customerUser._id,
-      favorites: [],
-      regulars: [],
-      purchaseHistory: [],
-    })
-
-    console.log('✅ Customer data created')
-
-    // 5. Create Products
+    // 4. Create Products
     const kirkstallProducts = [
       { name: 'Premium Jollof Rice Mix', description: 'Authentic Nigerian jollof rice spice blend with tomatoes and peppers', category: 'grains-rice', price: 6.99, unit: '500g', image: 'https://images.unsplash.com/photo-1596560548464-f010549b84d7?w=400', stock: 50 },
       { name: 'Nigerian Palm Oil', description: 'Pure red palm oil, perfect for traditional soups and stews', category: 'spices', price: 8.49, unit: '1L', image: 'https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?w=400', stock: 30 },
@@ -208,7 +189,6 @@ export async function GET() {
   return NextResponse.json({
     message: 'Use POST to seed the database',
     credentials: {
-      customer: { username: 'customer', password: 'customer' },
       vendor1: { username: 'abubakr', password: 'abubakr' },
       vendor2: { username: 'sunday', password: 'sunday' },
     }

@@ -310,6 +310,17 @@ export const useAuthStore = create<AuthState>()(
         user: state.user,
         isAuthenticated: state.isAuthenticated,
       }),
+      // Don't restore the old test account "John Customer" — treat as logged out
+      merge: (persistedState, currentState) => {
+        const persisted = persistedState as { user?: User | null; isAuthenticated?: boolean } | undefined
+        const user = persisted?.user
+        const isTestUser =
+          user?.email === 'customer@example.com' || user?.name === 'John Customer'
+        if (persisted?.isAuthenticated && user && isTestUser) {
+          return { ...currentState, user: null, isAuthenticated: false }
+        }
+        return { ...currentState, ...persisted }
+      },
     }
   )
 )
