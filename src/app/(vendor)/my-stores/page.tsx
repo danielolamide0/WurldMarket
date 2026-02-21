@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import {
   MapPin,
@@ -9,8 +9,8 @@ import {
   Package,
   Plus,
   Trash2,
-  X,
   ArrowLeft,
+  Upload,
 } from 'lucide-react'
 import { useAuthStore } from '@/stores/authStore'
 import { useProductStore } from '@/stores/productStore'
@@ -36,12 +36,32 @@ export default function VendorStoresPage() {
   const [newStorePostcode, setNewStorePostcode] = useState('')
   const [newStoreImage, setNewStoreImage] = useState('')
   const [storeAddressSelected, setStoreAddressSelected] = useState(false)
+  const [isUploadingImage, setIsUploadingImage] = useState(false)
+  const storeImageInputRef = useRef<HTMLInputElement>(null)
 
   const handleStoreAddressSelect = (addr: { line1: string; city: string; postcode: string }) => {
     setNewStoreAddress(addr.line1)
     setNewStoreCity(addr.city)
     setNewStorePostcode(addr.postcode)
     setStoreAddressSelected(true)
+  }
+
+  const handleStoreImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file || !file.type.startsWith('image/')) return
+    setIsUploadingImage(true)
+    try {
+      const formDataUpload = new FormData()
+      formDataUpload.append('file', file)
+      const res = await fetch('/api/upload', { method: 'POST', body: formDataUpload })
+      const data = await res.json()
+      if (res.ok && data.url) {
+        setNewStoreImage(data.url)
+      }
+    } finally {
+      setIsUploadingImage(false)
+      e.target.value = ''
+    }
   }
 
   const products = useProductStore((state) =>
@@ -178,17 +198,40 @@ export default function VendorStoresPage() {
                 </div>
               )}
 
-              <Input
-                label="Store Image URL"
-                value={newStoreImage}
-                onChange={(e) => setNewStoreImage(e.target.value)}
-                placeholder="https://example.com/store-image.jpg"
-              />
-              {newStoreImage && (
-                <div className="h-24 rounded-xl overflow-hidden bg-gray-100">
-                  <img src={newStoreImage} alt="Preview" className="w-full h-full object-cover" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }} />
-                </div>
-              )}
+              <div>
+                <p className="text-sm font-medium text-gray-700 mb-2">Store Image</p>
+                <input
+                  ref={storeImageInputRef}
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp,image/gif"
+                  className="hidden"
+                  onChange={handleStoreImageUpload}
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="w-full"
+                  disabled={isUploadingImage}
+                  onClick={() => storeImageInputRef.current?.click()}
+                >
+                  <Upload className="h-4 w-4 mr-2" />
+                  <span>{isUploadingImage ? 'Uploading…' : 'Upload image'}</span>
+                </Button>
+                {newStoreImage && (
+                  <div className="mt-3 relative">
+                    <div className="h-32 rounded-xl overflow-hidden bg-gray-100">
+                      <img src={newStoreImage} alt="Store preview" className="w-full h-full object-cover" />
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setNewStoreImage('')}
+                      className="absolute top-2 right-2 p-1.5 bg-black/50 text-white rounded-lg text-sm hover:bg-black/70"
+                    >
+                      Remove
+                    </button>
+                  </div>
+                )}
+              </div>
 
               <div className="flex gap-3">
                 <Button onClick={handleAddStore} disabled={!storeAddressSelected || !newStoreName.trim() || !newStoreImage.trim()}>

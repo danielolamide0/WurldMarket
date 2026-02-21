@@ -24,7 +24,7 @@ const navItems = [
   { href: '/vendor/orders', icon: ShoppingCart, label: 'Orders' },
   { href: '/my-stores', icon: Store, label: 'My Stores' },
   { href: '/settings', icon: Settings, label: 'Account' },
-  { href: '/account/permissions', icon: Shield, label: 'Permissions' },
+  { href: '/vendor/permissions', icon: Shield, label: 'Permissions' },
 ]
 
 export function VendorSidebar() {

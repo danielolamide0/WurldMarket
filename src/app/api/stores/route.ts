@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import dbConnect from '@/lib/mongodb'
 import Store from '@/models/Store'
+import Order from '@/models/Order'
 
 export async function GET(request: NextRequest) {
   try {
@@ -15,6 +16,14 @@ export async function GET(request: NextRequest) {
       if (!store) {
         return NextResponse.json({ error: 'Store not found' }, { status: 404 })
       }
+
+      const ratingResult = await Order.aggregate([
+        { $match: { storeId: store._id, status: 'completed', rating: { $exists: true, $ne: null } } },
+        { $group: { _id: null, avg: { $avg: '$rating' }, count: { $sum: 1 } } },
+      ])
+      const averageRating = ratingResult[0] ? Math.round(ratingResult[0].avg * 10) / 10 : undefined
+      const reviewCount = ratingResult[0]?.count ?? 0
+
       return NextResponse.json({
         store: {
           id: store._id.toString(),
@@ -27,6 +36,8 @@ export async function GET(request: NextRequest) {
           openingHours: store.openingHours,
           isActive: store.isActive,
           image: store.image,
+          averageRating,
+          reviewCount,
         },
       })
     }

@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useParams } from 'next/navigation'
 import Link from 'next/link'
-import { ArrowLeft, MapPin, Clock, Phone, ExternalLink } from 'lucide-react'
+import { ArrowLeft, MapPin, Clock, Phone, ExternalLink, Star } from 'lucide-react'
 import { useVendorStore } from '@/stores/vendorStore'
 import { useProductStore } from '@/stores/productStore'
 import { ProductCard } from '@/components/products/ProductCard'
@@ -16,6 +16,7 @@ export default function StoreDetailPage() {
   const params = useParams()
   const storeId = params.storeId as string
   const [selectedCategory, setSelectedCategory] = useState<ProductCategory | null>(null)
+  const [storeRating, setStoreRating] = useState<{ averageRating: number; reviewCount: number } | null>(null)
 
   const stores = useVendorStore((state) => state.stores)
   const vendors = useVendorStore((state) => state.vendors)
@@ -39,6 +40,22 @@ export default function StoreDetailPage() {
     if (vendors.length === 0) fetchVendors()
     fetchProducts({ storeId })
   }, [fetchStores, fetchVendors, fetchProducts, storeId, stores.length, vendors.length])
+
+  // Fetch store rating (average from completed orders)
+  useEffect(() => {
+    if (!storeId) return
+    let cancelled = false
+    fetch(`/api/stores?id=${encodeURIComponent(storeId)}`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (cancelled || !data.store) return
+        if (data.store.averageRating != null && data.store.reviewCount != null) {
+          setStoreRating({ averageRating: data.store.averageRating, reviewCount: data.store.reviewCount })
+        }
+      })
+      .catch(() => {})
+    return () => { cancelled = true }
+  }, [storeId])
 
   if (!store) {
     return (
@@ -80,7 +97,16 @@ export default function StoreDetailPage() {
           <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
             <div>
               <Badge variant="success" size="sm" className="mb-2">Open Now</Badge>
-              <h1 className="text-2xl font-bold text-gray-900 mb-2">{store.name}</h1>
+              <div className="flex flex-wrap items-center gap-2 mb-2">
+                <h1 className="text-2xl font-bold text-gray-900">{store.name}</h1>
+                {storeRating && storeRating.reviewCount > 0 && (
+                  <span className="flex items-center gap-1 text-amber-600 font-medium">
+                    <Star className="h-5 w-5 fill-amber-500 text-amber-500" />
+                    {storeRating.averageRating}
+                    <span className="text-gray-500 font-normal text-sm">({storeRating.reviewCount} review{storeRating.reviewCount !== 1 ? 's' : ''})</span>
+                  </span>
+                )}
+              </div>
               <p className="text-gray-600 mb-4">{vendor?.description}</p>
 
               <div className="flex flex-wrap gap-4 text-sm">

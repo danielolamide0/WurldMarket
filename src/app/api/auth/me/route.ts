@@ -44,10 +44,10 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: 'User ID is required' }, { status: 400 })
     }
 
-    // Build update object with only provided fields
+    // Build update object with only provided fields (email stored lowercase)
     const updateData: { name?: string; email?: string; phone?: string } = {}
     if (name !== undefined) updateData.name = name
-    if (email !== undefined) updateData.email = email
+    if (email !== undefined) updateData.email = (email + '').toString().toLowerCase().trim()
     if (phone !== undefined) updateData.phone = phone
 
     const user = await User.findByIdAndUpdate(userId, updateData, { new: true })
