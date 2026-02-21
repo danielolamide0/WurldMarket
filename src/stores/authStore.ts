@@ -12,13 +12,23 @@ interface SignupOptions {
   companyName?: string
 }
 
+const INACTIVITY_MS = 24 * 60 * 60 * 1000 // 24 hours
+
 interface AuthState {
   user: User | null
   isAuthenticated: boolean
   isLoading: boolean
   error: string | null
+  /** Set to true after persisted state has been rehydrated from storage (avoids redirect before load) */
+  _hasHydrated: boolean
+  /** Last activity timestamp for inactivity logout */
+  lastActivityAt: number | null
   // Login with email
   login: (email: string, password: string) => Promise<boolean>
+  /** Call on user activity to postpone inactivity logout */
+  touchSession: () => void
+  /** Check if session expired by inactivity; call periodically from app */
+  checkInactivityAndLogout: () => void
   // Email verification flow
   sendVerificationCode: (email: string, type: 'signup' | 'password-reset' | 'email-change', options?: { userId?: string }) => Promise<{ success: boolean; error?: string; timeRemaining?: number }>
   verifyCode: (email: string, code: string, type: 'signup' | 'password-reset') => Promise<{ success: boolean; error?: string }>
@@ -44,6 +54,26 @@ export const useAuthStore = create<AuthState>()(
       isAuthenticated: false,
       isLoading: false,
       error: null,
+      _hasHydrated: false,
+      lastActivityAt: null,
+
+      touchSession: () => {
+        set({ lastActivityAt: Date.now() })
+      },
+
+      checkInactivityAndLogout: () => {
+        const { isAuthenticated, lastActivityAt } = get()
+        if (!isAuthenticated || lastActivityAt == null) return
+        if (Date.now() - lastActivityAt > INACTIVITY_MS) {
+          set({
+            user: null,
+            isAuthenticated: false,
+            isLoading: false,
+            error: null,
+            lastActivityAt: null,
+          })
+        }
+      },
 
       login: async (identifier: string, password: string) => {
         set({ isLoading: true, error: null })
@@ -72,6 +102,7 @@ export const useAuthStore = create<AuthState>()(
             isAuthenticated: true,
             isLoading: false,
             error: null,
+            lastActivityAt: Date.now(),
           })
           return true
         } catch (error) {
@@ -171,6 +202,7 @@ export const useAuthStore = create<AuthState>()(
             isAuthenticated: true,
             isLoading: false,
             error: null,
+            lastActivityAt: Date.now(),
           })
 
           return { success: true, vendorId: data.vendorId }
@@ -341,6 +373,7 @@ export const useAuthStore = create<AuthState>()(
           isAuthenticated: false,
           isLoading: false,
           error: null,
+          lastActivityAt: null,
         })
       },
 
@@ -353,17 +386,37 @@ export const useAuthStore = create<AuthState>()(
       partialize: (state) => ({
         user: state.user,
         isAuthenticated: state.isAuthenticated,
+        lastActivityAt: state.lastActivityAt,
       }),
       // Don't restore the old test account "John Customer" — treat as logged out
       merge: (persistedState, currentState) => {
-        const persisted = persistedState as { user?: User | null; isAuthenticated?: boolean } | undefined
+        const persisted = persistedState as {
+          user?: User | null
+          isAuthenticated?: boolean
+          lastActivityAt?: number | null
+        } | undefined
         const user = persisted?.user
         const isTestUser =
           user?.email === 'customer@example.com' || user?.name === 'John Customer'
         if (persisted?.isAuthenticated && user && isTestUser) {
-          return { ...currentState, user: null, isAuthenticated: false }
+          return {
+            ...currentState,
+            user: null,
+            isAuthenticated: false,
+            lastActivityAt: null,
+            _hasHydrated: true,
+          }
         }
-        return { ...currentState, ...persisted }
+        // Treat rehydration (refresh / open app) as activity so inactivity timer resets
+        const merged = {
+          ...currentState,
+          ...(persisted ?? {}),
+          _hasHydrated: true,
+        }
+        if (merged.isAuthenticated && merged.user) {
+          merged.lastActivityAt = Date.now()
+        }
+        return merged
       },
     }
   )

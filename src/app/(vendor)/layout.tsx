@@ -11,17 +11,25 @@ export default function VendorLayout({
   children: React.ReactNode
 }) {
   const router = useRouter()
-  const { user, isAuthenticated } = useAuthStore()
+  const { user, isAuthenticated, _hasHydrated } = useAuthStore()
 
   useEffect(() => {
+    if (!_hasHydrated) return
     if (!isAuthenticated) {
       router.push('/login')
     } else if (user?.role !== 'vendor') {
       router.push('/')
     }
-  }, [isAuthenticated, user, router])
+  }, [_hasHydrated, isAuthenticated, user?.role, router])
 
-  // Show nothing while checking auth
+  // Wait for auth to rehydrate from storage before deciding (stops vendor logout on refresh)
+  if (!_hasHydrated) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-cream">
+        <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+      </div>
+    )
+  }
   if (!isAuthenticated || user?.role !== 'vendor') {
     return (
       <div className="min-h-screen flex items-center justify-center bg-cream">
