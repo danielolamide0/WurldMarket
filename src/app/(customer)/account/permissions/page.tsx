@@ -3,13 +3,14 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { ArrowLeft, Bell, Mail, MessageSquare } from 'lucide-react'
+import { ArrowLeft, Bell, Mail, MessageSquare, Store } from 'lucide-react'
 import { useAuthStore } from '@/stores/authStore'
 import { Card } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
 
 export default function PermissionsPage() {
   const router = useRouter()
-  const { isAuthenticated } = useAuthStore()
+  const { isAuthenticated, user } = useAuthStore()
   const [notifications, setNotifications] = useState({
     email: true,
     sms: true,
@@ -35,13 +36,21 @@ export default function PermissionsPage() {
     <div className="min-h-screen pb-20">
       <div className="max-w-3xl mx-auto px-4 py-4">
         {/* Back Arrow + Title Row */}
-        <div className="flex items-center gap-3 mb-4">
+        <div className="flex items-center justify-between gap-3 mb-4">
           <Link
             href="/account"
             className="p-2 -ml-2 rounded-xl hover:bg-gray-100 transition-colors"
           >
             <ArrowLeft className="h-5 w-5 text-primary" />
           </Link>
+          {user?.role === 'vendor' && (
+            <Link href="/dashboard">
+              <Button variant="outline" size="sm">
+                <Store className="h-4 w-4 mr-2" />
+                Vendor Dashboard
+              </Button>
+            </Link>
+          )}
         </div>
 
         {/* Notifications Section */}

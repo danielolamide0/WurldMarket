@@ -8,6 +8,8 @@ import {
   ShoppingCart,
   Store,
   Settings,
+  Shield,
+  User,
   LogOut,
   Menu,
   X,
@@ -22,6 +24,8 @@ const navItems = [
   { href: '/vendor/orders', icon: ShoppingCart, label: 'Orders' },
   { href: '/my-stores', icon: Store, label: 'My Stores' },
   { href: '/settings', icon: Settings, label: 'Settings' },
+  { href: '/account', icon: User, label: 'Account' },
+  { href: '/account/permissions', icon: Shield, label: 'Permissions' },
 ]
 
 export function VendorSidebar() {
