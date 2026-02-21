@@ -436,12 +436,12 @@ export function Header() {
         <div className="max-w-7xl mx-auto px-4">
           {/* Main Header Row */}
           <div className="flex items-center justify-between h-16">
-            {/* Left: Hamburger (only when signed in) + Logo */}
+            {/* Left: Hamburger on desktop only (mobile uses bottom nav) + Logo */}
             <div className="flex items-center gap-2">
               {isAuthenticated && (
                 <button
                   onClick={() => setIsMobileMenuOpen(true)}
-                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                  className="hidden md:flex p-2 hover:bg-gray-100 rounded-lg transition-colors"
                 >
                   <Menu className="h-6 w-6 text-gray-700" />
                 </button>

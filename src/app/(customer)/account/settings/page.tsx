@@ -112,11 +112,11 @@ export default function SettingsPage() {
 
   return (
     <div className="min-h-screen">
-      <div className="max-w-3xl mx-auto px-4 py-4">
+      <div className="max-w-3xl mx-auto px-4 pt-2 pb-4">
         {/* Back Arrow */}
         <Link
           href="/account"
-          className="p-2 -ml-2 rounded-xl hover:bg-gray-100 transition-colors inline-block mb-4"
+          className="p-2 -ml-2 rounded-xl hover:bg-gray-100 transition-colors inline-block mb-2"
         >
           <ArrowLeft className="h-5 w-5 text-primary" />
         </Link>

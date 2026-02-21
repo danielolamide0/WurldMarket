@@ -32,9 +32,9 @@ export default function PermissionsPage() {
 
   return (
     <div className="min-h-screen pb-20">
-      <div className="max-w-3xl mx-auto px-4 py-4">
+      <div className="max-w-3xl mx-auto px-4 pt-2 pb-4">
         {/* Back: dashboard for vendors, account for customers */}
-        <div className="flex items-center gap-3 mb-4">
+        <div className="flex items-center gap-3 mb-2">
           <Link
             href={user?.role === 'vendor' ? '/dashboard' : '/account'}
             className="p-2 -ml-2 rounded-xl hover:bg-gray-100 transition-colors"
@@ -43,13 +43,7 @@ export default function PermissionsPage() {
           </Link>
         </div>
 
-        {/* Notifications Section */}
         <Card className="p-6">
-          <div className="flex items-center gap-3 mb-6">
-            <Bell className="h-5 w-5 text-primary" />
-            <h2 className="text-lg font-semibold text-gray-900">Notifications</h2>
-          </div>
-
           <div className="space-y-4">
             {/* Email Notifications */}
             <div className="flex items-center justify-between py-3 border-b border-gray-100">

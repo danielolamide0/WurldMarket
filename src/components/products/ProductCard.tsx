@@ -149,13 +149,13 @@ export function ProductCard({ product, showStoreName }: ProductCardProps) {
               <button
                 onClick={handleAddToCart}
                 disabled={isOutOfStock}
-                className={`p-2.5 rounded-xl transition-all ${
+                className={`w-8 h-8 flex items-center justify-center rounded-full transition-all flex-shrink-0 ${
                   isOutOfStock
                     ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
                     : 'bg-primary text-white hover:bg-primary-dark'
                 }`}
               >
-                <Plus className="h-5 w-5" />
+                <Plus className="h-4 w-4" />
               </button>
             )}
           </div>

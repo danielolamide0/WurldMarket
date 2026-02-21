@@ -47,13 +47,12 @@ export default function CustomerOrdersPage() {
     <div className="min-h-screen bg-gray-50 pb-20">
       {/* Header */}
       <div className="bg-cream border-b border-gray-100">
-        <div className="max-w-7xl mx-auto px-4 py-6">
+        <div className="max-w-7xl mx-auto px-4 py-4">
           <Link
             href="/"
-            className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-4"
+            className="inline-flex items-center gap-2 p-2 -ml-2 rounded-xl hover:bg-gray-100 transition-colors"
           >
-            <ArrowLeft className="h-4 w-4" />
-            Back to Home
+            <ArrowLeft className="h-5 w-5 text-primary" />
           </Link>
         </div>
       </div>
