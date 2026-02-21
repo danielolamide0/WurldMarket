@@ -43,6 +43,7 @@ export default function CheckoutPage() {
   const [isProcessing, setIsProcessing] = useState(false)
   const [orderComplete, setOrderComplete] = useState(false)
   const [orderId, setOrderId] = useState('')
+  const [phoneError, setPhoneError] = useState<string | null>(null)
   const [selectedAddressId, setSelectedAddressId] = useState<string | null>(null)
   const [useNewAddress, setUseNewAddress] = useState(false)
   const [newAddressSelected, setNewAddressSelected] = useState(false)
@@ -152,7 +153,12 @@ export default function CheckoutPage() {
   }, {} as Record<string, typeof items>)
 
   const handleSubmitOrder = async () => {
-    if (!customerName || !customerPhone) {
+    setPhoneError(null)
+    if (!customerPhone.trim()) {
+      setPhoneError('Required')
+      return
+    }
+    if (!customerName.trim()) {
       return
     }
 
@@ -353,8 +359,12 @@ export default function CheckoutPage() {
                     type="tel"
                     placeholder="07123 456789"
                     value={customerPhone}
-                    onChange={(e) => setCustomerPhone(e.target.value)}
+                    onChange={(e) => {
+                      setCustomerPhone(e.target.value)
+                      if (phoneError) setPhoneError(null)
+                    }}
                     icon={<Phone className="h-5 w-5" />}
+                    error={phoneError || undefined}
                     required
                   />
                 )}
@@ -367,8 +377,12 @@ export default function CheckoutPage() {
               type="tel"
               placeholder="07123 456789"
               value={customerPhone}
-              onChange={(e) => setCustomerPhone(e.target.value)}
-                icon={<Phone className="h-5 w-5" />}
+              onChange={(e) => {
+                setCustomerPhone(e.target.value)
+                if (phoneError) setPhoneError(null)
+              }}
+              icon={<Phone className="h-5 w-5" />}
+              error={phoneError || undefined}
               required
             />
             )}

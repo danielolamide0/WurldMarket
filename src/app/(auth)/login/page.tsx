@@ -510,9 +510,6 @@ export default function LoginPage() {
                       icon={<Mail className="h-5 w-5" />}
                       required
                     />
-                    <p className="text-xs text-gray-500 -mt-2">
-                      Each email can only be used for one account (customer or vendor).
-                    </p>
 
                     {signupRole === 'customer' && (
                       <Input

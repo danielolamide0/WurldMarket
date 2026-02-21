@@ -78,7 +78,7 @@ export async function POST(request: NextRequest) {
       if (type === 'signup') {
         if (existingUser) {
           return NextResponse.json(
-            { error: 'This email is already registered. Each email can only be used for one account.' },
+            { error: 'This email is already registered. Sign in or recover your password.' },
             { status: 409 }
           )
         }
