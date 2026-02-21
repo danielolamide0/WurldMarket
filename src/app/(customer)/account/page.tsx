@@ -73,7 +73,7 @@ export default function AccountPage() {
     <div className="min-h-screen">
       <div className="max-w-3xl mx-auto px-4 py-6">
         <Link
-          href={user?.role === 'vendor' ? '/dashboard' : '/'}
+          href="/"
           className="inline-flex items-center gap-2 p-2 -ml-2 rounded-xl hover:bg-gray-100 transition-colors mb-4"
         >
           <ArrowLeft className="h-5 w-5 text-primary" />
