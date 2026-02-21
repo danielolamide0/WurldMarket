@@ -91,6 +91,7 @@ export interface Product {
   unit: string
   image: string
   stock: number
+  lowStockAlert?: number
   isActive: boolean
   isOnOffer?: boolean
   isTrending?: boolean

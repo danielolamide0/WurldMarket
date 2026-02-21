@@ -43,6 +43,7 @@ export interface IProduct extends Document {
   unit: string
   image: string
   stock: number
+  lowStockAlert?: number
   isActive: boolean
   isOnOffer: boolean
   isTrending: boolean
@@ -127,6 +128,10 @@ const ProductSchema = new Schema<IProduct>(
     stock: {
       type: Number,
       default: 0,
+      min: 0,
+    },
+    lowStockAlert: {
+      type: Number,
       min: 0,
     },
     isActive: {

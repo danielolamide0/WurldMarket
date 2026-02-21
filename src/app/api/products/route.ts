@@ -31,6 +31,7 @@ export async function GET(request: NextRequest) {
           unit: product.unit,
           image: product.image,
           stock: product.stock,
+          lowStockAlert: product.lowStockAlert,
           isActive: product.isActive,
           isOnOffer: product.isOnOffer || false,
           isTrending: product.isTrending || false,
@@ -56,6 +57,10 @@ export async function GET(request: NextRequest) {
         { description: { $regex: search, $options: 'i' } },
       ]
     }
+    // Hide out-of-stock products from customer-facing list (vendor views still see them via vendorId)
+    if (!vendorId) {
+      query.stock = { $gt: 0 }
+    }
 
     const products = await Product.find(query).sort({ createdAt: -1 })
 
@@ -72,6 +77,7 @@ export async function GET(request: NextRequest) {
         unit: p.unit,
         image: p.image,
         stock: p.stock,
+        lowStockAlert: p.lowStockAlert,
         isActive: p.isActive,
         isOnOffer: p.isOnOffer || false,
         isTrending: p.isTrending || false,
@@ -92,7 +98,7 @@ export async function POST(request: NextRequest) {
     await dbConnect()
 
     const body = await request.json()
-    const { vendorId, storeId, name, description, category, cuisines, price, unit, image, stock } = body
+    const { vendorId, storeId, name, description, category, cuisines, price, unit, image, stock, lowStockAlert } = body
 
     if (!vendorId || !storeId || !name || !category || price === undefined || !image) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
@@ -115,6 +121,7 @@ export async function POST(request: NextRequest) {
       unit: unit || 'each',
       image,
       stock: stock || 0,
+      lowStockAlert: lowStockAlert != null ? Number(lowStockAlert) : undefined,
       isOnOffer: isOnOffer || false,
       originalPrice: isOnOffer ? originalPrice : undefined,
       offerEndDate: isOnOffer && offerEndDate ? new Date(offerEndDate) : undefined,
@@ -133,6 +140,7 @@ export async function POST(request: NextRequest) {
           unit: product.unit,
           image: product.image,
           stock: product.stock,
+          lowStockAlert: product.lowStockAlert,
           isActive: product.isActive,
           isOnOffer: product.isOnOffer || false,
           isTrending: product.isTrending || false,
@@ -177,6 +185,7 @@ export async function PUT(request: NextRequest) {
           unit: product.unit,
           image: product.image,
           stock: product.stock,
+          lowStockAlert: product.lowStockAlert,
           isActive: product.isActive,
           isOnOffer: product.isOnOffer || false,
           isTrending: product.isTrending || false,

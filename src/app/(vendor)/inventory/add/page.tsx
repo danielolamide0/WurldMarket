@@ -31,6 +31,7 @@ export default function AddProductPage() {
     price: '',
     unit: '',
     stock: '',
+    lowStockAlert: '5',
     storeId: '',
     image: '',
     isOnOffer: false,
@@ -110,6 +111,7 @@ export default function AddProductPage() {
       price: parseFloat(formData.price),
       unit: formData.unit,
       stock: parseInt(formData.stock),
+      lowStockAlert: formData.lowStockAlert ? parseInt(formData.lowStockAlert) : undefined,
       image: formData.image,
       isActive: true,
       isOnOffer: formData.isOnOffer,
@@ -245,7 +247,7 @@ export default function AddProductPage() {
               />
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <Input
                 label="Initial Stock *"
                 type="number"
@@ -254,6 +256,14 @@ export default function AddProductPage() {
                 value={formData.stock}
                 onChange={(e) => setFormData({ ...formData, stock: e.target.value })}
                 required
+              />
+              <Input
+                label="Low stock alert"
+                type="number"
+                min="0"
+                placeholder="e.g. 5"
+                value={formData.lowStockAlert}
+                onChange={(e) => setFormData({ ...formData, lowStockAlert: e.target.value })}
               />
 
               <div>

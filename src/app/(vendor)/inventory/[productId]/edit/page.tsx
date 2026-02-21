@@ -42,6 +42,7 @@ export default function EditProductPage() {
     price: '',
     unit: '',
     stock: '',
+    lowStockAlert: '',
     storeId: '',
     image: '',
     isActive: true,
@@ -81,6 +82,7 @@ export default function EditProductPage() {
         price: product.price.toString(),
         unit: product.unit,
         stock: product.stock.toString(),
+        lowStockAlert: product.lowStockAlert != null ? product.lowStockAlert.toString() : '',
         storeId: product.storeId,
         image: product.image,
         isActive: product.isActive,
@@ -142,6 +144,7 @@ export default function EditProductPage() {
       price: parseFloat(formData.price),
       unit: formData.unit,
       stock: parseInt(formData.stock),
+      lowStockAlert: formData.lowStockAlert ? parseInt(formData.lowStockAlert) : undefined,
       storeId: formData.storeId,
       image: formData.image,
       isActive: formData.isActive,
@@ -274,7 +277,7 @@ export default function EditProductPage() {
               />
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <Input
                 label="Stock Quantity *"
                 type="number"
@@ -283,6 +286,14 @@ export default function EditProductPage() {
                 value={formData.stock}
                 onChange={(e) => setFormData({ ...formData, stock: e.target.value })}
                 required
+              />
+              <Input
+                label="Low stock alert"
+                type="number"
+                min="0"
+                placeholder="e.g. 5"
+                value={formData.lowStockAlert}
+                onChange={(e) => setFormData({ ...formData, lowStockAlert: e.target.value })}
               />
 
               <div>

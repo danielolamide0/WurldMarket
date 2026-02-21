@@ -3,7 +3,9 @@ import dbConnect from '@/lib/mongodb'
 import Order from '@/models/Order'
 import Product from '@/models/Product'
 import Store from '@/models/Store'
+import Vendor from '@/models/Vendor'
 import CustomerData from '@/models/CustomerData'
+import { sendLowStockEmail } from '@/lib/email'
 
 export async function GET(request: NextRequest) {
   try {
@@ -64,9 +66,22 @@ export async function POST(request: NextRequest) {
       status: 'pending', orderType, deliveryAddress, notes,
     })
 
-    // Decrement stock
+    // Decrement stock and check low-stock alerts
     for (const item of items) {
+      const product = await Product.findById(item.productId)
+      if (!product) continue
+      const previousStock = product.stock
       await Product.findByIdAndUpdate(item.productId, { $inc: { stock: -item.quantity } })
+      const newStock = previousStock - item.quantity
+      const alert = product.lowStockAlert ?? 0
+      if (alert > 0 && newStock <= alert) {
+        const vendor = await Vendor.findById(product.vendorId)
+        if (vendor?.contactEmail) {
+          sendLowStockEmail(vendor.contactEmail, product.name, newStock, alert).catch((err) =>
+            console.error('Low stock email failed:', err)
+          )
+        }
+      }
     }
 
     // Record purchase history

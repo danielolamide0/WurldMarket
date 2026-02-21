@@ -127,3 +127,71 @@ export async function sendVerificationEmail(
     return { success: false, error: 'Failed to send email' }
   }
 }
+
+export async function sendLowStockEmail(
+  toEmail: string,
+  productName: string,
+  currentStock: number,
+  lowStockAlert: number
+): Promise<{ success: boolean; error?: string }> {
+  try {
+    const client = getResendClient()
+    const { error } = await client.emails.send({
+      from: FROM_EMAIL,
+      to: toEmail,
+      subject: `Low stock alert: ${productName}`,
+      html: `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="utf-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        </head>
+        <body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background-color: #f5f5f5;">
+          <table role="presentation" style="width: 100%; border-collapse: collapse;">
+            <tr>
+              <td align="center" style="padding: 40px 20px;">
+                <table role="presentation" style="max-width: 480px; border-collapse: collapse; background: #fff; border-radius: 16px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                  <tr>
+                    <td style="padding: 40px 40px 20px; text-align: center;">
+                      <img src="https://wurldbasket.com/WurldBAsketLogo.png" alt="WurldBasket" style="height: 60px; width: auto;">
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style="padding: 0 40px 20px;">
+                      <h1 style="margin: 0 0 16px; font-size: 22px; font-weight: 700; color: #1a1a1a;">Low stock alert</h1>
+                      <p style="margin: 0 0 16px; font-size: 16px; line-height: 1.5; color: #444;">
+                        <strong>${productName}</strong> has reached your low stock threshold.
+                      </p>
+                      <p style="margin: 0; font-size: 16px; color: #444;">
+                        Current stock: <strong>${currentStock}</strong><br>
+                        Your alert threshold: <strong>${lowStockAlert}</strong>
+                      </p>
+                      <p style="margin: 16px 0 0; font-size: 14px; color: #666;">
+                        Restock soon so customers can keep ordering. If stock reaches zero, this product will be hidden from the store until you add stock.
+                      </p>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style="padding: 20px 40px 30px; border-top: 1px solid #eee;">
+                      <p style="margin: 0; font-size: 12px; color: #999; text-align: center;">WurldBasket – Vendor notifications</p>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+          </table>
+        </body>
+        </html>
+      `,
+    })
+    if (error) {
+      console.error('Low stock email error:', error)
+      return { success: false, error: error.message }
+    }
+    return { success: true }
+  } catch (error) {
+    console.error('Low stock email service error:', error)
+    return { success: false, error: 'Failed to send email' }
+  }
+}
