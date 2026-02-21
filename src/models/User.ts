@@ -65,7 +65,8 @@ const UserSchema = new Schema<IUser>(
 )
 
 // username already has unique: true which creates an index
-UserSchema.index({ email: 1 })
+// One email per account across the app (customer or vendor); sparse allows legacy users without email
+UserSchema.index({ email: 1 }, { unique: true, sparse: true })
 
 const User: Model<IUser> = mongoose.models.User || mongoose.model<IUser>('User', UserSchema)
 export default User

@@ -20,12 +20,15 @@ interface AuthState {
   // Login with email or username
   login: (identifier: string, password: string) => Promise<boolean>
   // Email verification flow
-  sendVerificationCode: (email: string, type: 'signup' | 'password-reset') => Promise<{ success: boolean; error?: string; timeRemaining?: number }>
+  sendVerificationCode: (email: string, type: 'signup' | 'password-reset' | 'email-change', options?: { userId?: string }) => Promise<{ success: boolean; error?: string; timeRemaining?: number }>
   verifyCode: (email: string, code: string, type: 'signup' | 'password-reset') => Promise<{ success: boolean; error?: string }>
   // Signup with email verification
   signup: (options: SignupOptions) => Promise<{ success: boolean; error?: string; vendorId?: string }>
   // Password reset
   resetPassword: (email: string, code: string, newPassword: string) => Promise<{ success: boolean; error?: string }>
+  // Change email (send code to new email, then confirm with code)
+  sendEmailChangeCode: (newEmail: string) => Promise<{ success: boolean; error?: string; timeRemaining?: number }>
+  updateEmailWithCode: (newEmail: string, code: string) => Promise<{ success: boolean; error?: string }>
   // Legacy support
   checkUsernameExists: (username: string) => Promise<boolean>
   checkEmailExists: (email: string) => Promise<boolean>
@@ -84,14 +87,16 @@ export const useAuthStore = create<AuthState>()(
         }
       },
 
-      sendVerificationCode: async (email: string, type: 'signup' | 'password-reset') => {
+      sendVerificationCode: async (email: string, type: 'signup' | 'password-reset' | 'email-change', options?: { userId?: string }) => {
         set({ isLoading: true, error: null })
 
         try {
+          const body: { email: string; type: string; userId?: string } = { email, type }
+          if (type === 'email-change' && options?.userId) body.userId = options.userId
           const response = await fetch('/api/auth/send-code', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email, type }),
+            body: JSON.stringify(body),
           })
 
           const data = await response.json()
@@ -202,6 +207,40 @@ export const useAuthStore = create<AuthState>()(
         } catch (error) {
           set({ isLoading: false, error: 'Failed to reset password' })
           return { success: false, error: 'Failed to reset password' }
+        }
+      },
+
+      sendEmailChangeCode: async (newEmail: string) => {
+        const user = get().user
+        if (!user?.id) {
+          return { success: false, error: 'You must be signed in to change your email' }
+        }
+        return get().sendVerificationCode(newEmail, 'email-change', { userId: user.id })
+      },
+
+      updateEmailWithCode: async (newEmail: string, code: string) => {
+        const user = get().user
+        if (!user?.id) {
+          set({ error: 'You must be signed in to change your email' })
+          return { success: false, error: 'You must be signed in to change your email' }
+        }
+        set({ isLoading: true, error: null })
+        try {
+          const response = await fetch('/api/auth/update-email', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ userId: user.id, newEmail, code }),
+          })
+          const data = await response.json()
+          if (!response.ok) {
+            set({ isLoading: false, error: data.error })
+            return { success: false, error: data.error }
+          }
+          set({ user: data.user, isLoading: false, error: null })
+          return { success: true }
+        } catch (error) {
+          set({ isLoading: false, error: 'Failed to update email' })
+          return { success: false, error: 'Failed to update email' }
         }
       },
 

@@ -46,11 +46,11 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Check if email already exists
+    // Email can only be used once (one account per email, customer or vendor)
     const existingUser = await User.findOne({ email: normalizedEmail })
     if (existingUser) {
       return NextResponse.json(
-        { error: 'An account with this email already exists' },
+        { error: 'This email is already registered. Each email can only be used for one account.' },
         { status: 409 }
       )
     }

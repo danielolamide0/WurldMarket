@@ -430,6 +430,9 @@ export default function LoginPage() {
                     Forgot your password?
                   </button>
                 </div>
+                <p className="text-xs text-gray-500 text-center mt-3">
+                  Vendors: sign in with the email and password you used when you created your vendor account.
+                </p>
               </form>
             )}
 
@@ -507,6 +510,9 @@ export default function LoginPage() {
                       icon={<Mail className="h-5 w-5" />}
                       required
                     />
+                    <p className="text-xs text-gray-500 -mt-2">
+                      Each email can only be used for one account (customer or vendor).
+                    </p>
 
                     {signupRole === 'customer' && (
                       <Input
