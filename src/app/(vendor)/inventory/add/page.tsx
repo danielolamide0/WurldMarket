@@ -1,9 +1,9 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { ArrowLeft, Tag } from 'lucide-react'
+import { ArrowLeft, Tag, Upload, Loader2 } from 'lucide-react'
 import { useAuthStore } from '@/stores/authStore'
 import { useProductStore } from '@/stores/productStore'
 import { useVendorStore } from '@/stores/vendorStore'
@@ -32,12 +32,14 @@ export default function AddProductPage() {
     unit: '',
     stock: '',
     storeId: '',
-    image: 'https://images.unsplash.com/photo-1586201375761-83865001e31c?w=400',
+    image: '',
     isOnOffer: false,
     originalPrice: '',
     offerEndDate: '',
   })
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isUploadingImage, setIsUploadingImage] = useState(false)
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   const CUISINES: { value: CuisineType; label: string }[] = [
     { value: 'african', label: 'African' },
@@ -71,10 +73,28 @@ export default function AddProductPage() {
     }
   }, [vendorStores, formData.storeId])
 
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file || !file.type.startsWith('image/')) return
+    setIsUploadingImage(true)
+    try {
+      const formDataUpload = new FormData()
+      formDataUpload.append('file', file)
+      const res = await fetch('/api/upload', { method: 'POST', body: formDataUpload })
+      const data = await res.json()
+      if (res.ok && data.url) {
+        setFormData((prev) => ({ ...prev, image: data.url }))
+      }
+    } finally {
+      setIsUploadingImage(false)
+      e.target.value = ''
+    }
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
-    if (!formData.name || !formData.price || !formData.unit || !formData.stock || !formData.storeId || formData.cuisines.length === 0) {
+    if (!formData.name || !formData.price || !formData.unit || !formData.stock || !formData.storeId || formData.cuisines.length === 0 || !formData.image) {
       return
     }
 
@@ -236,13 +256,34 @@ export default function AddProductPage() {
                 required
               />
 
-              <Input
-                label="Image URL"
-                type="url"
-                placeholder="https://..."
-                value={formData.image}
-                onChange={(e) => setFormData({ ...formData, image: e.target.value })}
-              />
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                  Product Image *
+                </label>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp,image/gif"
+                  className="hidden"
+                  onChange={handleImageUpload}
+                />
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={isUploadingImage}
+                  className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent disabled:opacity-50"
+                >
+                  {isUploadingImage ? (
+                    <Loader2 className="h-5 w-5 animate-spin" />
+                  ) : (
+                    <Upload className="h-5 w-5" />
+                  )}
+                  <span>{isUploadingImage ? 'Uploading...' : 'Upload image'}</span>
+                </button>
+                {!formData.image && (
+                  <p className="text-sm text-gray-500 mt-1">JPEG, PNG, WebP or GIF, max 5MB</p>
+                )}
+              </div>
             </div>
 
             {/* Preview */}
