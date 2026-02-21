@@ -12,7 +12,7 @@ import { useAddressStore } from '@/stores/addressStore'
 import { useLocationStore, useActiveLocation } from '@/stores/locationStore'
 import { Button } from '@/components/ui/button'
 import { Product, StoreLocation } from '@/types'
-import { calculateDistance } from '@/lib/utils'
+import { calculateDistance, getEffectiveCityForStores } from '@/lib/utils'
 
 // Popular searches for the dropdown
 const POPULAR_SEARCHES = [
@@ -160,6 +160,13 @@ export function Header() {
 
     const query = searchQuery.toLowerCase()
 
+    // Same city logic as search results page: only show products/stores in user's city
+    const { city: effectiveCity } = getEffectiveCityForStores(
+      activeLocation.city,
+      activeLocation.coordinates,
+      stores
+    )
+
     // Search products and include store info
     let matchedProducts = products
       .filter(
@@ -169,10 +176,16 @@ export function Header() {
           p.category.toLowerCase().includes(query)
       )
       .map((product) => {
-        // Find the store for this product
         const store = stores.find((s) => s.id === product.storeId)
-        return { ...product, storeName: store?.name, storeCoordinates: store?.coordinates }
+        return { ...product, storeName: store?.name, storeCoordinates: store?.coordinates, storeCity: store?.city }
       })
+
+    // Restrict to user's city (same as search results page)
+    if (effectiveCity) {
+      matchedProducts = matchedProducts.filter(
+        (p) => p.storeCity && p.storeCity.toLowerCase() === effectiveCity.toLowerCase()
+      )
+    }
 
     // Sort by proximity if user has location
     if (activeLocation.coordinates) {
@@ -208,6 +221,11 @@ export function Header() {
         s.postcode.toLowerCase().includes(query)
     )
 
+    // Restrict to user's city (same as search results page)
+    if (effectiveCity) {
+      matchedStores = matchedStores.filter((s) => s.city.toLowerCase() === effectiveCity.toLowerCase())
+    }
+
     // Sort stores by proximity if user has location
     if (activeLocation.coordinates) {
       matchedStores = matchedStores.sort((a, b) => {
@@ -234,7 +252,7 @@ export function Header() {
     matchedStores = matchedStores.slice(0, 3)
 
     setSearchResults({ products: matchedProducts, stores: matchedStores })
-  }, [searchQuery, products, stores, activeLocation.coordinates])
+  }, [searchQuery, products, stores, activeLocation.city, activeLocation.coordinates])
 
   // Close search dropdown when clicking outside or scrolling
   useEffect(() => {

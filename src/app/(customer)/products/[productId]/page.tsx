@@ -12,7 +12,6 @@ import { Badge } from '@/components/ui/badge'
 import { Card } from '@/components/ui/card'
 import { useToast } from '@/components/ui/toast'
 import { formatPrice } from '@/lib/utils'
-import { CATEGORY_MAP } from '@/lib/constants'
 
 export default function ProductDetailPage() {
   const params = useParams()
@@ -91,9 +90,6 @@ export default function ProductDetailPage() {
       <div className="max-w-3xl mx-auto px-4 py-6">
         {/* Product Info */}
         <div className="mb-6">
-          <Badge variant="outline" className="mb-3">
-            {CATEGORY_MAP[product.category]}
-          </Badge>
           <h1 className="text-2xl font-bold text-gray-900 mb-2">{product.name}</h1>
           <p className="text-gray-600 mb-4">{product.description}</p>
 

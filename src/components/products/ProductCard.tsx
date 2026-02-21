@@ -9,7 +9,6 @@ import { useCustomerStore } from '@/stores/customerStore'
 import { useVendorStore } from '@/stores/vendorStore'
 import { useAuthStore } from '@/stores/authStore'
 import { formatPrice } from '@/lib/utils'
-import { CATEGORY_MAP } from '@/lib/constants'
 import { Badge } from '@/components/ui/badge'
 
 interface ProductCardProps {
@@ -31,9 +30,6 @@ export function ProductCard({ product, showStoreName }: ProductCardProps) {
   // Show store name if not on a store page and showStoreName is not explicitly false
   const shouldShowStoreName = showStoreName !== false && !pathname?.startsWith('/stores/')
   const store = shouldShowStoreName ? stores.find((s) => s.id === product.storeId) : null
-  
-  // Hide category badge when viewing from a category page
-  const isCategoryPage = pathname?.startsWith('/category/')
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault()
@@ -120,19 +116,12 @@ export function ProductCard({ product, showStoreName }: ProductCardProps) {
 
         {/* Content */}
         <div className="p-4">
-          <div className="flex items-center justify-between mb-2">
-            {!isCategoryPage && (
-              <Badge variant="outline" size="sm">
-                {CATEGORY_MAP[product.category]}
-              </Badge>
-            )}
-            {shouldShowStoreName && store && (
-              <div className={`flex items-center gap-1 text-xs text-gray-500 ${isCategoryPage ? 'ml-auto' : ''}`}>
-                <Store className="h-3 w-3" />
-                <span className="truncate max-w-[100px]">{store.name}</span>
-              </div>
-            )}
-          </div>
+          {shouldShowStoreName && store && (
+            <div className="flex items-center gap-1 text-xs text-gray-500 mb-2">
+              <Store className="h-3 w-3" />
+              <span className="truncate max-w-[100px]">{store.name}</span>
+            </div>
+          )}
           <h3 className="font-semibold text-gray-900 mb-1 truncate">{product.name}</h3>
           <p className="text-sm text-gray-500 mb-3">{product.unit}</p>
 
