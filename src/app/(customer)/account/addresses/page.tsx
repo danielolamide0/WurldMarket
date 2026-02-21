@@ -83,7 +83,7 @@ function SavedAddressesContent() {
     if (editingId) {
       updateAddress(editingId, { label, fullAddress, city, postcode, coordinates })
     } else {
-      addAddress(user.id, label, fullAddress, city, postcode, false, coordinates)
+      addAddress(user.id, label, fullAddress, city, postcode, true, coordinates)
     }
 
     resetForm()
