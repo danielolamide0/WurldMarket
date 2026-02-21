@@ -1,5 +1,4 @@
 import { create } from 'zustand'
-import { persist } from 'zustand/middleware'
 import { Product, CuisineType } from '@/types'
 
 interface ProductState {
@@ -18,53 +17,38 @@ interface ProductState {
   getLowStockProducts: (vendorId: string, threshold?: number) => Product[]
 }
 
-export const useProductStore = create<ProductState>()(
-  persist(
-    (set, get) => ({
-      products: [],
-      isLoading: false,
+export const useProductStore = create<ProductState>()((set, get) => ({
+  products: [],
+  isLoading: false,
 
-      fetchProducts: async (params) => {
-        set({ isLoading: true })
-        try {
-          const searchParams = new URLSearchParams()
-          if (params?.storeId) searchParams.set('storeId', params.storeId)
-          if (params?.vendorId) searchParams.set('vendorId', params.vendorId)
-          if (params?.category) searchParams.set('category', params.category)
-          if (params?.cuisine) searchParams.set('cuisine', params.cuisine)
+  fetchProducts: async (params) => {
+    set({ isLoading: true })
+    try {
+      const searchParams = new URLSearchParams()
+      if (params?.storeId) searchParams.set('storeId', params.storeId)
+      if (params?.vendorId) searchParams.set('vendorId', params.vendorId)
+      if (params?.category) searchParams.set('category', params.category)
+      if (params?.cuisine) searchParams.set('cuisine', params.cuisine)
 
-          const url = `/api/products${searchParams.toString() ? `?${searchParams}` : ''}`
-          const response = await fetch(url)
-          const data = await response.json()
+      const url = `/api/products${searchParams.toString() ? `?${searchParams}` : ''}`
+      const response = await fetch(url)
+      const data = await response.json()
 
-          if (response.ok) {
-            const newProducts = data.products || []
-        const currentProducts = get().products
-            
-            // Merge products: use Map to deduplicate by ID, keeping the latest version
-            const productMap = new Map<string, Product>()
-            
-            // Add existing products to map
-            currentProducts.forEach((product) => {
-              productMap.set(product.id, product)
-            })
-            
-            // Update/add new products (newer data takes precedence)
-            newProducts.forEach((product: Product) => {
-              productMap.set(product.id, product)
-            })
-            
-            // Convert back to array
-            const mergedProducts = Array.from(productMap.values())
-            
-            set({ products: mergedProducts, isLoading: false })
-          } else {
-            set({ isLoading: false })
-          }
-        } catch {
-          set({ isLoading: false })
-        }
-      },
+      if (response.ok) {
+        const newProducts = data.products || []
+        // No params = full catalog from DB; use it as source of truth. With params, merge into current list for this session.
+        const currentProducts = params ? get().products : []
+        const productMap = new Map<string, Product>()
+        currentProducts.forEach((p) => productMap.set(p.id, p))
+        newProducts.forEach((p: Product) => productMap.set(p.id, p))
+        set({ products: Array.from(productMap.values()), isLoading: false })
+      } else {
+        set({ isLoading: false })
+      }
+    } catch {
+      set({ isLoading: false })
+    }
+  },
 
       addProduct: async (productData) => {
         try {
@@ -172,10 +156,4 @@ export const useProductStore = create<ProductState>()(
           (p) => p.vendorId === vendorId && p.stock <= threshold && p.isActive
         )
       },
-    }),
-    {
-      name: 'wurldbasket-products',
-      version: 2,
-    }
-  )
-)
+}))

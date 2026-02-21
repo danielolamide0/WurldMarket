@@ -354,7 +354,7 @@ export default function HomePage() {
     return () => clearTimeout(timer)
   }, [trendingProducts.length, updateScrollState])
 
-  return (
+    return (
     <div className="min-h-screen bg-cream">
       {/* Categories Row */}
       <section className="border-b border-gray-100">
@@ -392,9 +392,9 @@ export default function HomePage() {
                         alt={cat.name}
                         className="w-full h-full object-cover"
                       />
-                    </div>
+              </div>
                     <span className="text-[10px] md:text-sm text-gray-600 whitespace-nowrap text-center leading-tight">{cat.name}</span>
-                  </Link>
+              </Link>
                 )
               })}
             </div>
@@ -437,7 +437,7 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-4">
           <div className="grid grid-cols-2 gap-6">
             {/* Banner Carousel - Left */}
-            <div>
+              <div>
               <BannerCarousel className="h-64" />
             </div>
 
@@ -548,12 +548,12 @@ export default function HomePage() {
                                 <Plus className="h-3 w-3" />
                               </button>
                             )}
-                          </div>
-                        </div>
+              </div>
+            </div>
                       </Link>
                     )
                   })}
-                </div>
+              </div>
               </div>
             </div>
           </div>
@@ -728,7 +728,7 @@ export default function HomePage() {
                     }
                   }
 
-                  return (
+              return (
                     <Link
                       key={product.id}
                       href={`/products/${product.id}`}
@@ -745,8 +745,8 @@ export default function HomePage() {
                           src={product.image}
                           alt={product.name}
                           className="max-h-full max-w-full object-contain"
-                        />
-                      </div>
+                      />
+                    </div>
 
                       {/* Product info */}
                       <div className="p-2">
@@ -788,9 +788,9 @@ export default function HomePage() {
                           )}
                         </div>
                       </div>
-                    </Link>
-                  )
-                })}
+                </Link>
+              )
+            })}
               </div>
               {/* Mobile Arrows - Below content */}
               <div className="flex lg:hidden justify-center gap-4 mt-3">
@@ -813,9 +813,9 @@ export default function HomePage() {
                   <ChevronRight className="h-5 w-5" />
                 </button>
               </div>
-            </div>
           </div>
-        </section>
+        </div>
+      </section>
       )}
 
       {/* Mobile: Banner Carousel - Between Offers and Trending */}
@@ -916,7 +916,7 @@ export default function HomePage() {
                           )}
                         </div>
                       </div>
-                    </Link>
+          </Link>
                   )
                 })}
               </div>
@@ -942,8 +942,8 @@ export default function HomePage() {
                 <ChevronRight className="h-5 w-5" />
               </button>
             </div>
-          </div>
-        </section>
+        </div>
+      </section>
       )}
 
     </div>
