@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import dbConnect from '@/lib/mongodb'
 import User from '@/models/User'
 import VerificationCode from '@/models/VerificationCode'
+import { hashPassword } from '@/lib/password'
 
 export async function POST(request: NextRequest) {
   try {
@@ -52,8 +53,8 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Update password
-    user.password = newPassword
+    const hashedPassword = await hashPassword(newPassword)
+    user.password = hashedPassword
     await user.save()
 
     // Mark code as used

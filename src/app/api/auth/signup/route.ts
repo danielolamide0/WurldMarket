@@ -4,6 +4,7 @@ import User from '@/models/User'
 import Vendor from '@/models/Vendor'
 import CustomerData from '@/models/CustomerData'
 import VerificationCode from '@/models/VerificationCode'
+import { hashPassword } from '@/lib/password'
 
 export async function POST(request: NextRequest) {
   try {
@@ -87,9 +88,11 @@ export async function POST(request: NextRequest) {
       vendorId = vendor._id
     }
 
+    const hashedPassword = await hashPassword(password)
+
     // Create user with email-based auth (email only, no username)
     const user = await User.create({
-      password,
+      password: hashedPassword,
       role,
       name,
       email: normalizedEmail,
