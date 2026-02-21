@@ -13,7 +13,7 @@ import { ProductCard } from '@/components/products/ProductCard'
 import { Card } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { calculateDistance } from '@/lib/utils'
+import { calculateDistance, getEffectiveCityForStores } from '@/lib/utils'
 import { Product } from '@/types'
 
 type FilterType = 'stores' | 'products'
@@ -77,12 +77,17 @@ function SearchResults() {
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [])
 
-  // Filter stores by city if user has location
+  // Use effective city: user's city if it has stores, otherwise closest city with stores
+  const { city: effectiveCity, isFallback: isClosestCity } = getEffectiveCityForStores(
+    activeLocation.city,
+    activeLocation.coordinates,
+    stores
+  )
+
+  // Filter stores by effective city when we have a location
   let availableStores = stores
-  if (activeLocation.city) {
-    availableStores = stores.filter((s) => 
-      s.city.toLowerCase() === activeLocation.city!.toLowerCase()
-    )
+  if (effectiveCity) {
+    availableStores = stores.filter((s) => s.city.toLowerCase() === effectiveCity.toLowerCase())
   }
 
   // Sort availableStores by proximity for the filter dropdown
@@ -178,11 +183,11 @@ function SearchResults() {
       return { ...product, storeName: store?.name, storeCoordinates: store?.coordinates }
     })
 
-  // Filter products by city if user has location
-  if (activeLocation.city) {
+  // Filter products by effective city when we have a location
+  if (effectiveCity) {
     matchedProducts = matchedProducts.filter((p) => {
       const store = stores.find((s) => s.id === p.storeId)
-      return store && store.city.toLowerCase() === activeLocation.city!.toLowerCase()
+      return store && store.city.toLowerCase() === effectiveCity.toLowerCase()
     })
   }
 
@@ -298,8 +303,8 @@ function SearchResults() {
                   <div className="px-4 py-2 bg-gray-50 text-xs font-semibold text-gray-500 uppercase tracking-wide border-b border-gray-100">
                     {matchedCuisine 
                       ? `Stores with ${matchedCuisine} products`
-                      : activeLocation.city 
-                        ? `Stores in ${activeLocation.city}`
+                      : effectiveCity 
+                        ? `Stores in ${effectiveCity}${isClosestCity ? ' (closest to you)' : ''}`
                         : 'Stores with matching products'}
                   </div>
                   <button

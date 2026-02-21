@@ -64,6 +64,40 @@ export function calculateDistance(
   return R * c
 }
 
+/** Store-like shape needed for effective-city calculation */
+type StoreWithCity = { id: string; city: string; coordinates?: { lat: number; lng: number } | null }
+
+/**
+ * Get the city to use for filtering stores/products.
+ * If the user's city has no stores, returns the closest city that has stores (by distance from user coordinates).
+ */
+export function getEffectiveCityForStores(
+  userCity: string | null,
+  userCoordinates: { lat: number; lng: number } | null,
+  stores: StoreWithCity[]
+): { city: string | null; isFallback: boolean } {
+  if (!stores.length) return { city: null, isFallback: false }
+  if (!userCity && !userCoordinates) return { city: null, isFallback: false }
+
+  const userCityLower = userCity?.toLowerCase() ?? ''
+  const hasStoresInUserCity = userCityLower && stores.some((s) => s.city.toLowerCase() === userCityLower)
+  if (hasStoresInUserCity) return { city: userCity!, isFallback: false }
+
+  if (!userCoordinates) return { city: null, isFallback: false }
+  const withCoords = stores.filter(
+    (s) => s.coordinates && typeof s.coordinates.lat === 'number' && typeof s.coordinates.lng === 'number'
+  )
+  if (!withCoords.length) return { city: null, isFallback: false }
+
+  const { lat, lng } = userCoordinates
+  const closest = withCoords.slice().sort((a, b) => {
+    const distA = calculateDistance(lat, lng, a.coordinates!.lat, a.coordinates!.lng)
+    const distB = calculateDistance(lat, lng, b.coordinates!.lat, b.coordinates!.lng)
+    return distA - distB
+  })[0]
+  return { city: closest.city, isFallback: true }
+}
+
 function toRad(deg: number): number {
   return deg * (Math.PI / 180)
 }
