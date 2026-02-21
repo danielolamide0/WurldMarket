@@ -46,11 +46,11 @@ export default function SettingsPage() {
 
   const handleSendEmailChangeCode = async () => {
     clearError?.()
-    if (!emailValue.trim()) return
-    const result = await sendEmailChangeCode(emailValue.trim())
+    const result = await sendEmailChangeCode()
     if (result.success) {
       setEmailChangeStep('verify')
       setEmailVerificationCode(['', '', '', '', '', ''])
+      setEmailValue('') // new email input in step 2
     }
   }
 
@@ -72,7 +72,7 @@ export default function SettingsPage() {
   const handleConfirmEmailChange = async () => {
     clearError?.()
     const code = getEmailChangeCode()
-    if (code.length !== 6) return
+    if (code.length !== 6 || !emailValue.trim()) return
     const success = await updateEmailWithCode(emailValue.trim(), code)
     if (success) {
       setIsEditingEmail(false)
@@ -155,34 +155,28 @@ export default function SettingsPage() {
               <div className="space-y-3">
                 {emailChangeStep === 'enter' ? (
                   <>
-                    <Input
-                      label="New email"
-                      type="email"
-                      placeholder="your@email.com"
-                      value={emailValue}
-                      onChange={(e) => setEmailValue(e.target.value)}
-                      icon={<Mail className="h-5 w-5" />}
-                    />
-                    <p className="text-xs text-gray-500">We’ll send a verification code to this address.</p>
+                    <p className="text-sm text-gray-600">We’ll send a verification code to your current email to confirm it’s you.</p>
+                    <p className="text-sm font-medium text-gray-900">Current email: <strong>{user?.email || '—'}</strong></p>
                     {error && <p className="text-sm text-red-600 bg-red-50 p-3 rounded-xl">{error}</p>}
                     <div className="flex gap-2">
-                      <Button onClick={handleSendEmailChangeCode} size="sm" className="flex-1" disabled={!emailValue.trim() || isLoading}>
-                        Send verification code
+                      <Button onClick={handleSendEmailChangeCode} size="sm" className="flex-1" disabled={isLoading}>
+                        Send verification code to current email
                       </Button>
                       <Button onClick={handleCancelEmail} variant="outline" size="sm" className="flex-1"><X className="h-4 w-4 mr-2" /> Cancel</Button>
                     </div>
                   </>
                 ) : (
                   <>
-                    <p className="text-sm text-gray-600">Enter the 6-digit code sent to <strong>{emailValue}</strong></p>
+                    <p className="text-sm text-gray-600">Enter the 6-digit code we sent to your current email (<strong>{user?.email}</strong>), then enter your new email below.</p>
                     <div className="flex justify-center gap-2">
                       {[0,1,2,3,4,5].map((i) => (
                         <input key={i} ref={(el) => { emailCodeRefs.current[i] = el }} type="text" inputMode="numeric" maxLength={i === 0 ? 6 : 1} value={emailVerificationCode[i]} onChange={(e) => handleEmailCodeChange(i, e.target.value)} className="w-10 h-12 text-center text-lg font-semibold border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary" />
                       ))}
                     </div>
+                    <Input label="New email" type="email" placeholder="your@email.com" value={emailValue} onChange={(e) => setEmailValue(e.target.value)} icon={<Mail className="h-5 w-5" />} />
                     {error && <p className="text-sm text-red-600 bg-red-50 p-3 rounded-xl">{error}</p>}
                     <div className="flex flex-wrap gap-2">
-                      <Button onClick={handleConfirmEmailChange} size="sm" disabled={getEmailChangeCode().length !== 6 || isLoading}><Check className="h-4 w-4 mr-2" /> Confirm new email</Button>
+                      <Button onClick={handleConfirmEmailChange} size="sm" disabled={getEmailChangeCode().length !== 6 || !emailValue.trim() || isLoading}><Check className="h-4 w-4 mr-2" /> Update to new email</Button>
                       <Button variant="outline" size="sm" onClick={() => { setEmailChangeStep('enter'); setEmailVerificationCode(['','','','','','']); clearError?.(); }}>Back</Button>
                       <Button onClick={handleCancelEmail} variant="outline" size="sm"><X className="h-4 w-4 mr-2" /> Cancel</Button>
                     </div>

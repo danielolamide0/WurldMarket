@@ -27,7 +27,7 @@ interface AuthState {
   // Password reset
   resetPassword: (email: string, code: string, newPassword: string) => Promise<{ success: boolean; error?: string }>
   // Change email (send code to new email, then confirm with code)
-  sendEmailChangeCode: (newEmail: string) => Promise<{ success: boolean; error?: string; timeRemaining?: number }>
+  sendEmailChangeCode: () => Promise<{ success: boolean; error?: string; timeRemaining?: number }>
   updateEmailWithCode: (newEmail: string, code: string) => Promise<{ success: boolean; error?: string }>
   // Legacy support
   checkUsernameExists: (username: string) => Promise<boolean>
@@ -210,12 +210,29 @@ export const useAuthStore = create<AuthState>()(
         }
       },
 
-      sendEmailChangeCode: async (newEmail: string) => {
+      sendEmailChangeCode: async () => {
         const user = get().user
         if (!user?.id) {
           return { success: false, error: 'You must be signed in to change your email' }
         }
-        return get().sendVerificationCode(newEmail, 'email-change', { userId: user.id })
+        set({ isLoading: true, error: null })
+        try {
+          const response = await fetch('/api/auth/send-code', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ type: 'email-change', userId: user.id }),
+          })
+          const data = await response.json()
+          if (!response.ok) {
+            set({ isLoading: false, error: data.error })
+            return { success: false, error: data.error, timeRemaining: data.timeRemaining }
+          }
+          set({ isLoading: false, error: null })
+          return { success: true }
+        } catch (error) {
+          set({ isLoading: false, error: 'Failed to send verification code' })
+          return { success: false, error: 'Failed to send verification code' }
+        }
       },
 
       updateEmailWithCode: async (newEmail: string, code: string) => {

@@ -15,9 +15,9 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     const { email, type } = body
 
-    if (!email || !type) {
+    if (!type) {
       return NextResponse.json(
-        { error: 'Email and type are required' },
+        { error: 'Type is required' },
         { status: 400 }
       )
     }
@@ -29,19 +29,10 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const normalizedEmail = email.toLowerCase().trim()
+    let normalizedEmail: string
 
-    // Validate email format
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-    if (!emailRegex.test(normalizedEmail)) {
-      return NextResponse.json(
-        { error: 'Invalid email format' },
-        { status: 400 }
-      )
-    }
-
-    // For email-change we need the current user's id
     if (type === 'email-change') {
+      // Code is sent to the user's CURRENT email to confirm they own the account
       const userId = body.userId
       if (!userId) {
         return NextResponse.json(
@@ -54,26 +45,33 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ error: 'User not found' }, { status: 404 })
       }
       const currentEmail = (currentUser.email || '').toLowerCase().trim()
-      if (normalizedEmail === currentEmail) {
+      if (!currentEmail) {
         return NextResponse.json(
-          { error: 'New email is the same as your current email' },
+          { error: 'Your account has no email on file. Cannot send verification.' },
           { status: 400 }
         )
       }
-      const existingUser = await User.findOne({ email: normalizedEmail })
-      if (existingUser) {
+      normalizedEmail = currentEmail
+    } else {
+      if (!email) {
         return NextResponse.json(
-          { error: 'This email is already registered. Each email can only be used for one account.' },
-          { status: 409 }
+          { error: 'Email and type are required' },
+          { status: 400 }
         )
       }
-      // Code will be sent to normalizedEmail (the new address)
-    } else {
-      // Check user existence based on type
-      const existingUser = await User.findOne({ email: normalizedEmail })
+      normalizedEmail = email.toLowerCase().trim()
 
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+      if (!emailRegex.test(normalizedEmail)) {
+        return NextResponse.json(
+          { error: 'Invalid email format' },
+          { status: 400 }
+        )
+    }
+
+    if (type !== 'email-change') {
+      const existingUser = await User.findOne({ email: normalizedEmail })
       if (type === 'signup') {
-        // For signup, email must not be used by any existing account (customer or vendor)
         if (existingUser) {
           return NextResponse.json(
             { error: 'This email is already registered. Each email can only be used for one account.' },
@@ -81,9 +79,7 @@ export async function POST(request: NextRequest) {
           )
         }
       } else if (type === 'password-reset') {
-        // For password reset, email MUST exist
         if (!existingUser) {
-          // Return success anyway to prevent email enumeration
           return NextResponse.json({ success: true })
         }
       }

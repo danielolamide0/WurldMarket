@@ -8,6 +8,8 @@ export interface IVendor extends Document {
   logo?: string
   contactEmail: string
   contactPhone: string
+  /** Optional; used only for legacy vendors created before User-based auth. Login uses User first, then falls back to Vendor. */
+  password?: string
   isLive: boolean
   createdAt: Date
   updatedAt: Date
@@ -41,6 +43,7 @@ const VendorSchema = new Schema<IVendor>(
       type: String,
       trim: true,
     },
+    password: { type: String },
     isLive: {
       type: Boolean,
       default: false,

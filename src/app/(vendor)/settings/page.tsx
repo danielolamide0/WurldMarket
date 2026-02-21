@@ -44,11 +44,11 @@ export default function VendorSettingsPage() {
 
   const handleSendEmailChangeCode = async () => {
     clearError?.()
-    if (!newEmailValue.trim()) return
-    const result = await sendEmailChangeCode(newEmailValue.trim())
+    const result = await sendEmailChangeCode()
     if (result.success) {
       setEmailChangeStep('verify')
       setEmailVerificationCode(['', '', '', '', '', ''])
+      setNewEmailValue('') // new email input in step 2
     }
   }
 
@@ -70,7 +70,7 @@ export default function VendorSettingsPage() {
   const handleConfirmEmailChange = async () => {
     clearError?.()
     const code = getEmailChangeCode()
-    if (code.length !== 6) return
+    if (code.length !== 6 || !newEmailValue.trim()) return
     const success = await updateEmailWithCode(newEmailValue.trim(), code)
     if (success && user?.vendorId) {
       await updateVendor(user.vendorId, { contactEmail: newEmailValue.trim() })
@@ -149,7 +149,7 @@ export default function VendorSettingsPage() {
                   <div className="px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-gray-700 flex-1">
                     {contactEmail || user?.email || '—'}
                   </div>
-                  <button type="button" onClick={() => { setIsEditingEmail(true); setNewEmailValue(contactEmail || user?.email || ''); setEmailChangeStep('enter'); }} className="p-2 rounded-xl hover:bg-gray-100">
+                  <button type="button" onClick={() => { setIsEditingEmail(true); setNewEmailValue(''); setEmailChangeStep('enter'); }} className="p-2 rounded-xl hover:bg-gray-100">
                     <Edit2 className="h-4 w-4 text-gray-600" />
                   </button>
                 </div>
@@ -157,25 +157,26 @@ export default function VendorSettingsPage() {
                 <div className="space-y-3">
                   {emailChangeStep === 'enter' ? (
                     <>
-                      <Input type="email" placeholder="info@yourbusiness.com" value={newEmailValue} onChange={(e) => setNewEmailValue(e.target.value)} icon={<Mail className="h-5 w-5" />} />
-                      <p className="text-xs text-gray-500">We’ll send a verification code to this address.</p>
+                      <p className="text-sm text-gray-600">We’ll send a verification code to your current email to confirm it’s you.</p>
+                      <p className="text-sm font-medium text-gray-900">Current email: <strong>{user?.email || contactEmail || '—'}</strong></p>
                       {error && <p className="text-sm text-red-600 bg-red-50 p-3 rounded-xl">{error}</p>}
                       <div className="flex gap-2">
-                        <Button onClick={handleSendEmailChangeCode} size="sm" disabled={!newEmailValue.trim() || isLoading}>Send verification code</Button>
+                        <Button onClick={handleSendEmailChangeCode} size="sm" disabled={isLoading}>Send verification code to current email</Button>
                         <Button onClick={handleCancelEmail} variant="outline" size="sm"><X className="h-4 w-4 mr-2" /> Cancel</Button>
                       </div>
                     </>
                   ) : (
                     <>
-                      <p className="text-sm text-gray-600">Enter the 6-digit code sent to <strong>{newEmailValue}</strong></p>
+                      <p className="text-sm text-gray-600">Enter the 6-digit code we sent to your current email (<strong>{user?.email}</strong>), then enter your new contact email below.</p>
                       <div className="flex justify-center gap-2">
                         {[0,1,2,3,4,5].map((i) => (
                           <input key={i} ref={(el) => { emailCodeRefs.current[i] = el }} type="text" inputMode="numeric" maxLength={i === 0 ? 6 : 1} value={emailVerificationCode[i]} onChange={(e) => handleEmailCodeChange(i, e.target.value)} className="w-10 h-12 text-center text-lg font-semibold border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary" />
                         ))}
                       </div>
+                      <Input label="New contact email" type="email" placeholder="info@yourbusiness.com" value={newEmailValue} onChange={(e) => setNewEmailValue(e.target.value)} icon={<Mail className="h-5 w-5" />} />
                       {error && <p className="text-sm text-red-600 bg-red-50 p-3 rounded-xl">{error}</p>}
                       <div className="flex flex-wrap gap-2">
-                        <Button onClick={handleConfirmEmailChange} size="sm" disabled={getEmailChangeCode().length !== 6 || isLoading}><Check className="h-4 w-4 mr-2" /> Confirm new email</Button>
+                        <Button onClick={handleConfirmEmailChange} size="sm" disabled={getEmailChangeCode().length !== 6 || !newEmailValue.trim() || isLoading}><Check className="h-4 w-4 mr-2" /> Update to new email</Button>
                         <Button variant="outline" size="sm" onClick={() => { setEmailChangeStep('enter'); setEmailVerificationCode(['','','','','','']); clearError?.(); }}>Back</Button>
                         <Button onClick={handleCancelEmail} variant="outline" size="sm"><X className="h-4 w-4 mr-2" /> Cancel</Button>
                       </div>

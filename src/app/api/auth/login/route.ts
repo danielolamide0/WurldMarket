@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import dbConnect from '@/lib/mongodb'
 import User from '@/models/User'
+import Vendor from '@/models/Vendor'
 
 export async function POST(request: NextRequest) {
   try {
@@ -9,9 +10,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     const { identifier, password } = body
 
-    // Support both 'identifier' (new) and 'username' (legacy) field names
     const loginIdentifier = identifier || body.username
-
     if (!loginIdentifier || !password) {
       return NextResponse.json(
         { error: 'Email/username and password are required' },
@@ -20,16 +19,40 @@ export async function POST(request: NextRequest) {
     }
 
     const normalizedIdentifier = loginIdentifier.toLowerCase().trim()
-
-    // Check if identifier looks like an email
     const isEmail = normalizedIdentifier.includes('@')
 
-    // Find user by email or username
-    let user
+    let user = null
     if (isEmail) {
       user = await User.findOne({ email: normalizedIdentifier })
     } else {
       user = await User.findOne({ username: normalizedIdentifier })
+    }
+
+    // If no User found by email, try Vendor (contactEmail + password) for legacy vendor accounts
+    if (!user && isEmail) {
+      const vendor = await Vendor.findOne({
+        contactEmail: normalizedIdentifier,
+      })
+      if (vendor?.password !== undefined && vendor.password !== null && String(vendor.password) === String(password)) {
+        const emailPrefix = normalizedIdentifier.split('@')[0].toLowerCase().replace(/[^a-z0-9]/g, '') || 'vendor'
+        let username = emailPrefix
+        let counter = 0
+        while (await User.findOne({ username })) {
+          counter++
+          username = `${emailPrefix}${counter}`
+        }
+        user = await User.create({
+          username,
+          password: vendor.password,
+          role: 'vendor',
+          name: vendor.name,
+          email: vendor.contactEmail,
+          phone: vendor.contactPhone || '',
+          vendorId: vendor._id,
+          authMethod: 'email',
+          isEmailVerified: true,
+        })
+      }
     }
 
     if (!user) {
@@ -39,7 +62,6 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // In production, use bcrypt.compare
     if (user.password !== password) {
       return NextResponse.json(
         { error: 'Incorrect password' },

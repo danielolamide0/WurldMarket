@@ -19,8 +19,22 @@ export async function POST(request: NextRequest) {
 
     const normalizedNewEmail = newEmail.toLowerCase().trim()
 
+    const user = await User.findById(userId)
+    if (!user) {
+      return NextResponse.json({ error: 'User not found' }, { status: 404 })
+    }
+
+    const currentEmail = (user.email || '').toLowerCase().trim()
+    if (!currentEmail) {
+      return NextResponse.json(
+        { error: 'Account has no email on file.' },
+        { status: 400 }
+      )
+    }
+
+    // Code was sent to current email; verify it
     const verificationCode = await VerificationCode.findOne({
-      email: normalizedNewEmail,
+      email: currentEmail,
       code,
       type: 'email-change',
       used: false,
@@ -34,9 +48,11 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const user = await User.findById(userId)
-    if (!user) {
-      return NextResponse.json({ error: 'User not found' }, { status: 404 })
+    if (normalizedNewEmail === currentEmail) {
+      return NextResponse.json(
+        { error: 'New email is the same as your current email' },
+        { status: 400 }
+      )
     }
 
     // Ensure no other user has taken this email since the code was sent
