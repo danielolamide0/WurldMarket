@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
+import mongoose from 'mongoose'
 import dbConnect from '@/lib/mongodb'
+import { GUEST_CUSTOMER_OBJECT_ID } from '@/lib/constants'
 import Order from '@/models/Order'
 import Product from '@/models/Product'
 import Store from '@/models/Store'
@@ -16,6 +18,7 @@ export async function GET(request: NextRequest) {
     const customerId = searchParams.get('customerId')
     const vendorId = searchParams.get('vendorId')
     const status = searchParams.get('status')
+    const isGuestOrder = searchParams.get('isGuestOrder')
 
     if (orderId) {
       const order = await Order.findById(orderId)
@@ -29,6 +32,8 @@ export async function GET(request: NextRequest) {
     if (customerId) query.customerId = customerId
     if (vendorId) query.vendorId = vendorId
     if (status) query.status = status
+    if (isGuestOrder === 'true') query.isGuestOrder = true
+    if (isGuestOrder === 'false') query.isGuestOrder = false
 
     const orders = await Order.find(query).sort({ createdAt: -1 })
 
@@ -53,6 +58,12 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
     }
 
+    // Guest checkout: persist in same Order collection with sentinel ID and isGuestOrder flag
+    const isGuest = customerId === 'guest'
+    const orderCustomerId = isGuest
+      ? new mongoose.Types.ObjectId(GUEST_CUSTOMER_OBJECT_ID)
+      : customerId
+
     // Look up store name if not provided
     let resolvedStoreName = storeName
     if (!resolvedStoreName) {
@@ -61,9 +72,21 @@ export async function POST(request: NextRequest) {
     }
 
     const order = await Order.create({
-      customerId, customerName, customerPhone, vendorId, storeId, storeName: resolvedStoreName,
-      items, subtotal, deliveryFee: deliveryFee || 0, total,
-      status: 'pending', orderType, deliveryAddress, notes,
+      customerId: orderCustomerId,
+      customerName,
+      customerPhone,
+      vendorId,
+      storeId,
+      storeName: resolvedStoreName,
+      items,
+      subtotal,
+      deliveryFee: deliveryFee || 0,
+      total,
+      status: 'pending',
+      orderType,
+      deliveryAddress,
+      notes,
+      isGuestOrder: isGuest,
     })
 
     // Decrement stock and check low-stock alerts (don't let email break the order)
@@ -153,6 +176,7 @@ function formatOrder(order: InstanceType<typeof Order>) {
     orderType: order.orderType,
     deliveryAddress: order.deliveryAddress,
     notes: order.notes,
+    isGuestOrder: !!order.isGuestOrder,
     createdAt: order.createdAt.toISOString(),
     updatedAt: order.updatedAt.toISOString(),
   }

@@ -225,3 +225,6 @@ export const ORDER_STATUS_COLORS: Record<string, string> = {
 export const DELIVERY_FEE = 3.99
 export const FREE_DELIVERY_THRESHOLD = 30
 export const MIN_ORDER_AMOUNT = 10
+
+/** Sentinel ObjectId for guest orders (24-char hex). Use with mongoose.Types.ObjectId(GUEST_CUSTOMER_OBJECT_ID). */
+export const GUEST_CUSTOMER_OBJECT_ID = '000000000000000000000000'

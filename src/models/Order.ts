@@ -28,6 +28,8 @@ export interface IOrder extends Document {
   orderType: OrderType
   deliveryAddress?: string
   notes?: string
+  /** True when order was placed as guest (no account); use for analytics and filtering. */
+  isGuestOrder?: boolean
   createdAt: Date
   updatedAt: Date
 }
@@ -64,6 +66,7 @@ const OrderSchema = new Schema<IOrder>(
     orderType: { type: String, enum: ['delivery', 'pickup'], required: true },
     deliveryAddress: { type: String, trim: true },
     notes: { type: String, trim: true },
+    isGuestOrder: { type: Boolean, default: false },
   },
   { timestamps: true }
 )
@@ -72,6 +75,7 @@ OrderSchema.index({ customerId: 1 })
 OrderSchema.index({ vendorId: 1 })
 OrderSchema.index({ status: 1 })
 OrderSchema.index({ createdAt: -1 })
+OrderSchema.index({ isGuestOrder: 1 })
 
 const Order: Model<IOrder> = mongoose.models.Order || mongoose.model<IOrder>('Order', OrderSchema)
 export default Order
