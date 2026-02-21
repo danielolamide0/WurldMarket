@@ -58,7 +58,7 @@ export default function VendorDashboardPage() {
     user?.vendorId ? state.getProductsByVendor(user.vendorId) : []
   )
   const lowStockProducts = useProductStore((state) =>
-    user?.vendorId ? state.getLowStockProducts(user.vendorId, 10) : []
+    user?.vendorId ? state.getLowStockProducts(user.vendorId) : []
   )
   const orders = useOrderStore((state) =>
     user?.vendorId ? state.getOrdersByVendor(user.vendorId) : []
@@ -327,7 +327,7 @@ export default function VendorDashboardPage() {
               <AlertTriangle className="h-5 w-5 text-amber-500" />
               <h2 className="font-semibold text-gray-900">Low Stock Alert</h2>
             </div>
-            <Link href="/inventory" className="text-sm text-primary hover:underline flex items-center gap-1">
+            <Link href="/inventory?filter=lowStock" className="text-sm text-primary hover:underline flex items-center gap-1">
               Manage <ArrowRight className="h-4 w-4" />
             </Link>
           </CardHeader>

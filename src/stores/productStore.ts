@@ -14,7 +14,7 @@ interface ProductState {
   getProductsByVendor: (vendorId: string) => Product[]
   getProductsByCategory: (category: string) => Product[]
   getProductsByCuisine: (cuisine: CuisineType) => Product[]
-  getLowStockProducts: (vendorId: string, threshold?: number) => Product[]
+  getLowStockProducts: (vendorId: string) => Product[]
 }
 
 export const useProductStore = create<ProductState>()((set, get) => ({
@@ -151,9 +151,13 @@ export const useProductStore = create<ProductState>()((set, get) => ({
         return get().products.filter((p) => p.cuisines?.includes(cuisine) && p.isActive)
       },
 
-      getLowStockProducts: (vendorId, threshold = 10) => {
+      getLowStockProducts: (vendorId) => {
         return get().products.filter(
-          (p) => p.vendorId === vendorId && p.stock <= threshold && p.isActive
+          (p) =>
+            p.vendorId === vendorId &&
+            p.isActive &&
+            (p.lowStockAlert ?? 0) > 0 &&
+            p.stock <= (p.lowStockAlert ?? 0)
         )
       },
 }))

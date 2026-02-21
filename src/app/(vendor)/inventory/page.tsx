@@ -1,8 +1,9 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import Link from 'next/link'
-import { Plus, Search, Edit, Trash2, Package, AlertTriangle } from 'lucide-react'
+import { useSearchParams } from 'next/navigation'
+import { Plus, Search, Edit, Trash2, Package, AlertTriangle, X } from 'lucide-react'
 import { useAuthStore } from '@/stores/authStore'
 import { useProductStore } from '@/stores/productStore'
 import { useVendorStore } from '@/stores/vendorStore'
@@ -14,11 +15,19 @@ import { Modal } from '@/components/ui/modal'
 import { formatPrice } from '@/lib/utils'
 import { CATEGORY_MAP } from '@/lib/constants'
 
-export default function InventoryPage() {
+function InventoryContent() {
   const { user } = useAuthStore()
-  const products = useProductStore((state) =>
+  const searchParams = useSearchParams()
+  const filterLowStock = searchParams.get('filter') === 'lowStock'
+
+  const allProducts = useProductStore((state) =>
     user?.vendorId ? state.getProductsByVendor(user.vendorId) : []
   )
+  const lowStockProducts = useProductStore((state) =>
+    user?.vendorId ? state.getLowStockProducts(user.vendorId) : []
+  )
+  const products = filterLowStock ? lowStockProducts : allProducts
+
   const fetchProducts = useProductStore((state) => state.fetchProducts)
   const deleteProduct = useProductStore((state) => state.deleteProduct)
   const updateProduct = useProductStore((state) => state.updateProduct)
@@ -62,11 +71,34 @@ export default function InventoryPage() {
 
   return (
     <div className="p-4 lg:p-8">
+      {/* Low stock filter banner */}
+      {filterLowStock && (
+        <div className="mb-6 flex items-center justify-between gap-4 p-4 bg-amber-50 border border-amber-200 rounded-xl">
+          <div className="flex items-center gap-2">
+            <AlertTriangle className="h-5 w-5 text-amber-600 flex-shrink-0" />
+            <div>
+              <h2 className="font-semibold text-gray-900">Low stock alert</h2>
+              <p className="text-sm text-gray-600">
+                Showing only products at or below their low stock threshold ({lowStockProducts.length} {lowStockProducts.length === 1 ? 'product' : 'products'})
+              </p>
+            </div>
+          </div>
+          <Link href="/inventory">
+            <Button variant="outline" size="sm">
+              <X className="h-4 w-4 mr-1" />
+              View all
+            </Button>
+          </Link>
+        </div>
+      )}
+
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Inventory</h1>
-          <p className="text-gray-600">{products.length} products total</p>
+          <h1 className="text-2xl font-bold text-gray-900">{filterLowStock ? 'Low stock alert' : 'Inventory'}</h1>
+          <p className="text-gray-600">
+            {products.length} {filterLowStock ? 'products at or below threshold' : 'products total'}
+          </p>
         </div>
         <Link href="/inventory/add">
           <Button>
@@ -136,7 +168,7 @@ export default function InventoryPage() {
                 <tbody className="divide-y divide-gray-100">
                   {filteredProducts.map((product) => {
                     const store = vendorStores.find((s) => s.id === product.storeId)
-                    const isLowStock = product.stock <= 10
+                    const isLowStock = (product.lowStockAlert ?? 0) > 0 && product.stock <= (product.lowStockAlert ?? 0)
 
                     return (
                       <tr key={product.id} className="hover:bg-gray-50">
@@ -208,7 +240,7 @@ export default function InventoryPage() {
           <div className="lg:hidden space-y-4">
             {filteredProducts.map((product) => {
               const store = vendorStores.find((s) => s.id === product.storeId)
-              const isLowStock = product.stock <= 10
+              const isLowStock = (product.lowStockAlert ?? 0) > 0 && product.stock <= (product.lowStockAlert ?? 0)
 
               return (
                 <Card key={product.id} className="p-4">
@@ -306,5 +338,13 @@ export default function InventoryPage() {
         </div>
       </Modal>
     </div>
+  )
+}
+
+export default function InventoryPage() {
+  return (
+    <Suspense fallback={<div className="p-4 lg:p-8 flex items-center justify-center min-h-[200px]">Loading...</div>}>
+      <InventoryContent />
+    </Suspense>
   )
 }
