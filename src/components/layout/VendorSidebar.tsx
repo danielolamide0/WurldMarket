@@ -23,8 +23,7 @@ const navItems = [
   { href: '/inventory', icon: Package, label: 'Inventory' },
   { href: '/vendor/orders', icon: ShoppingCart, label: 'Orders' },
   { href: '/my-stores', icon: Store, label: 'My Stores' },
-  { href: '/settings', icon: Settings, label: 'Settings' },
-  { href: '/account', icon: User, label: 'Account' },
+  { href: '/settings', icon: Settings, label: 'Account' },
   { href: '/account/permissions', icon: Shield, label: 'Permissions' },
 ]
 

@@ -18,28 +18,34 @@ function getResendClient(): Resend {
 export async function sendVerificationEmail(
   email: string,
   code: string,
-  type: 'signup' | 'password-reset' | 'email-change'
+  type: 'signup' | 'password-reset' | 'email-change' | 'delete-vendor-account'
 ): Promise<{ success: boolean; error?: string }> {
   const subject =
     type === 'signup'
       ? 'Verify your WurldBasket account'
       : type === 'password-reset'
         ? 'Reset your WurldBasket password'
-        : 'Confirm your new email address'
+        : type === 'email-change'
+          ? 'Confirm your new email address'
+          : 'Confirm delete vendor account'
 
   const heading =
     type === 'signup'
       ? 'Welcome to WurldBasket!'
       : type === 'password-reset'
         ? 'Password Reset Request'
-        : 'Confirm New Email'
+        : type === 'email-change'
+          ? 'Confirm New Email'
+          : 'Delete Vendor Account'
 
   const message =
     type === 'signup'
       ? 'Use the code below to verify your email address and complete your registration.'
       : type === 'password-reset'
         ? 'Use the code below to reset your password. If you did not request this, please ignore this email.'
-        : 'Use the code below to confirm your new email address. If you did not request this change, please ignore this email.'
+        : type === 'email-change'
+          ? 'Use the code below to confirm your new email address. If you did not request this change, please ignore this email.'
+          : 'Use the code below to permanently delete your vendor account and all associated data (stores, products, orders). This cannot be undone.'
 
   try {
     const client = getResendClient()

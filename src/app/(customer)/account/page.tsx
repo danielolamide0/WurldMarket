@@ -1,6 +1,7 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
+import { useEffect } from 'react'
 import Link from 'next/link'
 import {
   User,
@@ -29,6 +30,13 @@ export default function AccountPage() {
   const router = useRouter()
   const { user, isAuthenticated, logout } = useAuthStore()
 
+  // Vendors see vendor account (store name, description, email, phone, delete) at /settings
+  useEffect(() => {
+    if (isAuthenticated && user?.role === 'vendor') {
+      router.replace('/settings')
+    }
+  }, [isAuthenticated, user?.role, router])
+
   const handleLogout = () => {
     logout()
     router.push('/')
@@ -48,6 +56,15 @@ export default function AccountPage() {
             <Button size="lg" className="w-full">Sign in / Sign up</Button>
           </Link>
         </div>
+      </div>
+    )
+  }
+
+  // Vendors are redirected to /settings in useEffect; show loading until then
+  if (user?.role === 'vendor') {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />
       </div>
     )
   }

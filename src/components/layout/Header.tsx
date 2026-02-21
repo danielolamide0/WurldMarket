@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { ShoppingCart, User, Search, LogOut, X, MapPin, Package, Menu, ChevronDown, Check } from 'lucide-react'
+import { ShoppingCart, User, Search, LogOut, X, MapPin, Package, Menu, ChevronDown, Check, Home, ShoppingBasket } from 'lucide-react'
 import { useAuthStore } from '@/stores/authStore'
 import { useCartStore } from '@/stores/cartStore'
 import { useProductStore } from '@/stores/productStore'
@@ -695,21 +695,21 @@ export function Header() {
               )}
             </div>
 
-            {/* Menu Items */}
+            {/* Menu Items - same as mobile bottom nav: Home, Orders, Regulars, Account */}
             <nav className="p-4">
               <ul className="space-y-1">
+                <li>
+                  <Link
+                    href="/"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-100 text-gray-700"
+                  >
+                    <Home className="h-5 w-5" />
+                    Home
+                  </Link>
+                </li>
                 {isAuthenticated && (
                   <>
-                    <li>
-                      <Link
-                        href="/checkout"
-                        onClick={() => setIsMobileMenuOpen(false)}
-                        className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-100 text-gray-700"
-                      >
-                        <ShoppingCart className="h-5 w-5" />
-                        Checkout
-                      </Link>
-                    </li>
                     <li>
                       <Link
                         href="/orders"
@@ -717,7 +717,17 @@ export function Header() {
                         className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-100 text-gray-700"
                       >
                         <Package className="h-5 w-5" />
-                        Your Orders
+                        Orders
+                      </Link>
+                    </li>
+                    <li>
+                      <Link
+                        href="/regulars"
+                        onClick={() => setIsMobileMenuOpen(false)}
+                        className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-100 text-gray-700"
+                      >
+                        <ShoppingBasket className="h-5 w-5" />
+                        Regulars
                       </Link>
                     </li>
                     <li>
@@ -727,45 +737,11 @@ export function Header() {
                         className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-100 text-gray-700"
                       >
                         <User className="h-5 w-5" />
-                        Your Account
-                      </Link>
-                    </li>
-                    <li>
-                      <Link
-                        href="/regulars"
-                        onClick={() => setIsMobileMenuOpen(false)}
-                        className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-100 text-gray-700"
-                      >
-                        <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                        </svg>
-                        Your Regulars
+                        Account
                       </Link>
                     </li>
                   </>
                 )}
-                <li className="border-t border-gray-100 pt-2 mt-2">
-                  <Link
-                    href="/stores"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                    className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-100 text-gray-700"
-                  >
-                    <MapPin className="h-5 w-5" />
-                    Groceries
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href="/regulars"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                    className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-100 text-gray-700"
-                  >
-                    <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                    </svg>
-                    Regulars & Favourites
-                  </Link>
-                </li>
               </ul>
             </nav>
 

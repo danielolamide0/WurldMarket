@@ -22,7 +22,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    if (!['signup', 'password-reset', 'email-change'].includes(type)) {
+    if (!['signup', 'password-reset', 'email-change', 'delete-vendor-account'].includes(type)) {
       return NextResponse.json(
         { error: 'Invalid verification type' },
         { status: 400 }
@@ -31,7 +31,7 @@ export async function POST(request: NextRequest) {
 
     let normalizedEmail: string
 
-    if (type === 'email-change') {
+    if (type === 'email-change' || type === 'delete-vendor-account') {
       // Code is sent to the user's CURRENT email to confirm they own the account
       const userId = body.userId
       if (!userId) {
@@ -50,6 +50,9 @@ export async function POST(request: NextRequest) {
           { error: 'Your account has no email on file. Cannot send verification.' },
           { status: 400 }
         )
+      }
+      if (type === 'delete-vendor-account' && currentUser.role !== 'vendor') {
+        return NextResponse.json({ error: 'Only vendors can request this' }, { status: 403 })
       }
       normalizedEmail = currentEmail
     } else {
@@ -70,7 +73,7 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    if (type !== 'email-change') {
+    if (type !== 'email-change' && type !== 'delete-vendor-account') {
       const existingUser = await User.findOne({ email: normalizedEmail })
       if (type === 'signup') {
         if (existingUser) {

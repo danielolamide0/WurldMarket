@@ -4,7 +4,7 @@ export interface IVerificationCode extends Document {
   _id: mongoose.Types.ObjectId
   email: string
   code: string
-  type: 'signup' | 'password-reset' | 'email-change'
+  type: 'signup' | 'password-reset' | 'email-change' | 'delete-vendor-account'
   expiresAt: Date
   used: boolean
   createdAt: Date
@@ -25,7 +25,7 @@ const VerificationCodeSchema = new Schema<IVerificationCode>(
     },
     type: {
       type: String,
-      enum: ['signup', 'password-reset', 'email-change'],
+      enum: ['signup', 'password-reset', 'email-change', 'delete-vendor-account'],
       required: true,
     },
     expiresAt: {
