@@ -2,16 +2,18 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { Search, Package, ChevronDown, ChevronUp, Phone, MapPin, Clock, ArrowLeft } from 'lucide-react'
+import { Search, Package, ChevronDown, ChevronUp, Phone, MapPin, Clock, ArrowLeft, RotateCcw } from 'lucide-react'
 import { useAuthStore } from '@/stores/authStore'
 import { useOrderStore } from '@/stores/orderStore'
 import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
+import { Modal } from '@/components/ui/modal'
 import { formatPrice, formatDateTime } from '@/lib/utils'
 import { ORDER_STATUS_LABELS, ORDER_STATUS_COLORS } from '@/lib/constants'
 import { OrderStatus } from '@/types'
+import type { Order } from '@/types'
 
 const statusOptions: OrderStatus[] = ['pending', 'confirmed', 'preparing', 'ready', 'completed', 'cancelled']
 
@@ -33,6 +35,7 @@ export default function VendorOrdersPage() {
   const [searchQuery, setSearchQuery] = useState('')
   const [statusFilter, setStatusFilter] = useState<string>('all')
   const [expandedOrder, setExpandedOrder] = useState<string | null>(null)
+  const [cancelOrder, setCancelOrder] = useState<Order | null>(null)
 
   // Filter orders
   const filteredOrders = orders.filter((order) => {
@@ -43,8 +46,19 @@ export default function VendorOrdersPage() {
     return matchesSearch && matchesStatus
   })
 
-  const handleStatusChange = (orderId: string, newStatus: OrderStatus) => {
-    updateOrderStatus(orderId, newStatus)
+  const handleStatusChange = (orderId: string, newStatus: OrderStatus, restoreInventory?: boolean) => {
+    updateOrderStatus(orderId, newStatus, restoreInventory !== undefined ? { restoreInventory } : undefined)
+  }
+
+  const handleCancelClick = (order: Order) => {
+    setCancelOrder(order)
+  }
+
+  const handleCancelConfirm = (restoreInventory: boolean) => {
+    if (!cancelOrder) return
+    handleStatusChange(cancelOrder.id, 'cancelled', restoreInventory)
+    setCancelOrder(null)
+    setExpandedOrder(null)
   }
 
   const getNextStatus = (currentStatus: OrderStatus): OrderStatus | null => {
@@ -221,7 +235,7 @@ export default function VendorOrdersPage() {
                           variant="outline"
                           onClick={(e) => {
                             e.stopPropagation()
-                            handleStatusChange(order.id, 'cancelled')
+                            handleCancelClick(order)
                           }}
                           className="text-red-600 border-red-200 hover:bg-red-50"
                         >
@@ -236,6 +250,51 @@ export default function VendorOrdersPage() {
           })}
         </div>
       )}
+
+      {/* Cancel order: ask if vendor wants to restore inventory */}
+      <Modal
+        isOpen={!!cancelOrder}
+        onClose={() => setCancelOrder(null)}
+        title="Cancel order?"
+        size="sm"
+      >
+        {cancelOrder && (
+          <div className="space-y-4">
+            <p className="text-gray-600">
+              Do you want to add the order quantities back to inventory?
+            </p>
+            <ul className="text-sm text-gray-500 list-disc list-inside space-y-1">
+              {cancelOrder.items.map((item) => (
+                <li key={item.productId}>
+                  {item.productName}: {item.quantity} back to stock
+                </li>
+              ))}
+            </ul>
+            <div className="flex flex-col gap-2 pt-2">
+              <Button
+                onClick={() => handleCancelConfirm(true)}
+                className="w-full"
+              >
+                <RotateCcw className="h-4 w-4 mr-2" />
+                Cancel order & add back to inventory
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => handleCancelConfirm(false)}
+                className="w-full text-red-600 border-red-200 hover:bg-red-50"
+              >
+                Cancel order only (don’t restore stock)
+              </Button>
+              <button
+                onClick={() => setCancelOrder(null)}
+                className="text-sm text-gray-500 hover:text-gray-700 py-2"
+              >
+                Keep order
+              </button>
+            </div>
+          </div>
+        )}
+      </Modal>
     </div>
   )
 }

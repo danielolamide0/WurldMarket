@@ -134,18 +134,32 @@ export async function PUT(request: NextRequest) {
     await dbConnect()
 
     const body = await request.json()
-    const { id, status } = body
+    const { id, status, restoreInventory } = body
 
     if (!id || !status) {
       return NextResponse.json({ error: 'Order ID and status are required' }, { status: 400 })
     }
 
-    const order = await Order.findByIdAndUpdate(id, { status }, { new: true })
+    const order = await Order.findById(id)
     if (!order) {
       return NextResponse.json({ error: 'Order not found' }, { status: 404 })
     }
 
-    return NextResponse.json({ order: formatOrder(order) })
+    const updated = await Order.findByIdAndUpdate(id, { status }, { new: true })
+    if (!updated) {
+      return NextResponse.json({ error: 'Order not found' }, { status: 404 })
+    }
+
+    // When cancelling, optionally add each item's quantity back to product stock
+    if (status === 'cancelled' && restoreInventory === true && order.items?.length) {
+      for (const item of order.items) {
+        await Product.findByIdAndUpdate(item.productId, {
+          $inc: { stock: item.quantity },
+        })
+      }
+    }
+
+    return NextResponse.json({ order: formatOrder(updated) })
   } catch (error) {
     console.error('Update order error:', error)
     return NextResponse.json({ error: 'Failed to update order' }, { status: 500 })

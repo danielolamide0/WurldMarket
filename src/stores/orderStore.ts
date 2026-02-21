@@ -15,7 +15,7 @@ interface OrderState {
     deliveryAddress?: string,
     notes?: string
   ) => Promise<Order | null>
-  updateOrderStatus: (orderId: string, status: OrderStatus) => Promise<void>
+  updateOrderStatus: (orderId: string, status: OrderStatus, options?: { restoreInventory?: boolean }) => Promise<void>
   getOrderById: (orderId: string) => Order | undefined
   getOrdersByVendor: (vendorId: string) => Order[]
   getOrdersByCustomer: (customerId: string) => Order[]
@@ -120,7 +120,7 @@ export const useOrderStore = create<OrderState>()(
         }
       },
 
-      updateOrderStatus: async (orderId, status) => {
+      updateOrderStatus: async (orderId, status, options) => {
         const originalOrders = get().orders
         // Optimistically update
         set((state) => ({
@@ -132,10 +132,14 @@ export const useOrderStore = create<OrderState>()(
         }))
 
         try {
+          const body: { id: string; status: OrderStatus; restoreInventory?: boolean } = { id: orderId, status }
+          if (status === 'cancelled' && options?.restoreInventory === true) {
+            body.restoreInventory = true
+          }
           const response = await fetch('/api/orders', {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ id: orderId, status }),
+            body: JSON.stringify(body),
           })
 
           if (!response.ok) {
