@@ -129,20 +129,20 @@ export function ProductCard({ product, showStoreName }: ProductCardProps) {
             <span className="text-lg font-bold text-primary">{formatPrice(product.price)}</span>
 
             {isInCart ? (
-              <div className="flex items-center gap-2 bg-primary-light rounded-xl p-1">
+              <div className="flex items-center gap-1">
                 <button
                   onClick={handleDecreaseQuantity}
-                  className="p-1.5 rounded-lg hover:bg-primary transition-colors text-white"
+                  className="w-7 h-7 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 transition-colors"
                 >
-                  <Minus className="h-4 w-4" />
+                  <Minus className="h-3 w-3" />
                 </button>
-                <span className="w-6 text-center font-semibold text-white">{quantityInCart}</span>
+                <span className="w-5 text-center text-sm font-medium text-gray-900">{quantityInCart}</span>
                 <button
                   onClick={handleIncreaseQuantity}
                   disabled={quantityInCart >= product.stock}
-                  className="p-1.5 rounded-lg hover:bg-primary transition-colors text-white disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-7 h-7 flex items-center justify-center rounded-full bg-primary text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  <Plus className="h-4 w-4" />
+                  <Plus className="h-3 w-3" />
                 </button>
               </div>
             ) : (
