@@ -87,21 +87,8 @@ export async function POST(request: NextRequest) {
       vendorId = vendor._id
     }
 
-    // Create user with email-based auth
-    // Generate a unique username from email (for backward compatibility)
-    const emailPrefix = normalizedEmail.split('@')[0]
-    let username = emailPrefix.toLowerCase().replace(/[^a-z0-9]/g, '')
-
-    // Ensure username is unique
-    let counter = 0
-    let finalUsername = username
-    while (await User.findOne({ username: finalUsername })) {
-      counter++
-      finalUsername = `${username}${counter}`
-    }
-
+    // Create user with email-based auth (email only, no username)
     const user = await User.create({
-      username: finalUsername,
       password,
       role,
       name,
@@ -129,13 +116,12 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       user: {
         id: user._id.toString(),
-        username: user.username,
         role: user.role,
         name: user.name,
         email: user.email,
         phone: user.phone,
         vendorId: vendorId?.toString(),
-        authMethod: user.authMethod,
+        authMethod: 'email',
         isEmailVerified: user.isEmailVerified,
         createdAt: user.createdAt.toISOString(),
       },

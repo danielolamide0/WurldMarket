@@ -427,15 +427,15 @@ export async function POST() {
       })
       createdStores.push(store)
 
-      // Create vendor user
-      const username = storeData.vendorSlug.replace(/-/g, '')
+      // Create vendor user (email-only auth)
       const user = await User.create({
-        username,
-        password: username, // Simple password for demo
+        password: storeData.vendorSlug.replace(/-/g, ''),
         role: 'vendor',
         name: `${storeData.vendorName} Admin`,
         email: `admin@${storeData.vendorSlug.replace(/-/g, '')}.com`,
         vendorId: vendor._id,
+        authMethod: 'email',
+        isEmailVerified: true,
       })
       createdUsers.push(user)
 

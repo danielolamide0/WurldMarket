@@ -76,13 +76,12 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       user: {
         id: user._id.toString(),
-        username: user.username,
         role: user.role,
         name: user.name,
         email: user.email,
         phone: user.phone,
         vendorId: user.vendorId?.toString(),
-        authMethod: user.authMethod,
+        authMethod: 'email',
         isEmailVerified: user.isEmailVerified,
         createdAt: user.createdAt.toISOString(),
       },

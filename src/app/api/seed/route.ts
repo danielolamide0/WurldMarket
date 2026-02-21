@@ -103,23 +103,25 @@ export async function POST() {
 
     console.log('✅ Stores created')
 
-    // 3. Create Users (vendor accounts only; no default customer account)
+    // 3. Create Users (vendor accounts; email-only auth)
     await User.create({
-      username: 'abubakr',
       password: 'abubakr',
       role: 'vendor',
       name: 'Abu Bakr Admin',
       email: 'admin@abubakr.com',
       vendorId: abubakrVendor._id,
+      authMethod: 'email',
+      isEmailVerified: true,
     })
 
     await User.create({
-      username: 'sunday',
       password: 'sunday',
       role: 'vendor',
       name: 'Sunday Admin',
       email: 'admin@sunnyday.com',
       vendorId: sunnydayVendor._id,
+      authMethod: 'email',
+      isEmailVerified: true,
     })
 
     console.log('✅ Users created')
@@ -189,8 +191,8 @@ export async function GET() {
   return NextResponse.json({
     message: 'Use POST to seed the database',
     credentials: {
-      vendor1: { username: 'abubakr', password: 'abubakr' },
-      vendor2: { username: 'sunday', password: 'sunday' },
+      vendor1: { email: 'admin@abubakr.com', password: 'abubakr' },
+      vendor2: { email: 'admin@sunnyday.com', password: 'sunday' },
     }
   })
 }

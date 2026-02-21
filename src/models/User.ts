@@ -2,14 +2,13 @@ import mongoose, { Schema, Document, Model } from 'mongoose'
 
 export interface IUser extends Document {
   _id: mongoose.Types.ObjectId
-  username: string
   password: string
   role: 'customer' | 'vendor'
   name: string
   email?: string
   phone?: string
   vendorId?: mongoose.Types.ObjectId
-  authMethod: 'username' | 'email'
+  authMethod: 'email'
   isEmailVerified: boolean
   createdAt: Date
   updatedAt: Date
@@ -17,13 +16,6 @@ export interface IUser extends Document {
 
 const UserSchema = new Schema<IUser>(
   {
-    username: {
-      type: String,
-      required: true,
-      unique: true,
-      trim: true,
-      lowercase: true,
-    },
     password: {
       type: String,
       required: true,
@@ -53,8 +45,8 @@ const UserSchema = new Schema<IUser>(
     },
     authMethod: {
       type: String,
-      enum: ['username', 'email'],
-      default: 'username',
+      enum: ['email'],
+      default: 'email',
     },
     isEmailVerified: {
       type: Boolean,
@@ -64,7 +56,6 @@ const UserSchema = new Schema<IUser>(
   { timestamps: true }
 )
 
-// username already has unique: true which creates an index
 // One email per account across the app (customer or vendor); sparse allows legacy users without email
 UserSchema.index({ email: 1 }, { unique: true, sparse: true })
 

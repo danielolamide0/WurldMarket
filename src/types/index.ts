@@ -3,15 +3,14 @@ export type UserRole = 'customer' | 'vendor'
 
 export interface User {
   id: string
-  username: string
-  password: string // For demo only - never store plain passwords in production!
+  password?: string // Never expose in API responses
   role: UserRole
   name: string
   email?: string
-  phone?: string // Customer phone number
-  vendorId?: string // Links vendor user to their vendor profile
-  authMethod?: 'username' | 'email' // How the user authenticates
-  isEmailVerified?: boolean // Whether email has been verified
+  phone?: string
+  vendorId?: string
+  authMethod?: 'email'
+  isEmailVerified?: boolean
   createdAt: string
 }
 

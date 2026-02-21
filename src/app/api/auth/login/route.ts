@@ -10,32 +10,29 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     const { identifier, password } = body
 
-    const loginIdentifier = identifier || body.username
-    if (!loginIdentifier || !password) {
+    const email = (identifier || body.email || '').toString().toLowerCase().trim()
+    if (!email || !password) {
       return NextResponse.json(
-        { error: 'Email/username and password are required' },
+        { error: 'Email and password are required' },
+        { status: 400 }
+      )
+    }
+    if (!email.includes('@')) {
+      return NextResponse.json(
+        { error: 'Please enter your email address to sign in' },
         { status: 400 }
       )
     }
 
-    const normalizedIdentifier = loginIdentifier.toLowerCase().trim()
-    const isEmail = normalizedIdentifier.includes('@')
+    console.log('[Login DEBUG] email:', JSON.stringify(email), 'passwordLength:', password?.length)
 
-    console.log('[Login DEBUG] identifier (normalized):', JSON.stringify(normalizedIdentifier), 'isEmail:', isEmail, 'passwordLength:', password?.length)
-
-    let user = null
-    if (isEmail) {
-      user = await User.findOne({ email: normalizedIdentifier })
-      console.log('[Login DEBUG] User lookup by email:', user ? `found id=${user._id}` : 'not found')
-    } else {
-      user = await User.findOne({ username: normalizedIdentifier })
-      console.log('[Login DEBUG] User lookup by username:', user ? `found id=${user._id}` : 'not found')
-    }
+    let user = await User.findOne({ email })
+    console.log('[Login DEBUG] User lookup by email:', user ? `found id=${user._id}` : 'not found')
 
     // If no User found by email, try Vendor (contactEmail + password) for legacy vendor accounts
-    if (!user && isEmail) {
+    if (!user) {
       const vendor = await Vendor.findOne({
-        contactEmail: normalizedIdentifier,
+        contactEmail: email,
       })
       console.log('[Login DEBUG] Vendor lookup by contactEmail:', vendor ? `found id=${vendor._id} name=${vendor.name}` : 'not found')
       if (vendor) {
@@ -50,15 +47,7 @@ export async function POST(request: NextRequest) {
       const passwordMatches = vendorPwOk && (String(vendor.password) === String(password) || String(vendor.password).trim() === String(password).trim())
       if (vendor && vendorPwOk && passwordMatches) {
         console.log('[Login DEBUG] Vendor password matched -> creating User for vendor id=', vendor._id)
-        const emailPrefix = normalizedIdentifier.split('@')[0].toLowerCase().replace(/[^a-z0-9]/g, '') || 'vendor'
-        let username = emailPrefix
-        let counter = 0
-        while (await User.findOne({ username })) {
-          counter++
-          username = `${emailPrefix}${counter}`
-        }
         user = await User.create({
-          username,
           password: vendor.password,
           role: 'vendor',
           name: vendor.name,
@@ -74,13 +63,31 @@ export async function POST(request: NextRequest) {
     if (!user) {
       console.log('[Login DEBUG] No user -> 401 Invalid')
       return NextResponse.json(
-        { error: 'Invalid email/username or password' },
+        { error: 'Invalid email or password' },
         { status: 401 }
       )
     }
 
-    const userPwMatch = user.password === password
+    let userPwMatch = user.password === password
+    const userPwTrimmed = String(user.password ?? '').trim() === String(password ?? '').trim()
+    if (!userPwMatch && userPwTrimmed) userPwMatch = true
     console.log('[Login DEBUG] User password check: userPwLength=', String(user.password ?? '').length, 'inputPwLength=', String(password ?? '').length, 'match=', userPwMatch)
+
+    // User exists but wrong password: if they're a vendor, try Vendor's password (sync User to Vendor)
+    if (!userPwMatch && user.vendorId) {
+      const vendor = await Vendor.findById(user.vendorId)
+      if (vendor?.password !== undefined && vendor?.password !== null) {
+        const vendorPw = String(vendor.password).trim()
+        const inputPw = String(password).trim()
+        if (vendorPw === inputPw) {
+          console.log('[Login DEBUG] User password wrong but Vendor password matched -> syncing User.password to Vendor')
+          user.password = vendor.password
+          await user.save()
+          userPwMatch = true
+        }
+      }
+    }
+
     if (!userPwMatch) {
       console.log('[Login DEBUG] Password mismatch -> 401 Incorrect password')
       return NextResponse.json(
@@ -92,14 +99,13 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       user: {
         id: user._id.toString(),
-        username: user.username,
         role: user.role,
         name: user.name,
         email: user.email,
         phone: user.phone,
         vendorId: user.vendorId?.toString(),
-        authMethod: user.authMethod || 'username',
-        isEmailVerified: user.isEmailVerified || false,
+        authMethod: 'email',
+        isEmailVerified: user.isEmailVerified ?? false,
         createdAt: user.createdAt.toISOString(),
       },
     })

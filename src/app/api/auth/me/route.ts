@@ -19,7 +19,6 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({
       user: {
         id: user._id.toString(),
-        username: user.username,
         role: user.role,
         name: user.name,
         email: user.email,
@@ -59,7 +58,6 @@ export async function PUT(request: NextRequest) {
     return NextResponse.json({
       user: {
         id: user._id.toString(),
-        username: user.username,
         role: user.role,
         name: user.name,
         email: user.email,

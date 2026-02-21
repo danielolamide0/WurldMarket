@@ -34,7 +34,7 @@ export default function LoginPage() {
   const [forgotPasswordStep, setForgotPasswordStep] = useState<ForgotPasswordStep>('email')
 
   // Form fields
-  const [identifier, setIdentifier] = useState('') // email or username for login
+  const [identifier, setIdentifier] = useState('') // email for login
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')

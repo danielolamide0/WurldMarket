@@ -9,7 +9,7 @@ import {
   HelpCircle,
   LogOut,
   ChevronRight,
-  Store,
+  ArrowLeft,
   Settings,
   Shield,
 } from 'lucide-react'
@@ -55,16 +55,12 @@ export default function AccountPage() {
   return (
     <div className="min-h-screen">
       <div className="max-w-3xl mx-auto px-4 py-6">
-        {user?.role === 'vendor' && (
-          <div className="mb-6">
-            <Link href="/dashboard">
-              <Button variant="outline" className="w-full">
-                <Store className="h-4 w-4 mr-2" />
-                Go to Vendor Dashboard
-              </Button>
-            </Link>
-          </div>
-        )}
+        <Link
+          href={user?.role === 'vendor' ? '/dashboard' : '/'}
+          className="inline-flex items-center gap-2 p-2 -ml-2 rounded-xl hover:bg-gray-100 transition-colors mb-4"
+        >
+          <ArrowLeft className="h-5 w-5 text-primary" />
+        </Link>
         {/* Menu Items */}
         <div>
           <Card className="divide-y divide-gray-100">

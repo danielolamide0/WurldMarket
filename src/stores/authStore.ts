@@ -17,8 +17,8 @@ interface AuthState {
   isAuthenticated: boolean
   isLoading: boolean
   error: string | null
-  // Login with email or username
-  login: (identifier: string, password: string) => Promise<boolean>
+  // Login with email
+  login: (email: string, password: string) => Promise<boolean>
   // Email verification flow
   sendVerificationCode: (email: string, type: 'signup' | 'password-reset' | 'email-change', options?: { userId?: string }) => Promise<{ success: boolean; error?: string; timeRemaining?: number }>
   verifyCode: (email: string, code: string, type: 'signup' | 'password-reset') => Promise<{ success: boolean; error?: string }>
@@ -29,8 +29,6 @@ interface AuthState {
   // Change email (send code to new email, then confirm with code)
   sendEmailChangeCode: () => Promise<{ success: boolean; error?: string; timeRemaining?: number }>
   updateEmailWithCode: (newEmail: string, code: string) => Promise<{ success: boolean; error?: string }>
-  // Legacy support
-  checkUsernameExists: (username: string) => Promise<boolean>
   checkEmailExists: (email: string) => Promise<boolean>
   // User management
   updateUser: (updates: Partial<User>) => Promise<boolean>
@@ -258,16 +256,6 @@ export const useAuthStore = create<AuthState>()(
         } catch (error) {
           set({ isLoading: false, error: 'Failed to update email' })
           return { success: false, error: 'Failed to update email' }
-        }
-      },
-
-      checkUsernameExists: async (username: string) => {
-        try {
-          const response = await fetch(`/api/auth/check-username?username=${encodeURIComponent(username)}`)
-          const data = await response.json()
-          return data.exists
-        } catch {
-          return false
         }
       },
 

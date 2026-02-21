@@ -3,8 +3,6 @@ import { User, Vendor } from '@/types'
 export const users: User[] = [
   {
     id: 'vendor-001',
-    username: 'abubakr',
-    password: 'abubakr',
     role: 'vendor',
     name: 'Abu Bakr Admin',
     email: 'admin@abubakr.com',
@@ -13,8 +11,6 @@ export const users: User[] = [
   },
   {
     id: 'vendor-002',
-    username: 'sunday',
-    password: 'sunday',
     role: 'vendor',
     name: 'Sunday Admin',
     email: 'admin@sunnyday.com',
