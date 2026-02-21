@@ -232,7 +232,7 @@ export default function VendorSettingsPage() {
                       <p className="text-sm font-medium text-gray-900">Current email: <strong>{user?.email || contactEmail || '—'}</strong></p>
                       {error && <p className="text-sm text-red-600 bg-red-50 p-3 rounded-xl">{error}</p>}
                       <div className="flex gap-2">
-                        <Button onClick={handleSendEmailChangeCode} size="sm" disabled={isLoading}>Send verification code to current email</Button>
+                        <Button onClick={handleSendEmailChangeCode} size="sm" disabled={isLoading}>Send code</Button>
                         <Button onClick={handleCancelEmail} variant="outline" size="sm"><X className="h-4 w-4 mr-2" /> Cancel</Button>
                       </div>
                     </>

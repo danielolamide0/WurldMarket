@@ -212,7 +212,7 @@ export default function SettingsPage() {
                     {error && <p className="text-sm text-red-600 bg-red-50 p-3 rounded-xl">{error}</p>}
                     <div className="flex gap-2">
                       <Button onClick={handleSendEmailChangeCode} size="sm" className="flex-1" disabled={isLoading}>
-                        Send verification code to current email
+                        Send code
                       </Button>
                       <Button onClick={handleCancelEmail} variant="outline" size="sm" className="flex-1"><X className="h-4 w-4 mr-2" /> Cancel</Button>
                     </div>
