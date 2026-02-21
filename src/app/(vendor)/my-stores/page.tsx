@@ -7,13 +7,7 @@ import {
   ExternalLink,
   Package,
   Plus,
-  Edit2,
   Trash2,
-  Building2,
-  Phone,
-  Mail,
-  FileText,
-  Save,
   X,
 } from 'lucide-react'
 import { useAuthStore } from '@/stores/authStore'
@@ -24,21 +18,14 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
 import { PostcodeLookup } from '@/components/address/PostcodeLookup'
-import { Vendor, StoreLocation } from '@/types'
+import { StoreLocation } from '@/types'
 
 export default function VendorStoresPage() {
   const { user } = useAuthStore()
-  const { getVendorById, updateVendor, getStoresByVendor, createStore, deleteStore, fetchVendors, fetchStores } = useVendorStore()
+  const { getStoresByVendor, createStore, deleteStore, fetchVendors, fetchStores } = useVendorStore()
 
-  const [vendor, setVendor] = useState<Vendor | undefined>(undefined)
   const [vendorStores, setVendorStores] = useState<StoreLocation[]>([])
-  const [isEditingDetails, setIsEditingDetails] = useState(false)
   const [isAddingStore, setIsAddingStore] = useState(false)
-
-  // Editable vendor fields
-  const [description, setDescription] = useState('')
-  const [contactPhone, setContactPhone] = useState('')
-  const [contactEmail, setContactEmail] = useState('')
 
   // New store fields
   const [newStoreName, setNewStoreName] = useState('')
@@ -66,52 +53,16 @@ export default function VendorStoresPage() {
     }
   }, [user?.vendorId, fetchVendors, fetchStores])
 
-  // Load vendor data from store
+  // Load stores from store
   useEffect(() => {
     if (user?.vendorId) {
-      const v = getVendorById(user.vendorId)
-
-      if (v) {
-        setVendor(v)
-        setDescription(v.description || '')
-        setContactPhone(v.contactPhone || '')
-        setContactEmail(v.contactEmail || '')
-      }
-
-      // Get stores
       const stores = getStoresByVendor(user.vendorId)
       setVendorStores(stores)
     }
-  }, [user?.vendorId, getVendorById, getStoresByVendor])
+  }, [user?.vendorId, getStoresByVendor])
 
   const getStoreProductCount = (storeId: string) => {
     return products.filter((p) => p.storeId === storeId).length
-  }
-
-  const handleSaveDetails = () => {
-    if (!user?.vendorId) return
-
-    // Update in vendorStore
-    updateVendor(user.vendorId, {
-      description,
-      contactPhone,
-      contactEmail,
-    })
-
-    // Also update localStorage for newly registered vendors
-    const storedVendors = localStorage.getItem('wurldbasket-vendors')
-    if (storedVendors) {
-      const parsedVendors = JSON.parse(storedVendors)
-      const updatedVendors = parsedVendors.map((v: Vendor) =>
-        v.id === user.vendorId
-          ? { ...v, description, contactPhone, contactEmail }
-          : v
-      )
-      localStorage.setItem('wurldbasket-vendors', JSON.stringify(updatedVendors))
-    }
-
-    setVendor((prev) => prev ? { ...prev, description, contactPhone, contactEmail } : prev)
-    setIsEditingDetails(false)
   }
 
   const handleAddStore = async () => {
@@ -160,102 +111,9 @@ export default function VendorStoresPage() {
     <div className="p-4 lg:p-8">
       {/* Header */}
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">My Business</h1>
-        <p className="text-gray-600">Manage your business details and store locations</p>
+        <h1 className="text-2xl font-bold text-gray-900">My Stores</h1>
+        <p className="text-gray-600">Manage your store locations</p>
       </div>
-
-      {/* Business Details Card */}
-      <Card className="mb-6">
-        <CardContent className="p-6">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-3">
-              <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center">
-                <Building2 className="h-6 w-6 text-primary" />
-              </div>
-              <div>
-                <h2 className="font-semibold text-gray-900">{vendor?.name}</h2>
-                <p className="text-sm text-gray-500">Business Profile</p>
-              </div>
-            </div>
-            {!isEditingDetails && (
-              <Button variant="outline" size="sm" onClick={() => setIsEditingDetails(true)}>
-                <Edit2 className="h-4 w-4 mr-2" />
-                Edit
-              </Button>
-            )}
-          </div>
-
-          {isEditingDetails ? (
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Business Description
-                </label>
-                <textarea
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  placeholder="Tell customers about your business..."
-                  className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent resize-none"
-                  rows={3}
-                />
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <Input
-                  label="Contact Phone"
-                  value={contactPhone}
-                  onChange={(e) => setContactPhone(e.target.value)}
-                  placeholder="+44 123 456 7890"
-                  icon={<Phone className="h-5 w-5" />}
-                />
-                <Input
-                  label="Contact Email"
-                  type="email"
-                  value={contactEmail}
-                  onChange={(e) => setContactEmail(e.target.value)}
-                  placeholder="info@yourbusiness.com"
-                  icon={<Mail className="h-5 w-5" />}
-                />
-              </div>
-              <div className="flex gap-3">
-                <Button onClick={handleSaveDetails}>
-                  <Save className="h-4 w-4 mr-2" />
-                  Save Changes
-                </Button>
-                <Button variant="outline" onClick={() => setIsEditingDetails(false)}>
-                  Cancel
-                </Button>
-              </div>
-            </div>
-          ) : (
-            <div className="space-y-3">
-              <div className="flex items-start gap-2">
-                <FileText className="h-4 w-4 text-gray-400 mt-1" />
-                <p className="text-gray-600">
-                  {vendor?.description || (
-                    <span className="text-gray-400 italic">No description added yet</span>
-                  )}
-                </p>
-              </div>
-              <div className="flex items-center gap-2">
-                <Phone className="h-4 w-4 text-gray-400" />
-                <p className="text-gray-600">
-                  {vendor?.contactPhone || (
-                    <span className="text-gray-400 italic">No phone number added</span>
-                  )}
-                </p>
-              </div>
-              <div className="flex items-center gap-2">
-                <Mail className="h-4 w-4 text-gray-400" />
-                <p className="text-gray-600">
-                  {vendor?.contactEmail || (
-                    <span className="text-gray-400 italic">No email added</span>
-                  )}
-                </p>
-              </div>
-            </div>
-          )}
-        </CardContent>
-      </Card>
 
       {/* Store Locations Section */}
       <div className="flex items-center justify-between mb-4">

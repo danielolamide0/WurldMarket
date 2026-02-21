@@ -7,8 +7,8 @@ import {
   Package,
   ShoppingCart,
   Store,
+  Settings,
   LogOut,
-  ChevronLeft,
   Menu,
   X,
 } from 'lucide-react'
@@ -21,6 +21,7 @@ const navItems = [
   { href: '/inventory', icon: Package, label: 'Inventory' },
   { href: '/vendor/orders', icon: ShoppingCart, label: 'Orders' },
   { href: '/my-stores', icon: Store, label: 'My Stores' },
+  { href: '/settings', icon: Settings, label: 'Settings' },
 ]
 
 export function VendorSidebar() {
@@ -87,14 +88,7 @@ export function VendorSidebar() {
       </nav>
 
       {/* Footer */}
-      <div className="p-4 border-t border-gray-100 space-y-2">
-        <Link
-          href="/"
-          className="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-700 hover:bg-gray-100 transition-colors"
-        >
-          <ChevronLeft className="h-5 w-5" />
-          <span className="font-medium">Back to Store</span>
-        </Link>
+      <div className="p-4 border-t border-gray-100">
         <button
           onClick={handleLogout}
           className="flex items-center gap-3 px-4 py-3 rounded-xl text-red-600 hover:bg-red-50 transition-colors w-full"

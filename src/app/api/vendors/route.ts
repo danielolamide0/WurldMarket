@@ -57,11 +57,16 @@ export async function PUT(request: NextRequest) {
     await dbConnect()
 
     const body = await request.json()
-    const { id, ...updateData } = body
+    const { id, description, contactEmail, contactPhone } = body
 
     if (!id) {
       return NextResponse.json({ error: 'Vendor ID is required' }, { status: 400 })
     }
+
+    const updateData: Record<string, unknown> = {}
+    if (description !== undefined) updateData.description = description
+    if (contactEmail !== undefined) updateData.contactEmail = contactEmail
+    if (contactPhone !== undefined) updateData.contactPhone = contactPhone
 
     const vendor = await Vendor.findByIdAndUpdate(id, updateData, { new: true })
     if (!vendor) {
